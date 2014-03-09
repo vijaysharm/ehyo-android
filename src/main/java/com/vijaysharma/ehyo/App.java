@@ -1,13 +1,15 @@
 package com.vijaysharma.ehyo;
 
-/**
- * Hello world!
- *
- */
+import java.util.List;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+    	List<String> strings = Lists.newArrayList("Hi", "World!", "It's", "Vijay!");
+        System.out.println( Joiner.on(" ").join(strings) );
     }
 }
