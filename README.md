@@ -2,6 +2,14 @@ Ehyo
 ====
 An android scaffolding command line tool.
 
+Building the jar
+----------------
+`mvn package`
+
+Running the command-line
+------------------------
+`java -jar ehyo.jar`
+
 TODO
 ----
 + Provide a way to create a new Android application
