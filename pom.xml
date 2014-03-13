@@ -16,9 +16,15 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+	<groupId>org.mockito</groupId>
+	  <artifactId>mockito-all</artifactId>
+	  <version>1.9.5</version>
+	  <scope>test</scope>
+    </dependency>           
   </dependencies>
   <build>
     <plugins>
@@ -41,6 +47,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.16</version>
+        <configuration>
+          <includes>
+            <include>**/com/vijaysharma/ehyo/AllTests.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
