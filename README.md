@@ -2,6 +2,12 @@ Ehyo
 ====
 An android scaffolding command line tool.
 
+Developing using Eclipse
+------------------------
+`mvn dependency:sources`
+`mvn dependency:resolve -Dclassifier=javadoc`
+`mvn eclipse:eclipse`
+
 Building the jar
 ----------------
 `mvn package`
