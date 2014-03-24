@@ -1,49 +1,52 @@
 package com.vijaysharma.ehyo;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.vijaysharma.ehyo.api.annotations.MakeLogger;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.GradleSettings;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class App 
 {
-	private static final Logger l = LoggerFactory.getLogger(App.class);
+	@MakeLogger
+	private static Logger l;
 	
     public static void main( String[] args ) throws Exception
     {
+    	initializeLoggers();
+    	
     	String directory = "/Users/vsharma/programming/android/MyApplication";
     	File file = new File( directory );
     	if ( ! file.isDirectory() ) {
-    		l.info( "Expected a directory. Got: " + directory );
+    		l.error( "Expected a directory. Got {}", directory );
     		return;
     	}
     	
     	String root = file.getName();
-    	l.info("Root: " + root);
     	
-    	final ProjectRegistryBuilder registry = new ProjectRegistryBuilder( root );
-    	showFiles(file.listFiles(), new FileSystemObserver() {
-			@Override
-			public void onSettings( File settings ) {
-				registry.addSettings( settings );
-			}
-
-			@Override
-			public void onManifest( File manifest ) {
-				registry.addManifest( manifest );
-			}
-
-			@Override
-			public void onBuild( File build ) {
-				registry.addBuild( build );
-			}
-		});
+    	FileObserverProjectBuilder observer = new FileObserverProjectBuilder( root );
+		showFiles(file.listFiles(), observer);
+		
+		ProjectRegistry registry = observer.build();
+    }
+    
+    public static void initializeLoggers() throws Exception {
+    	Reflections reflections = new Reflections("com.vijaysharma.ehyo", new FieldAnnotationsScanner());
+		Set<Field> set = reflections.getFieldsAnnotatedWith(MakeLogger.class);
+    	for (Field field : set) {
+    		field.set(null, LoggerFactory.getLogger(field.getDeclaringClass()));
+		}	
     }
     
 	public static void showFiles(File[] files, FileSystemObserver observer) {
@@ -71,37 +74,52 @@ public class App
     	void onBuild( File build );
     }
     
-    private static class ProjectRegistryBuilder {
+    private static class FileObserverProjectBuilder implements FileSystemObserver {
 		private final String root;
 		private final List<GradleSettings> settings = Lists.newArrayList();
 		private final List<AndroidManifest> manifests = Lists.newArrayList();
 		private final List<GradleBuild> builds = Lists.newArrayList();
 		
-		public ProjectRegistryBuilder(String root) {
+		public FileObserverProjectBuilder(String root) {
 			this.root = root;
 		}
 
-		public void addSettings(File settings) {
+		@Override
+		public void onSettings(File settings) {
 			this.settings.add(GradleSettings.read(settings));
 		}
 
-		public void addManifest(File manifest) {
+		@Override
+		public void onManifest(File manifest) {
 			this.manifests.add(AndroidManifest.read(manifest));
 		}
 
-		public void addBuild(File build) {
+		@Override
+		public void onBuild(File build) {
 			this.builds.add(GradleBuild.read(build));
 		}
 		
-		public void build() {
-			if ( settings.isEmpty() ) {
-				// create a 'root' project
-			} else {
+		public ProjectRegistry build() {
+			ProjectRegistryBuilder registry = new ProjectRegistryBuilder();
+			registry.addProject(root);
+			
+			if ( ! settings.isEmpty() ) {
 				// register a bunch of projects
-			}
+				for ( GradleSettings setting : this.settings )
+					registry.addProjects( setting.getProjects() );
+			} 
 			
 			// iterate over the build files and build a view of the projects
+			for ( GradleBuild build : this.builds ) {
+				registry.addBuild(build);
+			}
+
 			// iterate over the manifest file and keep a view on each project
+			for ( AndroidManifest manifest : this.manifests ) {
+				registry.adddManifest(manifest);
+			}
+			
+			return registry.build();
 		}
     }
 }

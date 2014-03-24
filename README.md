@@ -1,12 +1,10 @@
 Ehyo
 ====
-An android scaffolding command line tool.
+An Android scaffolding command line tool. Heavyily inspired by and loosely named after the yeoman web scaffolding tool. The goal of this project is to provide a command line tool for developers looking to perform worry free boiler-plate operations to their Android projects.
 
 Developing using Eclipse
 ------------------------
-`mvn dependency:sources`
-`mvn dependency:resolve -Dclassifier=javadoc`
-`mvn eclipse:eclipse`
+`mvn clean package dependency:sources dependency:resolve -Dclassifier=javadoc eclipse:eclipse`
 
 Building the jar
 ----------------
@@ -15,6 +13,10 @@ Building the jar
 Running the command-line
 ------------------------
 `java -jar ehyo.jar`
+
+Limitations
+-----------
+This project was designed around the default Android Studio project structure, and therefore makes a lot of assumptions based on the way the code is structured. 
 
 TODO
 ----

@@ -3,18 +3,19 @@ package com.vijaysharma.ehyo.core.models;
 import java.io.File;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.core.utils.EFileUtil;
 
 public class GradleSettings {
 	public static GradleSettings read(File file) {
-		List<String> projects = Lists.newArrayList();
+		ImmutableList.Builder<String> projects = ImmutableList.builder();
 		List<String> lines = EFileUtil.readLines(file);
 		
 		for ( String line: lines )
 			projects.addAll(readProjectRoot(line));
 
-		return new GradleSettings(projects);
+		return new GradleSettings(projects.build());
 	}
 	
 	private static List<String> readProjectRoot( String line ) {
@@ -41,5 +42,9 @@ public class GradleSettings {
 	
 	private GradleSettings(List<String> projects) {
 		this.projects = projects;
+	}
+
+	public List<String> getProjects() {
+		return projects;
 	}
 }
