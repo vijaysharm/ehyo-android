@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo;
+package com.vijaysharma.ehyo.core;
 
 import com.vijaysharma.ehyo.core.models.Project;
 

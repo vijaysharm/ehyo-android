@@ -1,5 +1,6 @@
-package com.vijaysharma.ehyo;
+package com.vijaysharma.ehyo.core;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +24,13 @@ public class ProjectRegistryBuilder {
 	private final ImmutableList.Builder<String> projectList = ImmutableList.builder();
 	private final Map<String, GradleBuild> builds = Maps.newHashMap();
 	private final Map<String, AndroidManifest> manifests = Maps.newHashMap();
+	private final File root;
+
 	
+	public ProjectRegistryBuilder(File root) {
+		this.root = root;
+	}
+
 	public void addProject(String root) {
 		this.projectList.add( root );
 	}
@@ -67,7 +74,7 @@ public class ProjectRegistryBuilder {
 					Joiner.on(", ").join(manifests.keySet()));
 		}
 		
-		return new ProjectRegistry(projectMap.build());
+		return new ProjectRegistry(root, projectMap.build());
 	}
 
 	private void addManifestToProject(ProjectBuilder project, AndroidManifest manifest) {

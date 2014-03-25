@@ -7,6 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME) @Target({FIELD})
-public @interface MakeLogger {
+public @interface IsLogger {
 
 }

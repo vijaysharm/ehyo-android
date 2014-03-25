@@ -28,5 +28,5 @@ TODO
 + Provide a way to add a new Component to the Android project 
 ++ Includes adding the new Component to the Manifest
 + Provide a way to add permissions to the project
-+ Provide a way to search and add libraries to the project
++ Provide a way to search maven and add libraries to the project
 + Provide a way to add new plugins to do more command line stuff
