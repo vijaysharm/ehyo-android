@@ -29,15 +29,15 @@ public class RunAction implements Action {
 					 PluginOptions pluginOptions,
 					 boolean dryrun, 
 					 boolean help) {
-		this(args, new ProjectRegistryLoader(root), pluginOptions, dryrun, help, new PluginLoader(pluginOptions.getPlugins()));
+		this(args, pluginOptions, new PluginLoader(pluginOptions.getPlugins()), new ProjectRegistryLoader(root), help, dryrun);
 	}
 
 	RunAction(String[] args, 
+			  PluginOptions pluginOptions, 
+			  PluginLoader loader,
 			  ProjectRegistryLoader projectLoader, 
-			  PluginOptions pluginOptions,
-			  boolean dryrun, 
 			  boolean help,
-			  PluginLoader loader) {
+			  boolean dryrun) {
 		this.args = args;
 		this.projectLoader = projectLoader;
 		this.pluginOptions = pluginOptions;

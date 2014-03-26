@@ -2,8 +2,6 @@ package com.vijaysharma.ehyo.core.commandline;
 
 import java.util.Set;
 
-import com.google.common.base.Optional;
-
 public class PluginOptions {
 	private final Set<String> plugins;
 	private final String plugin;

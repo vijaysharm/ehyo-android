@@ -1,7 +1,6 @@
 package com.vijaysharma.ehyo.core.commandline.converters;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -14,12 +13,10 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import junit.framework.Assert;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.google.common.base.Optional;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 
 public class PluginsCommandLineConverterTest {

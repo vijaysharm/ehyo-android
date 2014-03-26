@@ -73,6 +73,6 @@ public class RunActionTest {
 	}
 
 	private RunAction create(String[] args, boolean help, boolean dryrun) {
-		return new RunAction(args, projectLoader, pluginOptions, dryrun, help, loader);
+		return new RunAction(args, pluginOptions, loader, projectLoader, help, dryrun);
 	}
 }
