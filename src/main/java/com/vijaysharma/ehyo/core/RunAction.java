@@ -2,27 +2,25 @@ package com.vijaysharma.ehyo.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.common.base.Functions;
 import com.google.common.base.Optional;
 import com.vijaysharma.ehyo.api.Plugin;
+import com.vijaysharma.ehyo.api.PluginBundle;
+import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 
 public class RunAction implements Action {
-	private static final Logger l = LoggerFactory.getLogger(RunAction.class);
-	
 	private final String[] args;
 	private final ProjectRegistryLoader projectLoader;
 	private final PluginOptions pluginOptions;
 	private final boolean dryrun;
 	private final boolean help;
 	private final PluginLoader pluginLoader;
-
 
 	public RunAction(String[] args, 
 					 File root, 
@@ -63,14 +61,21 @@ public class RunAction implements Action {
 		}
 		
 		OptionSet options = parser.parse(this.args);
-		plugin.get().execute(options);
+		
+		PluginBundle bundle = buildBundle(plugin.get());
+		plugin.get().execute(options, bundle);
+	}
+
+	private PluginBundle buildBundle(Plugin plugin) {
+		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
+		return new PluginBundle(plugins);
 	}
 	
 	private void printUsage(OptionParser parser) {
 		try {
 			parser.printHelpOn(System.err);
 		} catch (IOException e) {
-			l.debug("Failed to log usage", e);
+			Outputter.debug.exception("Failed to log usage", e);
 		}
 	}
 }

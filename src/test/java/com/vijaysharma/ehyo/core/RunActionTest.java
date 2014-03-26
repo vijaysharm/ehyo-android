@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 
 import com.google.common.base.Optional;
 import com.vijaysharma.ehyo.api.Plugin;
+import com.vijaysharma.ehyo.api.PluginBundle;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 
 public class RunActionTest {
@@ -50,7 +51,7 @@ public class RunActionTest {
 		action.run();
 		verify(loader, times(1)).findPlugin(pluginName);
 		verify(plugin, times(1)).configure(Mockito.any(OptionParser.class));
-		verify(plugin, times(1)).execute(Mockito.any(OptionSet.class));
+		verify(plugin, times(1)).execute(Mockito.any(OptionSet.class), Mockito.any(PluginBundle.class));
 	}
 	
 	@Test
@@ -65,7 +66,7 @@ public class RunActionTest {
 		action.run();
 		verify(loader, times(1)).findPlugin(pluginName);
 		verify(plugin, times(1)).configure(Mockito.any(OptionParser.class));
-		verify(plugin, times(0)).execute(Mockito.any(OptionSet.class));
+		verify(plugin, times(0)).execute(Mockito.any(OptionSet.class), Mockito.any(PluginBundle.class));
 	}
 	
 	private RunAction create(String[] args) {

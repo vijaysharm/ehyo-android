@@ -5,6 +5,8 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpecBuilder;
 
 import com.vijaysharma.ehyo.api.Plugin;
+import com.vijaysharma.ehyo.api.PluginBundle;
+import com.vijaysharma.ehyo.api.logging.Outputter;
 
 public class ListPlugins implements Plugin {
 	
@@ -21,9 +23,16 @@ public class ListPlugins implements Plugin {
 	}
 
 	@Override
-	public void execute(OptionSet options) {
+	public void execute(OptionSet options, PluginBundle bundle) {
 		if ( options.has(about) ) {
-			System.err.println("This is about me.");
+			Outputter.out.println("TODO: Print about information");
+			return;
+		}
+		
+		Outputter.out.println( "Installed plugins" );
+		Outputter.out.println( "-----------------" );
+		for ( Plugin plugin : bundle.getPlugins() ) {
+			Outputter.out.println( "+ " + plugin.name() );
 		}
 	}
 }

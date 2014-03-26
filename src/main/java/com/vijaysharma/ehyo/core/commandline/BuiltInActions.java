@@ -4,6 +4,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpecBuilder;
 
+import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
 
@@ -21,8 +22,7 @@ class BuiltInActions implements CommandLineAction {
 			return new Action() {
 				@Override
 				public void run() {
-					// TODO: dump the version information
-					System.out.println( "VERSION INFORMATION" );
+					Outputter.out.println("VERSION INFORMATION");
 				}
 			};
 		}
