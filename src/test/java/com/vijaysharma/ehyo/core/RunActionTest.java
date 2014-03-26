@@ -4,9 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.io.File;
-
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -34,7 +31,7 @@ public class RunActionTest {
 	public void run_throws_when_no_plugin_found() {
 		String[] args = {};
 		String pluginName = "some-name";
-		when(pluginOptions.getPlugin()).thenReturn(Optional.of(pluginName));
+		when(pluginOptions.getPlugin()).thenReturn(pluginName);
 		when(loader.findPlugin(pluginName)).thenReturn(Optional.<Plugin>absent());
 		
 		RunAction action = create(args);
@@ -46,7 +43,7 @@ public class RunActionTest {
 		String[] args = {};
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
-		when(pluginOptions.getPlugin()).thenReturn(Optional.of(pluginName));
+		when(pluginOptions.getPlugin()).thenReturn(pluginName);
 		when(loader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		
 		RunAction action = create(args);
@@ -61,7 +58,7 @@ public class RunActionTest {
 		String[] args = {};
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
-		when(pluginOptions.getPlugin()).thenReturn(Optional.of(pluginName));
+		when(pluginOptions.getPlugin()).thenReturn(pluginName);
 		when(loader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		
 		RunAction action = create(args, true, false);

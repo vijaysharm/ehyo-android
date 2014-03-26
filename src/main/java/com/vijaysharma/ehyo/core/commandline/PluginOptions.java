@@ -6,14 +6,14 @@ import com.google.common.base.Optional;
 
 public class PluginOptions {
 	private final Set<String> plugins;
-	private final Optional<String> plugin;
+	private final String plugin;
 
 	public PluginOptions(String plugin, Set<String> plugins) {
-		this.plugin = Optional.fromNullable(plugin);
+		this.plugin = plugin;
 		this.plugins = plugins;
 	}
 	
-	public Optional<String> getPlugin() {
+	public String getPlugin() {
 		return plugin;
 	}
 	

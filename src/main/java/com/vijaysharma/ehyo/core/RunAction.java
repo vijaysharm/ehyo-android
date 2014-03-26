@@ -48,10 +48,10 @@ public class RunAction implements Action {
 
 	@Override
 	public void run() {
-		Optional<Plugin> plugin = pluginLoader.findPlugin(this.pluginOptions.getPlugin().get());
+		Optional<Plugin> plugin = pluginLoader.findPlugin(this.pluginOptions.getPlugin());
 		
 		if ( ! plugin.isPresent() ) {
-			throw new RuntimeException("Plugin [" + this.pluginOptions.getPlugin().get() + "] was not found.");
+			throw new RuntimeException("Plugin [" + this.pluginOptions.getPlugin() + "] was not found.");
 		}
 			
 		OptionParser parser = new OptionParser();
