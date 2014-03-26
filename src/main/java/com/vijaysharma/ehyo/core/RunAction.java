@@ -1,13 +1,11 @@
 package com.vijaysharma.ehyo.core;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.reflections.Reflections;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
@@ -36,7 +34,11 @@ public class RunAction implements Action {
 		try {
 			Reflections reflections = new Reflections("com.vijaysharma.ehyo");
 			Map<String, Plugin> plugins = loadPlugins(reflections);
-			
+			Plugin plugin = plugins.get(this.pluginOptions.getPlugin().get().toLowerCase());
+			if ( plugin == null ) {
+				// TODO: Show usage
+				return;
+			}
 		}
 		catch( Exception ex ) {
 			
@@ -48,7 +50,7 @@ public class RunAction implements Action {
 		Set<Class<? extends Plugin>> subTypesOf = reflections.getSubTypesOf(Plugin.class);
 		for ( Class<? extends Plugin> pluginClass : subTypesOf ) {
 			Plugin instance = pluginClass.newInstance();
-			plugins.put(instance.name(), instance);
+			plugins.put(instance.name().toLowerCase(), instance);
 		}
 
 		return plugins;

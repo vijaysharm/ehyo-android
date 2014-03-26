@@ -24,6 +24,7 @@ public class PluginsCommandLineConverter implements CommandLineConverter<PluginO
 		
 		plugin = parser.accepts("plugin")
 			.withRequiredArg()
+			.required()
 			.ofType(String.class);
 	}
 
@@ -32,7 +33,6 @@ public class PluginsCommandLineConverter implements CommandLineConverter<PluginO
 		ImmutableSet.Builder<String> plugins = ImmutableSet.builder();
 		plugins.add("com.vijaysharma.ehyo");
 		plugins.add(options.valueOf(pluginUrls));
-		
 		return new PluginOptions( options.valueOf(this.plugin), plugins.build() );
 	}
 }

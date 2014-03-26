@@ -25,8 +25,8 @@ public class Main implements Runnable {
 		String[] arguments = {
 //			"--version",
 //			"--plugins", "", 
-//			"--plugin", "list",
-//			"--directory", ".",
+			"--plugin", "listplugins",
+			"--directory", "/Users/vsharma/programming/android/MyApplication",
 //			"--help",
 		};
 		

@@ -20,6 +20,7 @@ This project was designed around the default Android Studio project structure, a
 
 TODO
 ----
+##High Level Goals
 + Provide a way to create a new Android application
 ++ Might create a project with basic pieces
 +++ Dependency Injection
@@ -30,3 +31,10 @@ TODO
 + Provide a way to add permissions to the project
 + Provide a way to search maven and add libraries to the project
 + Provide a way to add new plugins to do more command line stuff
+
+
+##Tasks
++ Support 3rd party plugins
++ Show usage when the --plugin flag is not given 
++ Show error when the name given in plugin is not found
++ Show better version information
