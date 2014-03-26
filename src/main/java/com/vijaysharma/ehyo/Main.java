@@ -1,12 +1,18 @@
 package com.vijaysharma.ehyo;
 
+import static com.google.common.base.Joiner.on;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
 import com.vijaysharma.ehyo.core.commandline.CommandLineFactory;
 
 
 public class Main implements Runnable {
 	private final String[] args;
 	private final CommandLineFactory factory;
-    
+    private static final Logger l = LoggerFactory.getLogger(Main.class);
     public Main(String[] args) {
     	this(args, new CommandLineFactory());
     }
@@ -18,18 +24,21 @@ public class Main implements Runnable {
     
     @Override
     public void run() {
+    	if (this.args != null) l.debug(on(" ").join(this.args));
     	factory.configure(this.args).run();
     }
+
     
     public static void main(String[] args) {
 		String[] arguments = {
 //			"--version",
 //			"--plugins", "", 
 			"--plugin", "listplugins",
-			"--directory", "/Users/vsharma/programming/android/MyApplication",
-//			"--help",
+//			"--about",
+//			"--directory", "/Users/vsharma/programming/android/MyApplication",
+			"--help",
 		};
-		
+
 		new Main(arguments).run();
 	}
 }

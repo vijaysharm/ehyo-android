@@ -1,18 +1,24 @@
 package com.vijaysharma.ehyo.core.commandline;
 
+import static com.google.common.base.Joiner.on;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
 
 class ParseAndBuildAction implements Action {
+	private static final Logger l = LoggerFactory.getLogger(ParseAndBuildAction.class);
+	
 	private final String[] args;
 	private final CommandLineActionsFactory factory;
 	
@@ -34,6 +40,7 @@ class ParseAndBuildAction implements Action {
 		List<CommandLineAction> actions = factory.create(args);
 
 		OptionParser parser = new OptionParser();
+		parser.allowsUnrecognizedOptions();
 		for ( CommandLineAction action : actions ) {
 			action.configure(parser);
 		}
@@ -42,16 +49,20 @@ class ParseAndBuildAction implements Action {
 			OptionSet options = parser.parse( args );
 			Action action = findAction(options, actions);
 			action.run();
-		} catch ( OptionException ex ) {
-			printUsage(parser);
+		} catch ( UnsupportedOperationException ex ) {
+			throw ex;
+		} catch ( Exception ex ) {
+			l.debug("Execution exception " + on(" ").join(this.args), ex);
+			printUsage(ex.getMessage(), parser);
 		}
 	}
 	
-	private void printUsage(OptionParser parser) {
+	private void printUsage(String message, OptionParser parser) {
 		try {
+			System.err.println(message);
 			parser.printHelpOn(System.err);
 		} catch (IOException e) {
-			// ignore
+			l.debug("Failed to print usage", e);
 		}		
 	}
 

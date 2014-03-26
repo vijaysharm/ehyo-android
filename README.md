@@ -35,5 +35,5 @@ TODO
 
 ##Tasks
 + Support 3rd party plugins
-+ Show error when the name given in plugin is not found
++ Show user formatted error when the name given in plugin is not found
 + Show better version information

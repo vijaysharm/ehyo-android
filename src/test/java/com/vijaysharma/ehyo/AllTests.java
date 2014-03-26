@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.vijaysharma.ehyo.core.RunActionTest;
 import com.vijaysharma.ehyo.core.commandline.ApplicationRunActionFactoryTest;
 import com.vijaysharma.ehyo.core.commandline.BuiltInActionsTest;
 import com.vijaysharma.ehyo.core.commandline.CommandLineFactoryTest;
@@ -20,6 +21,7 @@ import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConver
 	MainTest.class,
 	ParseAndBuildActionTest.class,
 	PluginsCommandLineConverterTest.class,
+	RunActionTest.class,
 })
 public class AllTests {
 
