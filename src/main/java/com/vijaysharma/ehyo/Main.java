@@ -23,11 +23,11 @@ public class Main implements Runnable {
     
     public static void main(String[] args) {
 		String[] arguments = {
-			"--version",
-			"--plugins", "", 
-			"--plugin", "list",
-			"--directory", ".",
-			"--help",
+//			"--version",
+//			"--plugins", "", 
+//			"--plugin", "list",
+//			"--directory", ".",
+//			"--help",
 		};
 		
 		new Main(arguments).run();

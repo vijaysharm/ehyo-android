@@ -1,12 +1,10 @@
 package com.vijaysharma.ehyo.core.commandline.converters;
 
-import java.util.HashSet;
-
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 
 public class PluginsCommandLineConverter implements CommandLineConverter<PluginOptions> {
@@ -31,7 +29,10 @@ public class PluginsCommandLineConverter implements CommandLineConverter<PluginO
 
 	@Override
 	public PluginOptions read(OptionSet options) {
-		HashSet<String> plugins = Sets.newHashSet("com.vijaysharma.ehyo", pluginUrls.value(options));
-		return new PluginOptions( options.valueOf(this.plugin), plugins );
+		ImmutableSet.Builder<String> plugins = ImmutableSet.builder();
+		plugins.add("com.vijaysharma.ehyo");
+		plugins.add(options.valueOf(pluginUrls));
+		
+		return new PluginOptions( options.valueOf(this.plugin), plugins.build() );
 	}
 }
