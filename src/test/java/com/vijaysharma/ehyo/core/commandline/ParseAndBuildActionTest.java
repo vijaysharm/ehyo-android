@@ -8,9 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import joptsimple.OptionSpecBuilder;
 
 import org.junit.Before;
 import org.junit.Test;

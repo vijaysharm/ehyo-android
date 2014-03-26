@@ -21,13 +21,13 @@ import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 public class RunActionTest {
 	private PluginLoader loader;
 	private PluginOptions pluginOptions;
-	private File root;
+	private ProjectRegistryLoader projectLoader;
 	
 	@Before
 	public void before() {
 		loader = mock(PluginLoader.class);
 		pluginOptions = mock(PluginOptions.class);
-		root = mock(File.class);
+		projectLoader = mock(ProjectRegistryLoader.class);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -76,6 +76,6 @@ public class RunActionTest {
 	}
 
 	private RunAction create(String[] args, boolean help, boolean dryrun) {
-		return new RunAction(args, root, pluginOptions, dryrun, help, loader);
+		return new RunAction(args, projectLoader, pluginOptions, dryrun, help, loader);
 	}
 }

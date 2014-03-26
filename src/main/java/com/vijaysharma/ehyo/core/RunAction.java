@@ -17,7 +17,7 @@ public class RunAction implements Action {
 	private static final Logger l = LoggerFactory.getLogger(RunAction.class);
 	
 	private final String[] args;
-	private final File root;
+	private final ProjectRegistryLoader projectLoader;
 	private final PluginOptions pluginOptions;
 	private final boolean dryrun;
 	private final boolean help;
@@ -29,17 +29,17 @@ public class RunAction implements Action {
 					 PluginOptions pluginOptions,
 					 boolean dryrun, 
 					 boolean help) {
-		this(args, root, pluginOptions, dryrun, help, new PluginLoader(pluginOptions.getPlugins()));
+		this(args, new ProjectRegistryLoader(root), pluginOptions, dryrun, help, new PluginLoader(pluginOptions.getPlugins()));
 	}
 
 	RunAction(String[] args, 
-			  File root, 
+			  ProjectRegistryLoader projectLoader, 
 			  PluginOptions pluginOptions,
 			  boolean dryrun, 
 			  boolean help,
-			  PluginLoader loader ) {
+			  PluginLoader loader) {
 		this.args = args;
-		this.root = root;
+		this.projectLoader = projectLoader;
 		this.pluginOptions = pluginOptions;
 		this.dryrun = dryrun;
 		this.help = help;

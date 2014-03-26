@@ -10,8 +10,13 @@ import com.vijaysharma.ehyo.core.models.GradleSettings;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class ProjectRegistryLoader {
+	private final File root;
 
-	public ProjectRegistry load(File root) {
+	public ProjectRegistryLoader(File root) {
+		this.root = root;
+	}
+	
+	public ProjectRegistry load() {
 		FileObserverProjectBuilder projects = new FileObserverProjectBuilder(root);
 		
 		if ( root.isDirectory() )
