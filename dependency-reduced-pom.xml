@@ -4,7 +4,7 @@
   <groupId>com.vijaysharma.ehyo</groupId>
   <artifactId>ehyo</artifactId>
   <name>ehyo</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>

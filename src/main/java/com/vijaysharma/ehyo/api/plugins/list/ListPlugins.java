@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.api.plugins;
+package com.vijaysharma.ehyo.api.plugins.list;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -14,7 +14,7 @@ public class ListPlugins implements Plugin {
 
 	@Override
 	public String name() {
-		return ListPlugins.class.getSimpleName();
+		return "list";
 	}
 
 	@Override

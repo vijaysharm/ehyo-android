@@ -38,3 +38,4 @@ TODO
 + Show user formatted error when the name given in plugin is not found
 + Show better version information
 + Have the custom logger respect debug mode
++ Broke the --version command
