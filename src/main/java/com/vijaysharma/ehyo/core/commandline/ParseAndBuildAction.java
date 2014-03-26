@@ -1,8 +1,10 @@
 package com.vijaysharma.ehyo.core.commandline;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -36,12 +38,23 @@ class ParseAndBuildAction implements Action {
 			action.configure(parser);
 		}
 		
-		OptionSet options = parser.parse( args );
-		Action action = findAction(options, actions);
-		
-		action.run();
+		try {
+			OptionSet options = parser.parse( args );
+			Action action = findAction(options, actions);
+			action.run();
+		} catch ( OptionException ex ) {
+			printUsage(parser);
+		}
 	}
 	
+	private void printUsage(OptionParser parser) {
+		try {
+			parser.printHelpOn(System.err);
+		} catch (IOException e) {
+			// ignore
+		}		
+	}
+
 	private Action findAction(OptionSet options, List<CommandLineAction> actions) {
 		for ( CommandLineAction command : actions ) {
 			Action action = command.getAction(options);

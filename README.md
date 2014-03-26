@@ -35,6 +35,5 @@ TODO
 
 ##Tasks
 + Support 3rd party plugins
-+ Show usage when the --plugin flag is not given 
 + Show error when the name given in plugin is not found
 + Show better version information
