@@ -39,3 +39,5 @@ TODO
 + Show better version information
 + Have the custom logger respect debug mode
 + Broke the --version command
++ Better option description
++ Check if the project structure is valid

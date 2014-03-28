@@ -20,7 +20,6 @@ public class ProjectRegistryBuilder {
 	private final Map<String, AndroidManifest> manifests = Maps.newHashMap();
 	private final File root;
 
-	
 	public ProjectRegistryBuilder(File root) {
 		this.root = root;
 	}
@@ -47,7 +46,7 @@ public class ProjectRegistryBuilder {
 		
 //		l.info("Found {} projects [{}]", projects.size(), Joiner.on(", ").join(projects));
 		for ( String projectName : projects ) {
-			ProjectBuilder project = new ProjectBuilder();
+			ProjectBuilder project = new ProjectBuilder(projectName, this.root);
 			
 			GradleBuild build = builds.remove(projectName);
 			addBuildToProject(project, build);
@@ -72,10 +71,12 @@ public class ProjectRegistryBuilder {
 	}
 
 	private void addManifestToProject(ProjectBuilder project, AndroidManifest manifest) {
-		
+		if ( manifest != null )
+			project.addManifest(manifest);
 	}
 
 	private void addBuildToProject(ProjectBuilder project, GradleBuild build) {
-		
+		if ( build != null )
+			project.addProjectBuild(build);
 	}
 }
