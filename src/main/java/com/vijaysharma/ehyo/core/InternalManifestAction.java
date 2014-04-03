@@ -13,7 +13,7 @@ class InternalManifestAction implements ManifestAction {
 		this.permissions.add(permission);
 	}
 	
-	public List<String> getPermissions() {
+	public List<String> getAddedPermissions() {
 		return permissions;
 	}
 }

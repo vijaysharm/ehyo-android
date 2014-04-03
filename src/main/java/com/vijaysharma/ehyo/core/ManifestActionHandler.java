@@ -17,7 +17,7 @@ public class ManifestActionHandler implements PluginActionHandler<Document> {
 	//VTD-XML
 	@Override
 	public void modify(Document doc) {
-		List<String> permissions = action.getPermissions();
+		List<String> permissions = action.getAddedPermissions();
 		for (String permission : permissions) {
 			Element usesPermission = new Element("uses-permission")
 				.setAttribute("name", permission, ANDROID_NAMESPACE);
