@@ -29,6 +29,7 @@ import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
+import com.vijaysharma.ehyo.core.utils.EFileUtil;
 
 import difflib.Delta;
 import difflib.DiffUtils;
@@ -141,7 +142,7 @@ public class RunAction implements Action {
 		List<String> changed = toListOfStrings(modified);
 		Patch diff = DiffUtils.diff(baseline, changed);
 		
-		Outputter.out.println("Modifying " + key.getPath());
+		Outputter.out.println("Modifying " + printedManifest(key));
 		for (Delta delta: diff.getDeltas()) {
 			Outputter.out.println(delta);
 		}		
@@ -164,12 +165,12 @@ public class RunAction implements Action {
 		FileSelector<AndroidManifest> selector = new FileSelector<AndroidManifest>(new Function<AndroidManifest, String>() {
 			@Override
 			public String apply(AndroidManifest manifest) {
-				return manifest.getProject() + ":" + manifest.getSourceSet();
+				return printedManifest(manifest);
 			}
 		});
 		
-//		return selector.select(manifests);
-		return Lists.newArrayList(manifests.get(0));
+		return selector.select(manifests);
+//		return Lists.newArrayList(manifests.get(0));
 	}
 	
 	private void perform(PluginActionHandler<?> handler, Map<AndroidManifest, Document> manifestLookup) {
@@ -209,4 +210,8 @@ public class RunAction implements Action {
 
 		return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()));
 	}
+	
+	private String printedManifest(AndroidManifest manifest) {
+		return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
+	}	
 }

@@ -32,14 +32,10 @@ public class AndroidManifest {
 	public String getSourceSet() {
 		return file.getParentFile().getName();
 	}
-
-	public String getPath() {
-		return EFileUtil.getCanonicalPath(file);
-	}
 	
-//	public File getFile() {
-//		return file;
-//	}
+	public File getFile() {
+		return file;
+	}
 	
 	public Document asXmlDocument() {
 		try {
