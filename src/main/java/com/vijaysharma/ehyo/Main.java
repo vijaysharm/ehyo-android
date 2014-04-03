@@ -28,6 +28,7 @@ public class Main implements Runnable {
 //			"--version",
 //			"--plugins", "com.thirdparty.plugin", 
 			"--plugin", "manifest-permissions",
+			"--dry-run",
 //			"--about",
 			"--directory", "/Users/vsharma/programming/android/MyApplication",
 //			"--help",

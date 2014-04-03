@@ -31,7 +31,7 @@ public class Permissions implements Plugin {
 	public List<? extends PluginAction> execute(OptionSet options, Service service) {
 		ManifestAction action = service.createManifestAction();
 		action.addPermission("android.permission.INTERNET");
-		
+		action.addPermission("android.permission.ACCESS_CHECKIN_PROPERTIES");
 		return Lists.newArrayList(action);
 	}
 }

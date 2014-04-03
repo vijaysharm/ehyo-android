@@ -1,11 +1,17 @@
 package com.vijaysharma.ehyo.core.models;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
+import com.vijaysharma.ehyo.core.utils.EFileUtil;
+import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 public class AndroidManifest {
 	public static AndroidManifest read(File file) {
-		// TODO: Store the file as an XML object so we can reference 
-		//		 pieces of the manifest directly
 		return new AndroidManifest(file);
 	}
 
@@ -27,7 +33,22 @@ public class AndroidManifest {
 		return file.getParentFile().getName();
 	}
 
-	public File getFile() {
-		return file;
+	public String getPath() {
+		return EFileUtil.getCanonicalPath(file);
+	}
+	
+//	public File getFile() {
+//		return file;
+//	}
+	
+	public Document asXmlDocument() {
+		try {
+			SAXBuilder builder = new SAXBuilder();
+			return builder.build(file);
+		} catch (IOException ioe) {
+			throw new UncheckedIoException(ioe);
+		} catch (JDOMException jde) {
+			throw new RuntimeException(jde);
+		}		
 	}
 }

@@ -25,4 +25,12 @@ public class EFileUtil {
 			throw new UncheckedIoException(e);
 		}
 	}
+
+	public static String getCanonicalPath(File file) {
+		try {
+			return file.getCanonicalPath();
+		} catch (IOException e) {
+			throw new UncheckedIoException(e);
+		}
+	}
 }

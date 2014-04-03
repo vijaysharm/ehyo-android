@@ -18,6 +18,14 @@ Limitations
 -----------
 This project was designed around the default Android Studio project structure, and therefore makes a lot of assumptions based on the way the code is structured. 
 
+Usage
+-----
+ehyo manage-permissions add internet
+ehyo manage-permissions delete internet
+ehyo search butterknife
+ehyo --plugins <ns> --directory <dir> search add flow
+ehyo --plugins <ns> --directory <dir> --plugin search --lib flow --add
+
 TODO
 ----
 ##High Level Goals
