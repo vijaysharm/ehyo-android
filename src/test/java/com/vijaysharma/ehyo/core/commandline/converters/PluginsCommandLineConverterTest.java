@@ -52,7 +52,7 @@ public class PluginsCommandLineConverterTest {
 		verify(parser, times(1)).accepts("plugins");
 		verify(options, times(2)).valueOf(Mockito.any(OptionSpec.class));
 		
-		Set<String> actualPlugins = plugin.getPlugins();
+		Set<String> actualPlugins = plugin.getPluginNamespaces();
 		assertEquals(2, actualPlugins.size());
 		assertTrue(actualPlugins.contains(expectedNamespace));
 		assertTrue(actualPlugins.contains("com.vijaysharma.ehyo"));
@@ -67,7 +67,7 @@ public class PluginsCommandLineConverterTest {
 		OptionSet options = spy(parser.parse("--plugin", "test"));
 		PluginOptions plugin = converter.read(options);
 		
-		Set<String> actualPlugins = plugin.getPlugins();
+		Set<String> actualPlugins = plugin.getPluginNamespaces();
 		assertEquals(1, actualPlugins.size());
 		assertTrue(actualPlugins.contains("com.vijaysharma.ehyo"));
 	}

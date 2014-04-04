@@ -27,7 +27,7 @@ public class ListPlugins implements Plugin {
 	}
 
 	@Override
-	public List<? extends PluginAction> execute(OptionSet options, Service service) {
+	public List<PluginAction> execute(OptionSet options, Service service) {
 		if ( options.has(about) ) {
 			Outputter.out.println("TODO: Print about information");
 			return Lists.newArrayList();

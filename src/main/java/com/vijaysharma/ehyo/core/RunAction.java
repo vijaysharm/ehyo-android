@@ -20,7 +20,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
@@ -36,6 +35,13 @@ import difflib.DiffUtils;
 import difflib.Patch;
 
 public class RunAction implements Action {
+	private static final FileSelector<AndroidManifest> MANIFEST_SELECTOR = new FileSelector<AndroidManifest>(new Function<AndroidManifest, String>() {
+		@Override
+		public String apply(AndroidManifest manifest) {
+			return printManifest(manifest);
+		}
+	});
+	
 	private final String[] args;
 	private final ProjectRegistryLoader projectLoader;
 	private final PluginOptions pluginOptions;
@@ -43,28 +49,40 @@ public class RunAction implements Action {
 	private final boolean help;
 	private final PluginLoader pluginLoader;
 	private final PluginActionHandlerFactory factory;
+	private final FileSelector<AndroidManifest> manifestSelector;
+
 
 	public RunAction(String[] args, 
 					 File root, 
 					 PluginOptions pluginOptions,
 					 boolean dryrun, 
 					 boolean help) {
-		this(args, pluginOptions, new PluginLoader(pluginOptions.getPlugins()), new ProjectRegistryLoader(root), help, dryrun);
+		this(args, 
+			 pluginOptions, 
+			 new PluginLoader(pluginOptions.getPluginNamespaces()),
+			 new ProjectRegistryLoader(root),
+			 new PluginActionHandlerFactory(),
+			 MANIFEST_SELECTOR,
+			 help,
+			 dryrun);
 	}
 
 	RunAction(String[] args, 
 			  PluginOptions pluginOptions, 
 			  PluginLoader loader,
 			  ProjectRegistryLoader projectLoader, 
+			  PluginActionHandlerFactory factory,
+			  FileSelector<AndroidManifest> manifestSelector,
 			  boolean help,
 			  boolean dryrun) {
 		this.args = args;
 		this.projectLoader = projectLoader;
 		this.pluginOptions = pluginOptions;
+		this.manifestSelector = manifestSelector;
 		this.dryrun = dryrun;
 		this.help = help;
 		this.pluginLoader = loader;
-		factory = new PluginActionHandlerFactory();
+		this.factory = factory;
 	}
 
 	@Override
@@ -98,7 +116,7 @@ public class RunAction implements Action {
 	 * 5) Show the diff to the user
 	 * 6) Apply the diff and save the modified files
 	 */
-	private void execute(String pluginName, List<? extends PluginAction> actions) {
+	private void execute(String pluginName, List<PluginAction> actions) {
 		if ( actions == null || actions.isEmpty() )
 			return;
 		
@@ -111,7 +129,7 @@ public class RunAction implements Action {
 		}
 		
 		if ( needsManifest ) {
-			List<AndroidManifest> manifests = select(registry.getAllAndroidManifests());
+			List<AndroidManifest> manifests = manifestSelector.select(registry.getAllAndroidManifests());
 			Map<AndroidManifest, Document> manifestLookup = transform(manifests);
 			for ( PluginAction action : actions ) {
 				Optional<PluginActionHandler<?>> handler = get(action);
@@ -119,11 +137,11 @@ public class RunAction implements Action {
 				else { Outputter.err.println(pluginName + " provided an unknown action type. Exiting."); return; }
 			}
 			
-			saveChangesToManifest(manifestLookup);
+			executeManifestChanges(manifestLookup);
 		}
 	}
 
-	private void saveChangesToManifest(Map<AndroidManifest, Document> manifestLookup) {
+	private void executeManifestChanges(Map<AndroidManifest, Document> manifestLookup) {
 		for ( Map.Entry<AndroidManifest, Document> manifest : manifestLookup.entrySet() ) {
 			try {
 				if ( dryrun ) {
@@ -132,7 +150,7 @@ public class RunAction implements Action {
 					save(manifest.getKey(), manifest.getValue());
 				}
 			} catch (Exception ex) {
-				
+				// TODO: What to do here?
 			}
 		}
 	}
@@ -142,14 +160,16 @@ public class RunAction implements Action {
 		List<String> changed = toListOfStrings(modified);
 		Patch diff = DiffUtils.diff(baseline, changed);
 		
-		Outputter.out.println("Modifying " + printedManifest(key));
+		Outputter.out.println("Diff " + printManifest(key));
 		for (Delta delta: diff.getDeltas()) {
 			Outputter.out.println(delta);
 		}		
 	}
 	
-	private void save(AndroidManifest key, Document modified) {
-		
+	private void save(AndroidManifest key, Document modified) throws IOException {
+		Outputter.out.println("Writing " + printManifest(key));
+		List<String> changed = toListOfStrings(modified);
+		EFileUtil.write(key, changed);
 	}
 
 	private Map<AndroidManifest, Document> transform(List<AndroidManifest> manifests) {
@@ -159,18 +179,6 @@ public class RunAction implements Action {
 		}
 
 		return mapping.build();
-	}
-
-	private List<AndroidManifest> select(List<AndroidManifest> manifests) {
-		FileSelector<AndroidManifest> selector = new FileSelector<AndroidManifest>(new Function<AndroidManifest, String>() {
-			@Override
-			public String apply(AndroidManifest manifest) {
-				return printedManifest(manifest);
-			}
-		});
-		
-		return selector.select(manifests);
-//		return Lists.newArrayList(manifests.get(0));
 	}
 	
 	private void perform(PluginActionHandler<?> handler, Map<AndroidManifest, Document> manifestLookup) {
@@ -211,7 +219,8 @@ public class RunAction implements Action {
 		return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()));
 	}
 	
-	private String printedManifest(AndroidManifest manifest) {
+	private static String printManifest(AndroidManifest manifest) {
 		return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
-	}	
+	}
+
 }

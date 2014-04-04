@@ -23,7 +23,7 @@ public class SearchLibraryPlugin implements Plugin {
 	}
 
 	@Override
-	public List<? extends PluginAction> execute(OptionSet options, Service service) {
+	public List<PluginAction> execute(OptionSet options, Service service) {
 		return Lists.newArrayList();
 	}
 }
