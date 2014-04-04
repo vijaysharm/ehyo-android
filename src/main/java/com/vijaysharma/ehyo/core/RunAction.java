@@ -1,46 +1,33 @@
 package com.vijaysharma.ehyo.core;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
-import com.vijaysharma.ehyo.core.utils.EFileUtil;
-
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
 
 public class RunAction implements Action {
-	private static final FileSelector<AndroidManifest> MANIFEST_SELECTOR = new FileSelector<AndroidManifest>(new Function<AndroidManifest, String>() {
+	private static final Function<AndroidManifest, String> MANIFEST_RENDERER = new Function<AndroidManifest, String>() {
 		@Override
 		public String apply(AndroidManifest manifest) {
-			return printManifest(manifest);
+			return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
 		}
-	});
+	};
 	
 	private final String[] args;
 	private final ProjectRegistryLoader projectLoader;
@@ -50,7 +37,7 @@ public class RunAction implements Action {
 	private final PluginLoader pluginLoader;
 	private final PluginActionHandlerFactory factory;
 	private final FileSelector<AndroidManifest> manifestSelector;
-
+	private final ManifestChangeManagerFactory manifestChangeFactory;
 
 	public RunAction(String[] args, 
 					 File root, 
@@ -62,7 +49,8 @@ public class RunAction implements Action {
 			 new PluginLoader(pluginOptions.getPluginNamespaces()),
 			 new ProjectRegistryLoader(root),
 			 new PluginActionHandlerFactory(),
-			 MANIFEST_SELECTOR,
+			 new FileSelector<AndroidManifest>(MANIFEST_RENDERER),
+			 new ManifestChangeManagerFactory(),
 			 help,
 			 dryrun);
 	}
@@ -73,6 +61,7 @@ public class RunAction implements Action {
 			  ProjectRegistryLoader projectLoader, 
 			  PluginActionHandlerFactory factory,
 			  FileSelector<AndroidManifest> manifestSelector,
+			  ManifestChangeManagerFactory manifestChangeFactory,
 			  boolean help,
 			  boolean dryrun) {
 		this.args = args;
@@ -83,6 +72,7 @@ public class RunAction implements Action {
 		this.help = help;
 		this.pluginLoader = loader;
 		this.factory = factory;
+		this.manifestChangeFactory = manifestChangeFactory; 
 	}
 
 	@Override
@@ -130,62 +120,14 @@ public class RunAction implements Action {
 		
 		if ( needsManifest ) {
 			List<AndroidManifest> manifests = manifestSelector.select(registry.getAllAndroidManifests());
-			Map<AndroidManifest, Document> manifestLookup = transform(manifests);
+			ManifestChangeManager manager = manifestChangeFactory.create(manifests);
 			for ( PluginAction action : actions ) {
 				Optional<PluginActionHandler<?>> handler = get(action);
-				if ( handler.isPresent() ) { perform( handler.get(), manifestLookup ); }
+				if ( handler.isPresent() ) { manager.perform(handler.get()); }
 				else { Outputter.err.println(pluginName + " provided an unknown action type. Exiting."); return; }
 			}
 			
-			executeManifestChanges(manifestLookup);
-		}
-	}
-
-	private void executeManifestChanges(Map<AndroidManifest, Document> manifestLookup) {
-		for ( Map.Entry<AndroidManifest, Document> manifest : manifestLookup.entrySet() ) {
-			try {
-				if ( dryrun ) {
-					show(manifest.getKey(), manifest.getValue());
-				} else {
-					save(manifest.getKey(), manifest.getValue());
-				}
-			} catch (Exception ex) {
-				// TODO: What to do here?
-			}
-		}
-	}
-
-	private void show(AndroidManifest key, Document modified) throws IOException {
-		List<String> baseline = toListOfStrings(key.asXmlDocument());
-		List<String> changed = toListOfStrings(modified);
-		Patch diff = DiffUtils.diff(baseline, changed);
-		
-		Outputter.out.println("Diff " + printManifest(key));
-		for (Delta delta: diff.getDeltas()) {
-			Outputter.out.println(delta);
-		}		
-	}
-	
-	private void save(AndroidManifest key, Document modified) throws IOException {
-		Outputter.out.println("Writing " + printManifest(key));
-		List<String> changed = toListOfStrings(modified);
-		EFileUtil.write(key, changed);
-	}
-
-	private Map<AndroidManifest, Document> transform(List<AndroidManifest> manifests) {
-		ImmutableMap.Builder<AndroidManifest, Document> mapping = ImmutableMap.builder();
-		for ( AndroidManifest manifest : manifests ) {
-			mapping.put(manifest, manifest.asXmlDocument());
-		}
-
-		return mapping.build();
-	}
-	
-	private void perform(PluginActionHandler<?> handler, Map<AndroidManifest, Document> manifestLookup) {
-		if ( handler instanceof ManifestActionHandler ) {
-			for ( Map.Entry<AndroidManifest, Document> manifest : manifestLookup.entrySet() ) {
-				((ManifestActionHandler)handler).modify(manifest.getValue());
-			}
+			manager.commit(dryrun);
 		}
 	}
 
@@ -209,18 +151,4 @@ public class RunAction implements Action {
 			Outputter.debug.exception("Failed to log usage", e);
 		}
 	}
-	
-	private List<String> toListOfStrings(Document doc) throws IOException {
-		XMLOutputter xmlOutput = new XMLOutputter();
-		xmlOutput.setFormat(Format.getPrettyFormat());
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		xmlOutput.output(doc, stream);
-
-		return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()));
-	}
-	
-	private static String printManifest(AndroidManifest manifest) {
-		return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
-	}
-
 }
