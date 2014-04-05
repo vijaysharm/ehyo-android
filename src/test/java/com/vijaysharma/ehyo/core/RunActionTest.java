@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo.core;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -114,17 +115,21 @@ public class RunActionTest {
 		Plugin plugin = mock(Plugin.class);
 		ManifestAction pluginAction = mock(ManifestAction.class);
 		ProjectRegistry registry = mock(ProjectRegistry.class);
+		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
 		
 		when(pluginOptions.getPlugin()).thenReturn(pluginName);
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(projectLoader.load()).thenReturn(registry);
 		when(plugin.execute(any(OptionSet.class), any(Service.class)))
 			.thenReturn(asList(pluginAction));
+		when(manifestChangeFactory.create(Mockito.anyList()))
+			.thenReturn(changeManager);
 		
 		RunAction action = create(args);
 		action.run();
 		
 		verify(manifestSelector, times(1)).select(Mockito.anyList());
+		verify(changeManager, times(1)).commit(false);
 	}
 	
 	@Test
@@ -135,6 +140,7 @@ public class RunActionTest {
 		ManifestAction pluginAction = mock(ManifestAction.class);
 		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
+		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
 		Document doc = mock(Document.class);
 		ManifestActionHandler handler = mock(ManifestActionHandler.class);
 		
@@ -147,12 +153,52 @@ public class RunActionTest {
 			.thenReturn(Arrays.asList(manifest));
 		when(manifest.asXmlDocument()).thenReturn(doc);
 		when(factory.create(pluginAction)).thenReturn(null);
+		when(manifestChangeFactory.create(Mockito.anyList()))
+			.thenReturn(changeManager);
 	
 		RunAction action = create(args);
 		action.run();
 		
-		verify(handler, never()).modify(any(Document.class));
+		verify(changeManager, never()).apply(handler);
+		verify(changeManager, times(1)).commit(false);
 	}
+	
+	@Test
+	public void run_executes_changer_handler_perform_when_PluginHandler_is_found() {
+		String[] args = {};
+		String pluginName = "some-name";
+		Plugin plugin = mock(Plugin.class);
+		ManifestAction pluginAction = mock(ManifestAction.class);
+		ProjectRegistry registry = mock(ProjectRegistry.class);
+		AndroidManifest manifest = mock(AndroidManifest.class);
+		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
+		Document doc = mock(Document.class);
+		ManifestActionHandler handler = mock(ManifestActionHandler.class);
+		
+		when(pluginOptions.getPlugin()).thenReturn(pluginName);
+		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(projectLoader.load()).thenReturn(registry);
+		when(plugin.execute(any(OptionSet.class), any(Service.class)))
+			.thenReturn(asList(pluginAction));
+		when(manifestSelector.select(Mockito.anyList()))
+			.thenReturn(Arrays.asList(manifest));
+		when(manifest.asXmlDocument()).thenReturn(doc);
+		doReturn(handler).when(factory).create(pluginAction);
+		when(manifestChangeFactory.create(Mockito.anyList()))
+			.thenReturn(changeManager);
+	
+		RunAction action = create(args);
+		action.run();
+		
+		verify(changeManager, times(1)).apply(handler);
+		verify(changeManager, times(1)).commit(false);
+	}	
+
+	private static PluginActionHandler<?> create()
+	{
+		return new ManifestActionHandler(null);
+	}
+	
 	private static List<PluginAction> asList(PluginAction...actions) {
 		List<PluginAction> result = Lists.newArrayList();
 		for( PluginAction action : actions ) {

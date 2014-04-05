@@ -120,14 +120,14 @@ public class RunAction implements Action {
 		
 		if ( needsManifest ) {
 			List<AndroidManifest> manifests = manifestSelector.select(registry.getAllAndroidManifests());
-			ManifestChangeManager manager = manifestChangeFactory.create(manifests);
+			ManifestChangeManager changes = manifestChangeFactory.create(manifests);
 			for ( PluginAction action : actions ) {
 				Optional<PluginActionHandler<?>> handler = get(action);
-				if ( handler.isPresent() ) { manager.perform(handler.get()); }
-				else { Outputter.err.println(pluginName + " provided an unknown action type. Exiting."); return; }
+				if ( handler.isPresent() ) { changes.apply(handler.get()); }
+				else { Outputter.err.println(pluginName + " provided an unknown action type."); }
 			}
 			
-			manager.commit(dryrun);
+			changes.commit(dryrun);
 		}
 	}
 

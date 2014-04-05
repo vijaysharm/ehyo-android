@@ -8,7 +8,6 @@ public class PluginActionHandlerFactory {
 		if ( action instanceof InternalManifestAction )
 			return new ManifestActionHandler((InternalManifestAction) action);
 		
-//		throw new IllegalArgumentException("Expected type [" + InternalManifestAction.class.getSimpleName() + "], Got [" + action.getClass() + "]");
 		return null;
 	}
 

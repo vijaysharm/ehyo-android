@@ -52,7 +52,7 @@ public class ManifestChangeManager {
 		return mapping.build();
 	}
 
-	public void perform(PluginActionHandler<?> handler) {
+	public void apply(PluginActionHandler<?> handler) {
 		if ( handler instanceof ManifestActionHandler ) {
 			for ( Map.Entry<AndroidManifest, Document> manifest : manifests.entrySet() ) {
 				((ManifestActionHandler)handler).modify(manifest.getValue());
