@@ -30,7 +30,7 @@ public class ManifestActionHandler implements PluginActionHandler<Document> {
 			Element usesPermission = new Element("uses-permission")
 				.setAttribute("name", permission, ANDROID_NAMESPACE);
 
-			doc.getRootElement().addContent(0, usesPermission);
+//			doc.getRootElement().addContent(0, usesPermission);
 		}
 	}
 }
