@@ -96,6 +96,6 @@ public class PluginsCommandLineConverterTest {
 		converter.configure(parser);
 		
 		OptionSet options = spy(parser.parse("test"));
-		PluginOptions plugin = converter.read(options);
+		converter.read(options);
 	}
 }

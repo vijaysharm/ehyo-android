@@ -192,11 +192,6 @@ public class RunActionTest {
 		
 		verify(changeManager, times(1)).apply(handler);
 		verify(changeManager, times(1)).commit(false);
-	}	
-
-	private static PluginActionHandler<?> create()
-	{
-		return new ManifestActionHandler(null);
 	}
 	
 	private static List<PluginAction> asList(PluginAction...actions) {
