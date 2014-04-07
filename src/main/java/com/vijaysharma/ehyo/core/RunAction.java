@@ -11,11 +11,16 @@ import joptsimple.OptionSet;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Optional;
+import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
+import com.vijaysharma.ehyo.api.ActionFactories.BuildActionFactory;
+import com.vijaysharma.ehyo.api.ActionFactories.ManifestActionFactory;
 import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
+import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
@@ -133,7 +138,9 @@ public class RunAction implements Action {
 
 	private Service create(Plugin plugin) {
 		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
-		return new Service(plugins, new DefaultManifestActionFactory());
+		return new Service(plugins, 
+						   new DefaultManifestActionFactory(),
+						   new DefaultBuildActionFactory());
 	}
 	
 	private Optional<PluginActionHandler<?>> get(PluginAction action) {
@@ -151,4 +158,18 @@ public class RunAction implements Action {
 			Outputter.debug.exception("Failed to log usage", e);
 		}
 	}
+	
+	static class DefaultBuildActionFactory implements BuildActionFactory {
+		@Override
+		public BuildAction create() {
+			return new InternalBuildAction();
+		}
+	}
+	
+	static class DefaultManifestActionFactory implements ManifestActionFactory {
+		@Override
+		public ManifestAction create() {
+			return new InternalManifestAction();
+		}
+	}	
 }

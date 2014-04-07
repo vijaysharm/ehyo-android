@@ -32,12 +32,17 @@ public class Main implements Runnable {
 			"--directory", "/Users/vsharma/programming/android/MyApplication"
 		};
 		
-		String[] manifest = {
-			"--plugin", "manifest-permissions",
-			"--add"
+//		String[] plugin = {
+//			"--plugin", "manifest-permissions",
+//			"--add"
+//		};
+		
+		String[] plugin = {
+			"--plugin", "search",
+			"--lib", "butterknife"
 		};
 		
-		new Main(concat(main, manifest)).run();
+		new Main(concat(main, plugin)).run();
 	}
     
     private static String[] concat(String[]...strings) {

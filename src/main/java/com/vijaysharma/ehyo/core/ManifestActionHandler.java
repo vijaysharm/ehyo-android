@@ -6,6 +6,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
+import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
+
 public class ManifestActionHandler implements PluginActionHandler<Document> {
 	private static final Namespace ANDROID_NAMESPACE = Namespace.getNamespace("android", "http://schemas.android.com/apk/res/android");
 	private final InternalManifestAction action;
