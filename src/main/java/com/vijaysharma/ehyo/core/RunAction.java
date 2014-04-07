@@ -36,7 +36,7 @@ public class RunAction implements Action {
 	private final boolean help;
 	private final PluginLoader pluginLoader;
 	private final PluginActionHandlerFactory factory;
-	private final FileSelector<AndroidManifest> manifestSelector;
+	private final OptionSelector<AndroidManifest> manifestSelector;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 
 	public RunAction(String[] args, 
@@ -49,7 +49,7 @@ public class RunAction implements Action {
 			 new PluginLoader(pluginOptions.getPluginNamespaces()),
 			 new ProjectRegistryLoader(root),
 			 new PluginActionHandlerFactory(),
-			 new FileSelector<AndroidManifest>(MANIFEST_RENDERER),
+			 new OptionSelector<AndroidManifest>(MANIFEST_RENDERER, "Which of the following would you like to modify"),
 			 new ManifestChangeManagerFactory(),
 			 help,
 			 dryrun);
@@ -60,7 +60,7 @@ public class RunAction implements Action {
 			  PluginLoader loader,
 			  ProjectRegistryLoader projectLoader, 
 			  PluginActionHandlerFactory factory,
-			  FileSelector<AndroidManifest> manifestSelector,
+			  OptionSelector<AndroidManifest> manifestSelector,
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  boolean help,
 			  boolean dryrun) {

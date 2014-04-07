@@ -35,7 +35,7 @@ public class RunActionTest {
 	private PluginOptions pluginOptions;
 	private ProjectRegistryLoader projectLoader;
 	private PluginActionHandlerFactory factory;
-	private FileSelector<AndroidManifest> manifestSelector;
+	private OptionSelector<AndroidManifest> manifestSelector;
 	private ManifestChangeManagerFactory manifestChangeFactory;
 	
 	@Before
@@ -44,7 +44,7 @@ public class RunActionTest {
 		pluginOptions = mock(PluginOptions.class);
 		projectLoader = mock(ProjectRegistryLoader.class);
 		factory = mock(PluginActionHandlerFactory.class);
-		manifestSelector = mock(FileSelector.class);
+		manifestSelector = mock(OptionSelector.class);
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
 	}
 	

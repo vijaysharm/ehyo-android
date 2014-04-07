@@ -9,31 +9,34 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.logging.Outputter;
 
-public class FileSelector<T> {
+public class OptionSelector<T> {
 	private final Scanner scanner;
 	private final Function<T, String> renderer;
+	private String header;
 	
-	public FileSelector(Function<T, String> renderer) {
-		this(renderer, System.in);
+	public OptionSelector(Function<T, String> renderer, String header) {
+		this(renderer, System.in, header);
 	}
 	
-	FileSelector(Function<T, String> renderer, InputStream in) {
+	OptionSelector(Function<T, String> renderer, InputStream in, String header) {
 		this.renderer = renderer;
+		this.header = header;
 		this.scanner = new Scanner(new InputStreamReader(in));
 	}
 	
-	public List<T> select(List<T> items) {
+	public List<T> select(List<T> items, boolean multiselect) {
 		StringBuilder dialog = new StringBuilder();
-		int max = items.size() + 1;
+		int max = items.size() + (multiselect ? 1 : 0);
 		
-		dialog.append("Which of the following would you like to modify\n");
+		dialog.append(header + "\n");
 		
 		for ( int index = 0; index < items.size(); index++ ) {
 			T item = items.get(index);
 			dialog.append("[" + (index + 1) + "] " + renderer.apply(item) + "\n");
 		}
 
-		dialog.append("[" + max + "] Apply to all\n");
+		if ( multiselect ) dialog.append("[" + max + "] Apply to all\n");
+		
 		dialog.append("Select: ");
 		Outputter.out.println(dialog.toString());
 		
@@ -45,7 +48,11 @@ public class FileSelector<T> {
 		if ( selection == max )
 			return items;
 		
-		return Lists.newArrayList(items.get(selection - 1));
+		return Lists.newArrayList(items.get(selection - 1));	
+	}
+	
+	public List<T> select(List<T> items) {
+		return this.select(items, true);
 	}
 
 	private int read(int min, int max) {
