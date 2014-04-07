@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
@@ -43,15 +43,6 @@ public class ManifestChangeManager {
 		this.renderer = renderer;
 	}
 	
-	private Map<AndroidManifest, Document> transform(List<AndroidManifest> manifests) {
-		ImmutableMap.Builder<AndroidManifest, Document> mapping = ImmutableMap.builder();
-		for ( AndroidManifest manifest : manifests ) {
-			mapping.put(manifest, manifest.asXmlDocument());
-		}
-
-		return mapping.build();
-	}
-
 	public void apply(PluginActionHandler<?> handler) {
 		if ( handler instanceof ManifestActionHandler ) {
 			for ( Map.Entry<AndroidManifest, Document> manifest : manifests.entrySet() ) {
@@ -87,17 +78,27 @@ public class ManifestChangeManager {
 	}
 	
 	private void save(AndroidManifest manifest, Document modified) throws IOException {
-		Outputter.out.println("Writing " + renderer.apply(manifest));
+		Outputter.out.print("Writing " + renderer.apply(manifest) + "... ");
 		List<String> changed = toListOfStrings(modified);
 		EFileUtil.write(manifest, changed);
+		Outputter.out.println("done");
 	}
 	
-	private List<String> toListOfStrings(Document doc) throws IOException {
+	private static List<String> toListOfStrings(Document doc) throws IOException {
 		XMLOutputter xmlOutput = new XMLOutputter();
 		xmlOutput.setFormat(Format.getPrettyFormat());
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		xmlOutput.output(doc, stream);
 
 		return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()));
+	}
+	
+	private static Map<AndroidManifest, Document> transform(List<AndroidManifest> manifests) {
+		ImmutableMap.Builder<AndroidManifest, Document> mapping = ImmutableMap.builder();
+		for ( AndroidManifest manifest : manifests ) {
+			mapping.put(manifest, manifest.asXmlDocument());
+		}
+
+		return mapping.build();
 	}
 }

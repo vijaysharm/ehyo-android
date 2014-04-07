@@ -14,7 +14,7 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

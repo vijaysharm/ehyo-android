@@ -28,6 +28,12 @@ public class Outputter implements StyledTextOutput {
 	}
 	
 	@Override
+	public StyledTextOutput print(Object text) {
+		text(text);
+		return this;
+	}
+	
+	@Override
 	public StyledTextOutput println(Object text) {
 		text(text);
         println();

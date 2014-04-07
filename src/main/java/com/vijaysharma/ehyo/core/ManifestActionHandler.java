@@ -2,9 +2,9 @@ package com.vijaysharma.ehyo.core;
 
 import java.util.List;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
 
 public class ManifestActionHandler implements PluginActionHandler<Document> {
 	private static final Namespace ANDROID_NAMESPACE = Namespace.getNamespace("android", "http://schemas.android.com/apk/res/android");
@@ -18,6 +18,14 @@ public class ManifestActionHandler implements PluginActionHandler<Document> {
 	@Override
 	public void modify(Document doc) {
 		List<String> permissions = action.getAddedPermissions();
+		for (String permission : permissions) {
+			Element usesPermission = new Element("uses-permission")
+				.setAttribute("name", permission, ANDROID_NAMESPACE);
+
+			doc.getRootElement().addContent(0, usesPermission);
+		}
+		
+		permissions = action.getRemovedPermissions();
 		for (String permission : permissions) {
 			Element usesPermission = new Element("uses-permission")
 				.setAttribute("name", permission, ANDROID_NAMESPACE);

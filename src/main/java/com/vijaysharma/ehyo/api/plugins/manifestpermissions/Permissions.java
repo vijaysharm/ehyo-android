@@ -30,11 +30,17 @@ public class Permissions implements Plugin {
 	@Override
 	public List<PluginAction> execute(OptionSet options, Service service) {
 		ManifestAction action = service.createManifestAction();
-		action.addPermission("android.permission.INTERNET");
-		action.addPermission("android.permission.ACCESS_CHECKIN_PROPERTIES");
-		
 		List<PluginAction> result = Lists.newArrayList();
-		result.add(action);
+
+		if (options.has(this.add)) {
+			action.addPermission("android.permission.INTERNET");
+			result.add(action);
+		}
+		
+		if (options.has(this.remove)) {
+			action.removePermission("android.permission.INTERNET");
+			result.add(action);
+		}
 		
 		return result;
 	}
