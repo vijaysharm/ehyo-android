@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo;
 
-import static com.google.common.base.Joiner.on;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.commandline.CommandLineFactory;
@@ -19,21 +20,50 @@ public class Main implements Runnable {
     
     @Override
     public void run() {
-    	if (this.args != null) Outputter.debug.println(on(" ").join(this.args));
+    	printArgs(this.args);
     	factory.configure(this.args).run();
     }
     
     public static void main(String[] args) {
-		String[] arguments = {
+		String[] main = {
 //			"--version",
 //			"--plugins", "com.thirdparty.plugin", 
-			"--plugin", "manifest-permissions",
 //			"--dry-run",
-//			"--about",
-			"--directory", "/Users/vsharma/programming/android/MyApplication",
-//			"--help",
+			"--directory", "/Users/vsharma/programming/android/MyApplication"
 		};
-
-		new Main(arguments).run();
+		
+		String[] manifest = {
+			"--plugin", "manifest-permissions",
+			"--add"
+		};
+		
+		new Main(concat(main, manifest)).run();
 	}
+    
+    private static String[] concat(String[]...strings) {
+    	ArrayList<String> result = new ArrayList<>();
+    	for ( String[] s : strings ) {
+    		result.addAll(Arrays.asList(s));
+    	}
+    	return result.toArray(new String[0]);
+    }
+    
+    private static void printArgs(String[] args) {
+    	if ( args == null )
+    		return;
+    	
+    	StringBuilder output = new StringBuilder();
+    	for ( int index = 0; index < args.length; index++ ) {
+    		String arg = args[index];
+    		if ( arg.startsWith("--") ) {
+    			if ( index != 0 )
+    				output.append("\n");
+    			output.append(arg);
+    		} else {
+    			output.append(" " + arg);
+    		}
+    	}
+    	output.append("\n");
+    	Outputter.debug.print(output.toString());
+    }
 }
