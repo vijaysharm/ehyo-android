@@ -25,6 +25,7 @@ import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
+import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
