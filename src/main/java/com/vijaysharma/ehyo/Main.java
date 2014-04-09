@@ -38,7 +38,7 @@ public class Main implements Runnable {
 //		};
 		
 		String[] plugin = {
-			"--plugin", "search",
+			"--plugin", "search-mvn-central",
 			"--lib", "butterknife"
 		};
 		

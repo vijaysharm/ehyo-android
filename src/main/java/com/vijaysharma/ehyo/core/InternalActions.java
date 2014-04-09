@@ -31,6 +31,24 @@ class InternalActions {
 	}
 	
 	static class InternalBuildAction implements BuildAction {
+		private ImmutableList.Builder<String> addedDependencies = ImmutableList.builder();
+		private ImmutableList.Builder<String> removedDependencies = ImmutableList.builder();
 		
+		@Override
+		public void addDependency(String dependency) {
+			addedDependencies.add(dependency);
+		}
+		
+		public List<String> getAddedDependencies() {
+			return addedDependencies.build();
+		}
+		
+		public void removeDependency(String dependency) {
+			removedDependencies.add(dependency);
+		}
+		
+		public List<String> getRemovedDependencies() {
+			return removedDependencies.build();
+		}
 	}
 }

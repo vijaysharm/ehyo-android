@@ -118,9 +118,10 @@ public class RunAction implements Action {
 		ProjectRegistry registry = this.projectLoader.load();
 
 		boolean needsManifest = false;
-//		boolean needsBuild = false;
+		boolean needsBuild = false;
 		for ( PluginAction action : actions ) {
 			if ( action instanceof ManifestAction ) needsManifest = true;
+			if ( action instanceof BuildAction ) needsBuild = true;
 		}
 		
 		if ( needsManifest ) {
@@ -133,6 +134,10 @@ public class RunAction implements Action {
 			}
 			
 			changes.commit(dryrun);
+		}
+		
+		if ( needsBuild ) {
+			
 		}
 	}
 

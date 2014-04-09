@@ -4,8 +4,6 @@ import java.io.File;
 
 public class GradleBuild {
 	public static GradleBuild read(File file) {
-		// TODO: Store the file as an XML object so we can reference 
-		//		 pieces of the manifest directly		
 		return new GradleBuild(file);
 	}
 	
