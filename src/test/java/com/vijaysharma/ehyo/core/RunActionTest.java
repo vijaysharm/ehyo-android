@@ -26,6 +26,7 @@ import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
@@ -138,7 +139,7 @@ public class RunActionTest {
 		String[] args = {};
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
-		ManifestAction pluginAction = mock(ManifestAction.class);
+		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
 		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
@@ -153,7 +154,7 @@ public class RunActionTest {
 		when(manifestSelector.select(Mockito.anyList()))
 			.thenReturn(Arrays.asList(manifest));
 		when(manifest.asXmlDocument()).thenReturn(doc);
-		when(factory.create(pluginAction)).thenReturn(null);
+		when(factory.createManifestActionHandler(pluginAction)).thenReturn(null);
 		when(manifestChangeFactory.create(Mockito.anyList()))
 			.thenReturn(changeManager);
 	
@@ -169,7 +170,7 @@ public class RunActionTest {
 		String[] args = {};
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
-		ManifestAction pluginAction = mock(ManifestAction.class);
+		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
 		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
@@ -184,7 +185,7 @@ public class RunActionTest {
 		when(manifestSelector.select(Mockito.anyList()))
 			.thenReturn(Arrays.asList(manifest));
 		when(manifest.asXmlDocument()).thenReturn(doc);
-		doReturn(handler).when(factory).create(pluginAction);
+		doReturn(handler).when(factory).createManifestActionHandler(pluginAction);
 		when(manifestChangeFactory.create(Mockito.anyList()))
 			.thenReturn(changeManager);
 	

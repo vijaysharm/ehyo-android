@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 
 public class ProjectRegistry {
@@ -17,18 +18,9 @@ public class ProjectRegistry {
 		this.root = root;
 		this.projects = projects;
 	}
-	
-	public Map<String, Project> getProjects() {
-		return projects;
-	}
 
 	public List<AndroidManifest> getAllAndroidManifests() {
-		ImmutableList.Builder<AndroidManifest> manifests = ImmutableList.builder();
-		for ( Project project : projects.values() ) {
-			manifests.addAll( project.getManifests() );
-		}
-		
-		return manifests.build();
+		return getAllAndroidManifests(Functions.<AndroidManifest>identity());
 	}
 	
 	public <T> List<T> getAllAndroidManifests(Function<AndroidManifest, T> transform) {
@@ -40,6 +32,10 @@ public class ProjectRegistry {
 		return builds.build();
 	}
 	
+	public List<GradleBuild> getAllGradleBuilds() {
+		return getAllGradleBuilds(Functions.<GradleBuild>identity());
+	}
+	
 	public <T> List<T> getAllGradleBuilds(Function<GradleBuild, T> transform) {
 		ImmutableList.Builder<T> builds = ImmutableList.builder();
 		for ( Project project : projects.values() ) {
@@ -47,5 +43,14 @@ public class ProjectRegistry {
 		}
 		
 		return builds.build();
+	}
+
+	public GradleBuild getGradleBuild(String id) {
+		for ( GradleBuild build : getAllGradleBuilds() ) {
+			if ( build.getId().equals(id) )
+				return build;
+		}
+		
+		throw new IllegalArgumentException("Uknown Gradle file: " + id);
 	}
 }

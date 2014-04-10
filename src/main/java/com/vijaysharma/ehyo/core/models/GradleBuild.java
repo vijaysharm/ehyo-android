@@ -11,9 +11,11 @@ public class GradleBuild {
 	}
 	
 	private final File file;
+	private final String id;
 	
 	public GradleBuild(File file) {
 		this.file = file;
+		id = file.getAbsolutePath();
 	}
 
 	public String getProject() {
@@ -22,6 +24,10 @@ public class GradleBuild {
 
 	public File getFile() {
 		return this.file;
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 	/**
@@ -40,5 +46,9 @@ public class GradleBuild {
 
 	public List<Flavor> getFlavors() {
 		return Lists.<Flavor>newArrayList();
+	}
+	
+	public GradleBuildDocument asDocument() {
+		return GradleBuildDocument.read(this.file, this.id);
 	}
 }

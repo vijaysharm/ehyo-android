@@ -21,7 +21,7 @@ import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 
-public class ManifestChangeManager {
+public class ManifestChangeManager implements ChangeManager<Document>{
 	static class ManifestChangeManagerFactory {
 		public ManifestChangeManager create(List<AndroidManifest> manifests) {
 			return new ManifestChangeManager(manifests, MANIFEST_RENDERER);
@@ -43,11 +43,9 @@ public class ManifestChangeManager {
 		this.renderer = renderer;
 	}
 	
-	public void apply(PluginActionHandler<?> handler) {
-		if ( handler instanceof ManifestActionHandler ) {
-			for ( Map.Entry<AndroidManifest, Document> manifest : manifests.entrySet() ) {
-				((ManifestActionHandler)handler).modify(manifest.getValue());
-			}
+	public void apply(PluginActionHandler<Document> handler) {
+		for ( Map.Entry<AndroidManifest, Document> manifest : manifests.entrySet() ) {
+			handler.modify(manifest.getValue());
 		}
 	}
 

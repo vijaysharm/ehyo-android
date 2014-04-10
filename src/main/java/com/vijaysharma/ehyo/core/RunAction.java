@@ -15,9 +15,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
-import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.ProjectBuild;
@@ -25,6 +23,8 @@ import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
+import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildActionFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
@@ -129,31 +129,32 @@ public class RunAction implements Action {
 		if ( actions == null || actions.isEmpty() )
 			return;
 
-		Set<PluginAction> manifestActions = Sets.newHashSet();
-		Set<PluginAction> buildActions = Sets.newHashSet();
+		Set<InternalManifestAction> manifestActions = Sets.newHashSet();
+		Set<InternalBuildAction> buildActions = Sets.newHashSet();
 		for ( PluginAction action : actions ) {
-			if ( action instanceof ManifestAction ) manifestActions.add(action);
-			if ( action instanceof BuildAction ) buildActions.add(action);
+			if ( action instanceof InternalManifestAction ) manifestActions.add((InternalManifestAction)action);
+			if ( action instanceof InternalBuildAction ) buildActions.add((InternalBuildAction)action);
 		}
 		
 		if ( ! manifestActions.isEmpty() ) {
 			List<AndroidManifest> manifests = manifestSelector.select(registry.getAllAndroidManifests());
 			ManifestChangeManager changes = manifestChangeFactory.create(manifests);
-			for ( PluginAction action : manifestActions ) {
-				Optional<PluginActionHandler<?>> handler = get(action);
-				if ( handler.isPresent() ) { changes.apply(handler.get()); }
-				else { Outputter.err.println(pluginName + " provided an unknown action type."); }
+			for ( InternalManifestAction action : manifestActions ) {
+				ManifestActionHandler handler = factory.createManifestActionHandler(action);
+				changes.apply(handler);
 			}
 			
 			changes.commit(dryrun);
 		}
 		
 		if ( ! buildActions.isEmpty() ) {
-			for ( PluginAction action : buildActions ) {
-				Optional<PluginActionHandler<?>> handler = get(action);
-				if ( handler.isPresent() ) { /*changes.apply(handler.get()); */ }
-				else { Outputter.err.println(pluginName + " provided an unknown action type."); }				
+			GradleBuildChangeManager changes = new GradleBuildChangeManager(registry, buildActions);
+			for ( InternalBuildAction action : buildActions ) {
+				BuildActionHandler handler = factory.createBuildActionHandler(action);
+				changes.apply(handler);
 			}
+			
+			changes.commit(dryrun);
 		}
 	}
 
@@ -201,14 +202,6 @@ public class RunAction implements Action {
 						   new DefaultManifestActionFactory(), 
 						   new DefaultBuildActionFactory(),
 						   new DefaultOptionSelectorFactory());
-	}
-	
-	private Optional<PluginActionHandler<?>> get(PluginAction action) {
-		PluginActionHandler<?> handler = factory.create(action);
-		if (handler == null)
-			return Optional.absent();
-		
-		return Optional.<PluginActionHandler<?>>of(handler);
 	}
 	
 	private void printUsage(OptionParser parser) {

@@ -6,7 +6,6 @@ import java.util.List;
 import com.vijaysharma.ehyo.api.ActionFactories.BuildActionFactory;
 import com.vijaysharma.ehyo.api.ActionFactories.ManifestActionFactory;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
-import com.vijaysharma.ehyo.api.utils.OptionSelectorFactory;
 
 public class Service {
 	private final Collection<Plugin> plugins;

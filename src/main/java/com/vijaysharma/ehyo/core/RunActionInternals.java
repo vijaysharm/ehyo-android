@@ -8,10 +8,10 @@ import com.vijaysharma.ehyo.api.ActionFactories.ManifestActionFactory;
 import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.ManifestAction;
+import com.vijaysharma.ehyo.api.OptionSelectorFactory;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
-import com.vijaysharma.ehyo.api.utils.OptionSelectorFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
@@ -26,6 +26,10 @@ class RunActionInternals {
 		public DefaultBuildConfiguration(String buildType, String flavor, GradleBuild build) {
 			this.build = build;
 			this.buildType = buildType;
+		}
+		
+		public GradleBuild getBuild() {
+			return build;
 		}
 		
 		@Override

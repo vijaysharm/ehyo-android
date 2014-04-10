@@ -8,15 +8,14 @@ import java.util.List;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import joptsimple.OptionSpecBuilder;
 import retrofit.RestAdapter;
 
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.BuildAction;
+import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
-import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.plugins.search.models.Artifact;
 import com.vijaysharma.ehyo.api.plugins.search.models.QueryByNameResponse;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
@@ -59,11 +58,11 @@ public class SearchLibraryPlugin implements Plugin {
 			OptionSelector<BuildConfiguration> configSelector = service.createSelector(BuildConfiguration.class);
 			List<BuildConfiguration> selectedBuildConfigs = configSelector.select(buildConfigs, false);
 			
+			BuildAction action = service.createBuildAction();
 			for ( BuildConfiguration config : selectedBuildConfigs ) {
-				BuildAction action = service.createBuildAction();
 				action.addDependency(config, toProjectId(first));
-				actions.add(action);
 			}
+			actions.add(action);
 		}
 		
 		return actions;

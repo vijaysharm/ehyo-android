@@ -8,6 +8,8 @@ import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
+import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 class InternalActions {
 	static class InternalManifestAction implements ManifestAction {
@@ -34,24 +36,27 @@ class InternalActions {
 	}
 	
 	static class InternalBuildAction implements BuildAction {
-		private ImmutableMultimap.Builder<BuildConfiguration, String> addedDependencies = ImmutableMultimap.builder();
-		private ImmutableMultimap.Builder<BuildConfiguration, String> removedDependencies = ImmutableMultimap.builder();
+		private ImmutableMultimap.Builder<String, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
 		
 		@Override
-		public void addDependency(BuildConfiguration variant, String dependency) {
-			addedDependencies.put(variant, dependency);
+		public void addDependency(BuildConfiguration config, String dependency) {
+			DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
+			BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
+			addedDependencies.put(configuration.getBuild().getId(), value);
 		}
 		
-		public Multimap<BuildConfiguration, String> getAddedDependencies() {
+		public Multimap<String, BuildActionDependencyValue> getAddedDependencies() {
 			return addedDependencies.build();
 		}
+	}
+	
+	static class BuildActionDependencyValue {
+		private final DefaultBuildConfiguration configuration;
+		private final String dependency;
 		
-		public void removeDependency(BuildConfiguration variant, String dependency) {
-			removedDependencies.put(variant, dependency);
-		}
-		
-		public Multimap<BuildConfiguration, String> getRemovedDependencies() {
-			return removedDependencies.build();
+		public BuildActionDependencyValue(DefaultBuildConfiguration config, String dependency) {
+			this.configuration = config;
+			this.dependency = dependency;
 		}
 	}
 }
