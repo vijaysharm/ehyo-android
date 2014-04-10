@@ -3,7 +3,6 @@ package com.vijaysharma.ehyo.core.models;
 import java.io.File;
 import java.util.List;
 
-import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.utils.EFileUtil;
 
 public class GradleBuildDocument {
@@ -27,8 +26,18 @@ public class GradleBuildDocument {
 		return lines;
 	}
 
+	/**
+	 * TODO: This may add to the dependencies defined in buildscript 
+	 */
 	public GradleBuildDocument appendDependency(String dependency) {
-		Outputter.out.print("Adding " + dependency);
+		for ( int index = 0; index < lines.size(); index++ ) {
+			String line = lines.get(index);
+			if ( line.trim().startsWith("dependencies") ) {
+				lines.add(index + 1, "\t" + dependency);
+				break;
+			}
+		}
+		
 		return this;
 	}
 }
