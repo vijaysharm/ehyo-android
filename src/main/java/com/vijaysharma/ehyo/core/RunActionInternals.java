@@ -15,26 +15,42 @@ import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.BuildType;
+import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 class RunActionInternals {
 
 	static class DefaultBuildConfiguration implements BuildConfiguration {
 		private final GradleBuild build;
-		private final String buildType;
+		private final BuildType buildType;
+		private final Flavor flavor;
 		
-		public DefaultBuildConfiguration(String buildType, String flavor, GradleBuild build) {
+		public DefaultBuildConfiguration(BuildType buildType, Flavor flavor, GradleBuild build) {
+			this.flavor = flavor;
 			this.build = build;
 			this.buildType = buildType;
+		}
+		
+		public BuildType getBuildType() {
+			return buildType;
 		}
 		
 		public GradleBuild getBuild() {
 			return build;
 		}
 		
+		public Flavor getFlavor() {
+			return flavor;
+		}
+		
 		@Override
 		public String toString() {
-			return on(":").join(build.getProject(), buildType);
+			if ( flavor == null ) {
+				return on(":").join(build.getProject(), buildType.getCompileString());
+			} else {
+				return on(":").join(build.getProject(), flavor.getCompileString(buildType));	
+			}
 		}
 	}
 	

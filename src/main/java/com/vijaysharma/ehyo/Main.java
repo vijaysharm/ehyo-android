@@ -28,7 +28,7 @@ public class Main implements Runnable {
 		String[] main = {
 //			"--version",
 //			"--plugins", "com.thirdparty.plugin", 
-//			"--dry-run",
+			"--dry-run",
 			"--directory", "/Users/vsharma/programming/android/MyApplication"
 		};
 		

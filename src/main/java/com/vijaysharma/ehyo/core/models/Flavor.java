@@ -1,7 +1,12 @@
 package com.vijaysharma.ehyo.core.models;
 
 public class Flavor {
-	public String getFlavor() {
-		return null;
+	private final String flavor;
+	public Flavor(String flavor) {
+		this.flavor = flavor;
+	}
+	
+	public String getCompileString(BuildType buildType) {
+		return "<FLAVOR????>";
 	}
 }

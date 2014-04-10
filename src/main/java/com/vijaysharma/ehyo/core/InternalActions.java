@@ -58,5 +58,13 @@ class InternalActions {
 			this.configuration = config;
 			this.dependency = dependency;
 		}
+		
+		public String getDependency() {
+			return dependency;
+		}
+		
+		public DefaultBuildConfiguration getConfiguration() {
+			return configuration;
+		}
 	}
 }

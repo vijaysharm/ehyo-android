@@ -181,11 +181,9 @@ public class RunAction implements Action {
 				List<Flavor> flavors = build.getFlavors();
 
 				for ( BuildType buildType : buildTypes ) {
-					configuration.add(new DefaultBuildConfiguration( buildType.getType(), null, build));
+					configuration.add(new DefaultBuildConfiguration( buildType, null, build));
 					for ( Flavor flavor : flavors ) {
-						configuration.add(new DefaultBuildConfiguration( buildType.getType(), 
-																		 flavor.getFlavor(), 
-																		 build ));
+						configuration.add(new DefaultBuildConfiguration( buildType, flavor, build ));
 					}
 				}
 				

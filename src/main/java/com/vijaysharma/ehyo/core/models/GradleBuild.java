@@ -36,10 +36,10 @@ public class GradleBuild {
 	 */
 	public List<BuildType> getBuildTypes() {
 		List<BuildType> buildTypes = Lists.newArrayList();
-		buildTypes.add(new BuildType("compile"));
-		buildTypes.add(new BuildType("release"));
-		buildTypes.add(new BuildType("debug"));
-		buildTypes.add(new BuildType("androidTest"));
+		buildTypes.add(BuildType.COMPILE);
+		buildTypes.add(BuildType.DEBUG);
+		buildTypes.add(BuildType.RELEASE);
+		buildTypes.add(BuildType.ANDROID_TEST);
 		
 		return buildTypes;
 	}

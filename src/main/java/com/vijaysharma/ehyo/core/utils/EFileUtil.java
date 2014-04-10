@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 public class EFileUtil {
 	private static final String UTF_8 = "UTF-8";
@@ -43,4 +44,12 @@ public class EFileUtil {
 			throw new UncheckedIoException(e);
 		}
 	}
+	
+	public static void write(GradleBuild build, List<String> lines) {
+		try {
+			FileUtils.writeLines(build.getFile(), lines);
+		} catch (IOException e) {
+			throw new UncheckedIoException(e);
+		}
+	}	
 }
