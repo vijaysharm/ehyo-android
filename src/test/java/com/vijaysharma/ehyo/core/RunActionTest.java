@@ -14,7 +14,6 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.jdom2.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -31,6 +30,7 @@ import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunActionTest {
@@ -146,7 +146,7 @@ public class RunActionTest {
 		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
-		Document doc = mock(Document.class);
+		AndroidManifestDocument doc = mock(AndroidManifestDocument.class);
 		ManifestActionHandler handler = mock(ManifestActionHandler.class);
 		
 		when(pluginOptions.getPlugin()).thenReturn(pluginName);
@@ -156,7 +156,7 @@ public class RunActionTest {
 			.thenReturn(asList(pluginAction));
 		when(manifestSelector.select(Mockito.anyList()))
 			.thenReturn(Arrays.asList(manifest));
-		when(manifest.asXmlDocument()).thenReturn(doc);
+		when(manifest.asDocument()).thenReturn(doc);
 		when(factory.createManifestActionHandler(pluginAction)).thenReturn(null);
 		when(manifestChangeFactory.create(Mockito.anyList()))
 			.thenReturn(changeManager);
@@ -177,7 +177,7 @@ public class RunActionTest {
 		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
-		Document doc = mock(Document.class);
+		AndroidManifestDocument doc = mock(AndroidManifestDocument.class);
 		ManifestActionHandler handler = mock(ManifestActionHandler.class);
 		
 		when(pluginOptions.getPlugin()).thenReturn(pluginName);
@@ -187,7 +187,7 @@ public class RunActionTest {
 			.thenReturn(asList(pluginAction));
 		when(manifestSelector.select(Mockito.anyList()))
 			.thenReturn(Arrays.asList(manifest));
-		when(manifest.asXmlDocument()).thenReturn(doc);
+		when(manifest.asDocument()).thenReturn(doc);
 		doReturn(handler).when(factory).createManifestActionHandler(pluginAction);
 		when(manifestChangeFactory.create(Mockito.anyList()))
 			.thenReturn(changeManager);

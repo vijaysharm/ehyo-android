@@ -16,7 +16,7 @@ Running the command-line
 
 Limitations
 -----------
-This project was designed around the default Android Studio project structure, and therefore makes a lot of assumptions based on the way the code is structured. 
+This project was designed around the default Android Studio project structure, and therefore makes a lot of assumptions based on the way it structures its code. 
 
 Usage
 -----
@@ -36,7 +36,6 @@ TODO
 +++ etc...
 + Provide a way to add a new Component to the Android project (Activity, Services, etc..)
 ++ Includes adding the new Component to the Manifest
-+ Provide a way to search maven and add libraries to the project
 + Provide a plugin that lets you rename your namespace
 + Make the command line more friendlier
 ++ ehyo permissions internet vs ehyo --plugin permissions --add internet
@@ -47,7 +46,7 @@ TODO
 + Show better version information
 + Have the custom logger respect debug mode
 + Broke the --version command
-+ Better option description
++ Better option description for usage
 + Check if the project structure is valid
 + Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
 + Improve ManifestActionHandler to only add permissions if defined in manifest

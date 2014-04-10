@@ -1,13 +1,6 @@
 package com.vijaysharma.ehyo.core.models;
 
 import java.io.File;
-import java.io.IOException;
-
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-
-import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 public class AndroidManifest {
 	public static AndroidManifest read(File file) {
@@ -15,9 +8,11 @@ public class AndroidManifest {
 	}
 
 	private final File file;
+	private final String id;
 	
 	public AndroidManifest(File file) {
 		this.file = file;
+		this.id = file.getAbsolutePath();
 	}
 
 	public String getProject() {
@@ -36,14 +31,7 @@ public class AndroidManifest {
 		return file;
 	}
 	
-	public Document asXmlDocument() {
-		try {
-			SAXBuilder builder = new SAXBuilder();
-			return builder.build(file);
-		} catch (IOException ioe) {
-			throw new UncheckedIoException(ioe);
-		} catch (JDOMException jde) {
-			throw new RuntimeException(jde);
-		}		
+	public AndroidManifestDocument asDocument() {
+		return AndroidManifestDocument.read(this.file, this.id);
 	}
 }

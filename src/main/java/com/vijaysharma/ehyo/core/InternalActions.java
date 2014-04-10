@@ -6,10 +6,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildAction;
-import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
+import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
-import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 class InternalActions {
 	static class InternalManifestAction implements ManifestAction {
