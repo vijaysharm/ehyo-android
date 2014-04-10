@@ -26,6 +26,7 @@ import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
@@ -39,6 +40,7 @@ public class RunActionTest {
 	private PluginActionHandlerFactory factory;
 	private OptionSelector<AndroidManifest> manifestSelector;
 	private ManifestChangeManagerFactory manifestChangeFactory;
+	private GradleBuildChangeManagerFactory buildChangeFactory;
 	
 	@Before
 	public void before() {
@@ -48,6 +50,7 @@ public class RunActionTest {
 		factory = mock(PluginActionHandlerFactory.class);
 		manifestSelector = mock(OptionSelector.class);
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
+		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -217,6 +220,7 @@ public class RunActionTest {
 							 factory, 
 							 manifestSelector,
 							 manifestChangeFactory,
+							 buildChangeFactory,
 							 help, 
 							 dryrun);
 	}

@@ -23,6 +23,7 @@ import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
@@ -56,6 +57,7 @@ public class RunAction implements Action {
 	private final PluginActionHandlerFactory factory;
 	private final OptionSelector<AndroidManifest> manifestSelector;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
+	private final GradleBuildChangeManagerFactory buildChangeFactory;
 
 	public RunAction(String[] args, 
 					 File root, 
@@ -69,6 +71,7 @@ public class RunAction implements Action {
 			 new PluginActionHandlerFactory(),
 			 new OptionSelector<AndroidManifest>("Which of the following would you like to modify", MANIFEST_RENDERER),
 			 new ManifestChangeManagerFactory(),
+			 new GradleBuildChangeManagerFactory(),
 			 help,
 			 dryrun);
 	}
@@ -80,6 +83,7 @@ public class RunAction implements Action {
 			  PluginActionHandlerFactory factory,
 			  OptionSelector<AndroidManifest> manifestSelector,
 			  ManifestChangeManagerFactory manifestChangeFactory,
+			  GradleBuildChangeManagerFactory buildChangeFactory,
 			  boolean help,
 			  boolean dryrun) {
 		this.args = args;
@@ -91,6 +95,7 @@ public class RunAction implements Action {
 		this.pluginLoader = loader;
 		this.factory = factory;
 		this.manifestChangeFactory = manifestChangeFactory; 
+		this.buildChangeFactory = buildChangeFactory;
 	}
 
 	@Override
@@ -148,7 +153,7 @@ public class RunAction implements Action {
 		}
 		
 		if ( ! buildActions.isEmpty() ) {
-			GradleBuildChangeManager changes = new GradleBuildChangeManager(registry, buildActions);
+			GradleBuildChangeManager changes = buildChangeFactory.create(registry, buildActions);
 			for ( InternalBuildAction action : buildActions ) {
 				BuildActionHandler handler = factory.createBuildActionHandler(action);
 				changes.apply(handler);

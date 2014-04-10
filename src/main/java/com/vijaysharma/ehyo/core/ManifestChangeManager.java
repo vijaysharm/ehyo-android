@@ -22,12 +22,6 @@ import difflib.DiffUtils;
 import difflib.Patch;
 
 public class ManifestChangeManager implements ChangeManager<Document>{
-	static class ManifestChangeManagerFactory {
-		public ManifestChangeManager create(List<AndroidManifest> manifests) {
-			return new ManifestChangeManager(manifests, MANIFEST_RENDERER);
-		}
-	}
-	
 	private static final Function<AndroidManifest, String> MANIFEST_RENDERER = new Function<AndroidManifest, String>() {
 		@Override
 		public String apply(AndroidManifest manifest) {
@@ -35,11 +29,26 @@ public class ManifestChangeManager implements ChangeManager<Document>{
 		}
 	};
 	
+	static class ManifestChangeManagerFactory {
+		public ManifestChangeManager create(List<AndroidManifest> manifests) {
+			return new ManifestChangeManager(transform(manifests), MANIFEST_RENDERER);
+		}
+		
+		private static Map<AndroidManifest, Document> transform(List<AndroidManifest> manifests) {
+			ImmutableMap.Builder<AndroidManifest, Document> mapping = ImmutableMap.builder();
+			for ( AndroidManifest manifest : manifests ) {
+				mapping.put(manifest, manifest.asXmlDocument());
+			}
+
+			return mapping.build();
+		}
+	}
+	
 	private final Map<AndroidManifest, Document> manifests;
 	private final Function<AndroidManifest, String> renderer;
 	
-	private ManifestChangeManager(List<AndroidManifest> manifests, Function<AndroidManifest, String> renderer) {
-		this.manifests = transform(manifests);
+	private ManifestChangeManager(Map<AndroidManifest, Document> manifests, Function<AndroidManifest, String> renderer) {
+		this.manifests = manifests;
 		this.renderer = renderer;
 	}
 	
@@ -89,14 +98,5 @@ public class ManifestChangeManager implements ChangeManager<Document>{
 		xmlOutput.output(doc, stream);
 
 		return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()));
-	}
-	
-	private static Map<AndroidManifest, Document> transform(List<AndroidManifest> manifests) {
-		ImmutableMap.Builder<AndroidManifest, Document> mapping = ImmutableMap.builder();
-		for ( AndroidManifest manifest : manifests ) {
-			mapping.put(manifest, manifest.asXmlDocument());
-		}
-
-		return mapping.build();
 	}
 }
