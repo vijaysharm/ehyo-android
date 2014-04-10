@@ -25,4 +25,8 @@ public class Project {
 	public Collection<AndroidManifest> getManifests() {
 		return manifests.values();
 	}
+	
+	public Collection<GradleBuild> getBuilds() {
+		return builds.values();
+	}
 }

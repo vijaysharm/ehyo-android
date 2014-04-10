@@ -16,7 +16,7 @@ public class OptionSelectorTest {
 	@Test
 	public void select_returns_empty_list_with_invalid_string_selection() {
 		Function<String, String> renderer = Functions.identity();
-		OptionSelector<String> selectors = new OptionSelector<String>(renderer, string("string"), "");
+		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("string"));
 		
 		List<String> list = Lists.newArrayList("one", "two");
 		List<String> selection = selectors.select(list);
@@ -26,7 +26,7 @@ public class OptionSelectorTest {
 	@Test
 	public void select_returns_empty_list_with_invalid_int_selection() {
 		Function<String, String> renderer = Functions.identity();
-		OptionSelector<String> selectors = new OptionSelector<String>(renderer, string("99"), "");
+		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("99"));
 		
 		List<String> list = Lists.newArrayList("one", "two");
 		List<String> selection = selectors.select(list);
@@ -36,7 +36,7 @@ public class OptionSelectorTest {
 	@Test
 	public void select_returns_item_when_selection_is_valid() {
 		Function<String, String> renderer = Functions.identity();
-		OptionSelector<String> selectors = new OptionSelector<String>(renderer, string("1"), "");
+		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("1"));
 		
 		List<String> list = Lists.newArrayList("one", "two");
 		List<String> selection = selectors.select(list);
@@ -47,7 +47,7 @@ public class OptionSelectorTest {
 	@Test
 	public void select_returns_array_when_selection_is_the_last_one() {
 		Function<String, String> renderer = Functions.identity();
-		OptionSelector<String> selectors = new OptionSelector<String>(renderer, string("3"), "");
+		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("3"));
 		
 		List<String> list = Lists.newArrayList("one", "two");
 		List<String> selection = selectors.select(list);
@@ -59,7 +59,7 @@ public class OptionSelectorTest {
 	@Test
 	public void select_returns_empty_array_when_selection_is_the_last_one_but_multiselect_is_false() {
 		Function<String, String> renderer = Functions.identity();
-		OptionSelector<String> selectors = new OptionSelector<String>(renderer, string("3"), "");
+		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("3"));
 		
 		List<String> list = Lists.newArrayList("one", "two");
 		List<String> selection = selectors.select(list, false);

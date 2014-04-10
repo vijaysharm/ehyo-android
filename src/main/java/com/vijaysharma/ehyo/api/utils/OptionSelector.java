@@ -14,11 +14,11 @@ public class OptionSelector<T> {
 	private final Function<T, String> renderer;
 	private String header;
 	
-	public OptionSelector(Function<T, String> renderer, String header) {
-		this(renderer, System.in, header);
+	public OptionSelector(String header, Function<T, String> renderer) {
+		this(header, renderer, System.in);
 	}
 	
-	OptionSelector(Function<T, String> renderer, InputStream in, String header) {
+	OptionSelector(String header, Function<T, String> renderer, InputStream in) {
 		this.renderer = renderer;
 		this.header = header;
 		this.scanner = new Scanner(new InputStreamReader(in));

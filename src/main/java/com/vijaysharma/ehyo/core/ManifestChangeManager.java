@@ -38,7 +38,7 @@ public class ManifestChangeManager {
 	private final Map<AndroidManifest, Document> manifests;
 	private final Function<AndroidManifest, String> renderer;
 	
-	public ManifestChangeManager(List<AndroidManifest> manifests, Function<AndroidManifest, String> renderer) {
+	private ManifestChangeManager(List<AndroidManifest> manifests, Function<AndroidManifest, String> renderer) {
 		this.manifests = transform(manifests);
 		this.renderer = renderer;
 	}

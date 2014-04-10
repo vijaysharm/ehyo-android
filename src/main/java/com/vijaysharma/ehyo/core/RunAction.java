@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -11,20 +12,31 @@ import joptsimple.OptionSet;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Optional;
-import com.vijaysharma.ehyo.api.ActionFactories.BuildActionFactory;
-import com.vijaysharma.ehyo.api.ActionFactories.ManifestActionFactory;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.BuildAction;
+import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
+import com.vijaysharma.ehyo.api.ProjectBuild;
+import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
-import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
-import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildActionFactory;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultManifestActionFactory;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.BuildType;
+import com.vijaysharma.ehyo.core.models.Flavor;
+import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunAction implements Action {
@@ -55,7 +67,7 @@ public class RunAction implements Action {
 			 new PluginLoader(pluginOptions.getPluginNamespaces()),
 			 new ProjectRegistryLoader(root),
 			 new PluginActionHandlerFactory(),
-			 new OptionSelector<AndroidManifest>(MANIFEST_RENDERER, "Which of the following would you like to modify"),
+			 new OptionSelector<AndroidManifest>("Which of the following would you like to modify", MANIFEST_RENDERER),
 			 new ManifestChangeManagerFactory(),
 			 help,
 			 dryrun);
@@ -100,8 +112,9 @@ public class RunAction implements Action {
 		
 		OptionSet options = parser.parse(this.args);
 		
-		Service service = create(plugin);
-		execute(plugin.name(), plugin.execute(options, service));
+		ProjectRegistry registry = this.projectLoader.load();
+		Service service = create(plugin, registry);
+		execute(plugin.name(), plugin.execute(options, service), registry);
 	}
 
 	/**
@@ -112,23 +125,21 @@ public class RunAction implements Action {
 	 * 5) Show the diff to the user
 	 * 6) Apply the diff and save the modified files
 	 */
-	private void execute(String pluginName, List<PluginAction> actions) {
+	private void execute(String pluginName, List<PluginAction> actions, ProjectRegistry registry) {
 		if ( actions == null || actions.isEmpty() )
 			return;
-		
-		ProjectRegistry registry = this.projectLoader.load();
 
-		boolean needsManifest = false;
-		boolean needsBuild = false;
+		Set<PluginAction> manifestActions = Sets.newHashSet();
+		Set<PluginAction> buildActions = Sets.newHashSet();
 		for ( PluginAction action : actions ) {
-			if ( action instanceof ManifestAction ) needsManifest = true;
-			if ( action instanceof BuildAction ) needsBuild = true;
+			if ( action instanceof ManifestAction ) manifestActions.add(action);
+			if ( action instanceof BuildAction ) buildActions.add(action);
 		}
 		
-		if ( needsManifest ) {
+		if ( ! manifestActions.isEmpty() ) {
 			List<AndroidManifest> manifests = manifestSelector.select(registry.getAllAndroidManifests());
 			ManifestChangeManager changes = manifestChangeFactory.create(manifests);
-			for ( PluginAction action : actions ) {
+			for ( PluginAction action : manifestActions ) {
 				Optional<PluginActionHandler<?>> handler = get(action);
 				if ( handler.isPresent() ) { changes.apply(handler.get()); }
 				else { Outputter.err.println(pluginName + " provided an unknown action type."); }
@@ -137,16 +148,59 @@ public class RunAction implements Action {
 			changes.commit(dryrun);
 		}
 		
-		if ( needsBuild ) {
-			
+		if ( ! buildActions.isEmpty() ) {
+			for ( PluginAction action : buildActions ) {
+				Optional<PluginActionHandler<?>> handler = get(action);
+				if ( handler.isPresent() ) { /*changes.apply(handler.get()); */ }
+				else { Outputter.err.println(pluginName + " provided an unknown action type."); }				
+			}
 		}
 	}
 
-	private Service create(Plugin plugin) {
+	private Service create(Plugin plugin, ProjectRegistry registry) {
 		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
+		
+		final ImmutableList.Builder<BuildConfiguration> configuration = ImmutableList.builder();
+		
+		List<ProjectBuild> builds = registry.getAllGradleBuilds(new Function<GradleBuild, ProjectBuild>() {
+			@Override
+			public ProjectBuild apply(GradleBuild build) {
+				configuration.addAll(buildConfiguration(build));
+				return new DefaultProjectBuild(build);
+			}
+
+			private List<BuildConfiguration> buildConfiguration(GradleBuild build) {
+				List<BuildConfiguration> configuration = Lists.newArrayList();
+				List<BuildType> buildTypes = build.getBuildTypes();
+				List<Flavor> flavors = build.getFlavors();
+
+				for ( BuildType buildType : buildTypes ) {
+					configuration.add(new DefaultBuildConfiguration( buildType.getType(), null, build));
+					for ( Flavor flavor : flavors ) {
+						configuration.add(new DefaultBuildConfiguration( buildType.getType(), 
+																		 flavor.getFlavor(), 
+																		 build ));
+					}
+				}
+				
+				return configuration;
+			}
+		});
+		
+		List<ProjectManifest> manifests = registry.getAllAndroidManifests(new Function<AndroidManifest, ProjectManifest>() {
+			@Override
+			public ProjectManifest apply(AndroidManifest manifest) {
+				return new DefaultProjectManifest(manifest);
+			}
+		});
+		
 		return new Service(plugins, 
-						   new DefaultManifestActionFactory(),
-						   new DefaultBuildActionFactory());
+						   manifests,
+						   builds,
+						   configuration.build(),
+						   new DefaultManifestActionFactory(), 
+						   new DefaultBuildActionFactory(),
+						   new DefaultOptionSelectorFactory());
 	}
 	
 	private Optional<PluginActionHandler<?>> get(PluginAction action) {
@@ -164,18 +218,4 @@ public class RunAction implements Action {
 			Outputter.debug.exception("Failed to log usage", e);
 		}
 	}
-	
-	static class DefaultBuildActionFactory implements BuildActionFactory {
-		@Override
-		public BuildAction create() {
-			return new InternalBuildAction();
-		}
-	}
-	
-	static class DefaultManifestActionFactory implements ManifestActionFactory {
-		@Override
-		public ManifestAction create() {
-			return new InternalManifestAction();
-		}
-	}	
 }

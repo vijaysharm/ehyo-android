@@ -3,8 +3,11 @@ package com.vijaysharma.ehyo.core;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.ManifestAction;
+import com.vijaysharma.ehyo.api.BuildConfiguration;
 
 class InternalActions {
 	static class InternalManifestAction implements ManifestAction {
@@ -31,23 +34,23 @@ class InternalActions {
 	}
 	
 	static class InternalBuildAction implements BuildAction {
-		private ImmutableList.Builder<String> addedDependencies = ImmutableList.builder();
-		private ImmutableList.Builder<String> removedDependencies = ImmutableList.builder();
+		private ImmutableMultimap.Builder<BuildConfiguration, String> addedDependencies = ImmutableMultimap.builder();
+		private ImmutableMultimap.Builder<BuildConfiguration, String> removedDependencies = ImmutableMultimap.builder();
 		
 		@Override
-		public void addDependency(String dependency) {
-			addedDependencies.add(dependency);
+		public void addDependency(BuildConfiguration variant, String dependency) {
+			addedDependencies.put(variant, dependency);
 		}
 		
-		public List<String> getAddedDependencies() {
+		public Multimap<BuildConfiguration, String> getAddedDependencies() {
 			return addedDependencies.build();
 		}
 		
-		public void removeDependency(String dependency) {
-			removedDependencies.add(dependency);
+		public void removeDependency(BuildConfiguration variant, String dependency) {
+			removedDependencies.put(variant, dependency);
 		}
 		
-		public List<String> getRemovedDependencies() {
+		public Multimap<BuildConfiguration, String> getRemovedDependencies() {
 			return removedDependencies.build();
 		}
 	}

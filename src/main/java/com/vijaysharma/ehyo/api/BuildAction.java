@@ -1,5 +1,5 @@
 package com.vijaysharma.ehyo.api;
 
 public interface BuildAction extends PluginAction {
-	void addDependency(String dependency);
+	void addDependency(BuildConfiguration variant, String dependency);
 }
