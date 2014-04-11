@@ -1,9 +1,9 @@
 package com.vijaysharma.ehyo.core.commandline.converters;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 public interface CommandLineConverter <T> {
-	void configure(OptionParser parser);
-	T read(OptionSet options);
+	void configure(CommandLineParser parser);
+	T read(ParsedSet options);
 }

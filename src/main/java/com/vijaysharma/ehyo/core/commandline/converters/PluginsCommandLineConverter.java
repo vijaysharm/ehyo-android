@@ -1,38 +1,37 @@
 package com.vijaysharma.ehyo.core.commandline.converters;
 
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import com.vijaysharma.ehyo.core.commandline.PluginOptions;
+import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
+import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
-public class PluginsCommandLineConverter implements CommandLineConverter<PluginOptions> {
-
-	private ArgumentAcceptingOptionSpec<String> pluginUrls;
-	private ArgumentAcceptingOptionSpec<String> plugin;
-
+public class PluginsCommandLineConverter implements CommandLineConverter<Set<String>> {
+	private final ArgumentOption<String> plugins;
+	
+	public PluginsCommandLineConverter() {
+		plugins = new ArgumentOptionBuilder<String>("plugins")
+				.withRequiredArg(String.class)
+				.defaultsTo("com.vijaysharma.ehyo")
+				.build();
+	}
+	
 	/**
 	 * TODO: Need to support multiple plugins
 	 */
 	@Override
-	public void configure(OptionParser parser) {
-		pluginUrls = parser.accepts( "plugins" )
-			.withRequiredArg()
-			.ofType( String.class )
-			.defaultsTo( "com.vijaysharma.ehyo" );
-		
-		plugin = parser.accepts("plugin")
-			.withRequiredArg()
-			.required()
-			.ofType(String.class);
+	public void configure(CommandLineParser parser) {
+		parser.addOptions(plugins);
 	}
 
 	@Override
-	public PluginOptions read(OptionSet options) {
+	public Set<String> read(ParsedSet options) {
 		ImmutableSet.Builder<String> plugins = ImmutableSet.builder();
 		plugins.add("com.vijaysharma.ehyo");
-		plugins.add(options.valueOf(pluginUrls));
-		return new PluginOptions( options.valueOf(this.plugin), plugins.build() );
+		plugins.add(options.value(this.plugins));
+		
+		return plugins.build();
 	}
 }

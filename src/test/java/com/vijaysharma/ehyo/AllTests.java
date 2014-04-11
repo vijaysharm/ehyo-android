@@ -10,6 +10,7 @@ import com.vijaysharma.ehyo.core.RunActionTest;
 import com.vijaysharma.ehyo.core.commandline.ApplicationRunActionFactoryTest;
 import com.vijaysharma.ehyo.core.commandline.BuiltInActionsTest;
 import com.vijaysharma.ehyo.core.commandline.CommandLineFactoryTest;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParserTest;
 import com.vijaysharma.ehyo.core.commandline.ParseAndBuildActionTest;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverterTest;
 import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConverterTest;
@@ -19,6 +20,7 @@ import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConver
 	ApplicationRunActionFactoryTest.class,
 	BuiltInActionsTest.class,
 	CommandLineFactoryTest.class,
+	CommandLineParserTest.class,
 	DirectoryCommandLineConverterTest.class,
 	OptionSelectorTest.class,
 	MainTest.class,

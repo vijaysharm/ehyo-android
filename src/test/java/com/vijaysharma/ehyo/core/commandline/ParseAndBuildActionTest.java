@@ -9,8 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import joptsimple.OptionSet;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -18,6 +16,7 @@ import org.mockito.Mockito;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.ParseAndBuildAction.CommandLineActionsFactory;
 
 public class ParseAndBuildActionTest {
@@ -45,13 +44,13 @@ public class ParseAndBuildActionTest {
 		CommandLineAction stub = mock(CommandLineAction.class);
 		List<CommandLineAction> actions = Lists.newArrayList(); actions.add(stub);
 		
-		when(stub.getAction(Mockito.any(OptionSet.class))).thenReturn(action);
+		when(stub.getAction(Mockito.any(ParsedSet.class))).thenReturn(action);
 		when(factory.create(args)).thenReturn(actions);
 		
 		new ParseAndBuildAction( args, factory ).run();
 		verify(action, times(1)).run();
 	}
-	
+
 	@Test
 	public void run_ignores_other_actions_when_first_is_found() {
 		List<String> args = newArrayList("test");
@@ -61,8 +60,8 @@ public class ParseAndBuildActionTest {
 		CommandLineAction stub_2 = mock(CommandLineAction.class);
 		List<CommandLineAction> actions = Lists.newArrayList(); actions.add(stub_1); actions.add(stub_2);
 		
-		when(stub_1.getAction(Mockito.any(OptionSet.class))).thenReturn(action_1);
-		when(stub_2.getAction(Mockito.any(OptionSet.class))).thenReturn(action_2);
+		when(stub_1.getAction(Mockito.any(ParsedSet.class))).thenReturn(action_1);
+		when(stub_2.getAction(Mockito.any(ParsedSet.class))).thenReturn(action_2);
 		when(factory.create(args)).thenReturn(actions);
 		
 		new ParseAndBuildAction( args, factory ).run();

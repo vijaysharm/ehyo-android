@@ -1,25 +1,21 @@
 package com.vijaysharma.ehyo.core.commandline;
 
-import static com.google.common.base.Joiner.on;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 class ParseAndBuildAction implements Action {
 	private final List<String> args;
 	private final CommandLineActionsFactory factory;
 	
 	public ParseAndBuildAction(List<String> args) {
-		this(args, new DefaultCommandLineActionsFactory());
+		this(args, new CommandLineActionsFactory());
 	}
 
 	ParseAndBuildAction(List<String> args, CommandLineActionsFactory factory) {
@@ -35,34 +31,33 @@ class ParseAndBuildAction implements Action {
 	public void run() {
 		List<CommandLineAction> actions = factory.create(args);
 
-		OptionParser parser = new OptionParser();
-		parser.allowsUnrecognizedOptions();
+		CommandLineParser parser = new CommandLineParser();
 		for ( CommandLineAction action : actions ) {
 			action.configure(parser);
 		}
 		
 		try {
-			OptionSet options = parser.parse( args.toArray(new String[0]) );
+			ParsedSet options = parser.parse(args);
 			Action action = findAction(options, actions);
 			action.run();
 		} catch ( UnsupportedOperationException ex ) {
 			throw ex;
 		} catch ( Exception ex ) {
-			Outputter.debug.exception("Execution exception " + on(" ").join(this.args), ex);
-			printUsage(ex.getMessage(), parser);
+			Outputter.debug.exception("Execution exception " + Joiner.on(" ").join(this.args), ex);
+//			printUsage(ex.getMessage(), parser);
 		}
 	}
 	
-	private void printUsage(String message, OptionParser parser) {
-		try {
-			System.err.println(message);
-			parser.printHelpOn(System.err);
-		} catch (IOException e) {
-			Outputter.debug.exception("Failed to print usage", e);
-		}		
-	}
+//	private void printUsage(String message, OptionParser parser) {
+//		try {
+//			System.err.println(message);
+//			parser.printHelpOn(System.err);
+//		} catch (IOException e) {
+//			Outputter.debug.exception("Failed to print usage", e);
+//		}		
+//	}
 
-	private Action findAction(OptionSet options, List<CommandLineAction> actions) {
+	private Action findAction(ParsedSet options, List<CommandLineAction> actions) {
 		for ( CommandLineAction command : actions ) {
 			Action action = command.getAction(options);
 			if ( action != null )
@@ -72,16 +67,11 @@ class ParseAndBuildAction implements Action {
 		throw new UnsupportedOperationException("No action factory for specified command-line arguments.");
 	}
 	
-	static interface CommandLineActionsFactory {
-		List<CommandLineAction> create(List<String> args);
-	}
-	
-	private static class DefaultCommandLineActionsFactory implements CommandLineActionsFactory {
-		@Override
+	static class CommandLineActionsFactory {
 		public List<CommandLineAction> create(List<String> args) {
 			ArrayList<CommandLineAction> actions = Lists.newArrayList();
 			actions.add(new BuiltInActions());
-			actions.add(new ApplicationRunActionFactory(args));
+			actions.add(new ApplicationRunActionFactory());
 			
 			return actions; 
 		}

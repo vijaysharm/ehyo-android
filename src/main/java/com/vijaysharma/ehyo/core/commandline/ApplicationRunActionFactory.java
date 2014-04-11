@@ -2,13 +2,11 @@ package com.vijaysharma.ehyo.core.commandline;
 
 import java.util.List;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpecBuilder;
-
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.RunActionBuilder;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
+import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter;
 import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConverter;
 
@@ -17,46 +15,41 @@ import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConver
  * etc...) before forwarding the commands on to the plugins
  */
 class ApplicationRunActionFactory implements CommandLineAction {
-	private final List<String> args;
 	private final DirectoryCommandLineConverter directory;
 	private final PluginsCommandLineConverter plugins;
 	private final RunActionBuilderFactory factory;
-	
-	private OptionSpecBuilder help;
-	private OptionSpecBuilder dryrun;
+	private final ArgumentOption<String> help;
+	private final ArgumentOption<String> dryrun;
 
-	public ApplicationRunActionFactory(List<String> args) {
-		this(args, 
-			new DirectoryCommandLineConverter(), 
-			new PluginsCommandLineConverter(),
-			new DefaultRunActionBuilderFactory());
+	public ApplicationRunActionFactory() {
+		this(new DirectoryCommandLineConverter(), 
+			 new PluginsCommandLineConverter(),
+			 new DefaultRunActionBuilderFactory());
 	}
 
-	ApplicationRunActionFactory(List<String> args,
-								DirectoryCommandLineConverter directory,
+	ApplicationRunActionFactory(DirectoryCommandLineConverter directory,
 								PluginsCommandLineConverter plugins,
 								RunActionBuilderFactory factory) {
-		this.args = args;
 		this.directory = directory;
 		this.plugins = plugins;
 		this.factory = factory;
+		
+		this.help = new ArgumentOptionBuilder<String>("help").build();
+		this.dryrun = new ArgumentOptionBuilder<String>("dry-run").build();
 	}
-
+	
 	@Override
-	public void configure(OptionParser parser) {
-		this.help = parser.accepts("help");
-		this.dryrun = parser.accepts("dry-run");
-		this.directory.configure(parser);
-		this.plugins.configure(parser);
+	public void configure(CommandLineParser parser) {
+		parser.addOptions(help, dryrun);
 	}
-
+	
 	@Override
-	public Action getAction(OptionSet options) {
-		RunActionBuilder run = factory.create(this.args);
+	public Action getAction(ParsedSet options) {
+		RunActionBuilder run = factory.create(options.getRemainingArgs());
 		run.setShowHelp(options.has(help));
 		run.setDryrun(options.has(dryrun));
-		run.setDirectory(directory.read(options));
-		run.setPluginOptions(plugins.read(options));
+//		run.setDirectory(directory.read(options));
+//		run.setPluginOptions(plugins.read(options));
 		
 		return run.build();
 	}

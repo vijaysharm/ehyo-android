@@ -1,24 +1,22 @@
 package com.vijaysharma.ehyo.core.commandline;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpecBuilder;
-
 import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
+import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
+import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 class BuiltInActions implements CommandLineAction {
-	private OptionSpecBuilder version;
+	private final ArgumentOption<String> version = new ArgumentOptionBuilder<String>("version").build();
 	
 	@Override
-	public void configure(OptionParser parser) {
-		this.version = parser.accepts( "version" );
+	public void configure(CommandLineParser parser) {
+		parser.addOptions(version);
 	}
 	
 	@Override
-	public Action getAction(OptionSet options) {
-		if (options.has(this.version)) {
+	public Action getAction(ParsedSet options) {
+		if (options.has( version )) {
 			return new Action() {
 				@Override
 				public void run() {
@@ -26,7 +24,7 @@ class BuiltInActions implements CommandLineAction {
 				}
 			};
 		}
-		
+
 		return null;
 	}
 }
