@@ -69,8 +69,11 @@ public class RunActionTest {
 		String[] args = {};
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
+		ProjectRegistry registry = mock(ProjectRegistry.class);
+		
 		when(pluginOptions.getPlugin()).thenReturn(pluginName);
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(projectLoader.load()).thenReturn(registry);
 		
 		RunAction action = create(args);
 		action.run();
@@ -118,7 +121,7 @@ public class RunActionTest {
 		String[] args = {};
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
-		ManifestAction pluginAction = mock(ManifestAction.class);
+		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
 		ProjectRegistry registry = mock(ProjectRegistry.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
 		
