@@ -46,7 +46,7 @@ public class Main implements Runnable {
 	}
     
     private static String[] concat(String[]...strings) {
-    	ArrayList<String> result = new ArrayList<>();
+    	ArrayList<String> result = new ArrayList<String>();
     	for ( String[] s : strings ) {
     		result.addAll(Arrays.asList(s));
     	}
