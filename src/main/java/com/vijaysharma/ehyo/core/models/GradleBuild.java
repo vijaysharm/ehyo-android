@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class GradleBuild {
+public class GradleBuild implements HasDocument {
 	public static GradleBuild read(File file) {
 		return new GradleBuild(file);
 	}
@@ -48,6 +48,7 @@ public class GradleBuild {
 		return Lists.<Flavor>newArrayList();
 	}
 	
+	@Override
 	public GradleBuildDocument asDocument() {
 		return GradleBuildDocument.read(this.file, this.id);
 	}

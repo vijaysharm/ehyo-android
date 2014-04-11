@@ -7,9 +7,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 
-import com.vijaysharma.ehyo.core.models.AndroidManifest;
-import com.vijaysharma.ehyo.core.models.GradleBuild;
-
 public class EFileUtil {
 	private static final String UTF_8 = "UTF-8";
 
@@ -37,19 +34,11 @@ public class EFileUtil {
 		}
 	}
 
-	public static void write(AndroidManifest manifest, List<String> lines) {
+	public static void write(File file, List<String> lines) {
 		try {
-			FileUtils.writeLines(manifest.getFile(), lines);
+			FileUtils.writeLines(file, lines);
 		} catch (IOException e) {
 			throw new UncheckedIoException(e);
 		}
 	}
-	
-	public static void write(GradleBuild build, List<String> lines) {
-		try {
-			FileUtils.writeLines(build.getFile(), lines);
-		} catch (IOException e) {
-			throw new UncheckedIoException(e);
-		}
-	}	
 }

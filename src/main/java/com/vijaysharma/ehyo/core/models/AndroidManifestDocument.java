@@ -16,7 +16,7 @@ import org.jdom2.output.XMLOutputter;
 
 import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
-public class AndroidManifestDocument {
+public class AndroidManifestDocument implements AsListOfStrings {
 	public static AndroidManifestDocument read(File file, String id) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
@@ -36,6 +36,7 @@ public class AndroidManifestDocument {
 		this.manifestId = id;
 	}
 
+	@Override
 	public List<String> toListOfStrings() {
 		try {
 			XMLOutputter xmlOutput = new XMLOutputter();

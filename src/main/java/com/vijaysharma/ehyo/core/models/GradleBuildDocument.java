@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.vijaysharma.ehyo.core.utils.EFileUtil;
 
-public class GradleBuildDocument {
+public class GradleBuildDocument implements AsListOfStrings {
 	public static GradleBuildDocument read(File file, String id) {
 		return new GradleBuildDocument(EFileUtil.readLines(file), id);
 	}
@@ -22,7 +22,8 @@ public class GradleBuildDocument {
 		return gradleId;
 	}
 	
-	public List<String> asListOfStrings() {
+	@Override
+	public List<String> toListOfStrings() {
 		return lines;
 	}
 

@@ -2,7 +2,7 @@ package com.vijaysharma.ehyo.core.models;
 
 import java.io.File;
 
-public class AndroidManifest {
+public class AndroidManifest implements HasDocument {
 	public static AndroidManifest read(File file) {
 		return new AndroidManifest(file);
 	}
@@ -30,7 +30,8 @@ public class AndroidManifest {
 	public File getFile() {
 		return file;
 	}
-	
+
+	@Override
 	public AndroidManifestDocument asDocument() {
 		return AndroidManifestDocument.read(this.file, this.id);
 	}
