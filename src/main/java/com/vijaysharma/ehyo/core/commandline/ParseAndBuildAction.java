@@ -15,14 +15,14 @@ import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
 
 class ParseAndBuildAction implements Action {
-	private final String[] args;
+	private final List<String> args;
 	private final CommandLineActionsFactory factory;
 	
-	public ParseAndBuildAction(String[] args) {
+	public ParseAndBuildAction(List<String> args) {
 		this(args, new DefaultCommandLineActionsFactory());
 	}
 
-	ParseAndBuildAction(String[] args, CommandLineActionsFactory factory) {
+	ParseAndBuildAction(List<String> args, CommandLineActionsFactory factory) {
 		this.args = args;
 		this.factory = factory;
 	}
@@ -42,7 +42,7 @@ class ParseAndBuildAction implements Action {
 		}
 		
 		try {
-			OptionSet options = parser.parse( args );
+			OptionSet options = parser.parse( args.toArray(new String[0]) );
 			Action action = findAction(options, actions);
 			action.run();
 		} catch ( UnsupportedOperationException ex ) {
@@ -73,12 +73,12 @@ class ParseAndBuildAction implements Action {
 	}
 	
 	static interface CommandLineActionsFactory {
-		List<CommandLineAction> create(String[] args);
+		List<CommandLineAction> create(List<String> args);
 	}
 	
 	private static class DefaultCommandLineActionsFactory implements CommandLineActionsFactory {
 		@Override
-		public List<CommandLineAction> create(String[] args) {
+		public List<CommandLineAction> create(List<String> args) {
 			ArrayList<CommandLineAction> actions = Lists.newArrayList();
 			actions.add(new BuiltInActions());
 			actions.add(new ApplicationRunActionFactory(args));

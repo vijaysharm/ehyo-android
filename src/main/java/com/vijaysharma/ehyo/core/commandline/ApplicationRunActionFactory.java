@@ -1,5 +1,7 @@
 package com.vijaysharma.ehyo.core.commandline;
 
+import java.util.List;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpecBuilder;
@@ -15,7 +17,7 @@ import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConver
  * etc...) before forwarding the commands on to the plugins
  */
 class ApplicationRunActionFactory implements CommandLineAction {
-	private final String[] args;
+	private final List<String> args;
 	private final DirectoryCommandLineConverter directory;
 	private final PluginsCommandLineConverter plugins;
 	private final RunActionBuilderFactory factory;
@@ -23,14 +25,14 @@ class ApplicationRunActionFactory implements CommandLineAction {
 	private OptionSpecBuilder help;
 	private OptionSpecBuilder dryrun;
 
-	public ApplicationRunActionFactory(String[] args) {
+	public ApplicationRunActionFactory(List<String> args) {
 		this(args, 
 			new DirectoryCommandLineConverter(), 
 			new PluginsCommandLineConverter(),
 			new DefaultRunActionBuilderFactory());
 	}
 
-	ApplicationRunActionFactory(String[] args,
+	ApplicationRunActionFactory(List<String> args,
 								DirectoryCommandLineConverter directory,
 								PluginsCommandLineConverter plugins,
 								RunActionBuilderFactory factory) {
@@ -60,12 +62,12 @@ class ApplicationRunActionFactory implements CommandLineAction {
 	}
 	
 	interface RunActionBuilderFactory {
-		RunActionBuilder create(String[] args);
+		RunActionBuilder create(List<String> args);
 	}
 	
 	private static class DefaultRunActionBuilderFactory implements RunActionBuilderFactory {
 		@Override
-		public RunActionBuilder create(String[] args) {
+		public RunActionBuilder create(List<String> args) {
 			return new RunActionBuilder(args);
 		}
 	}

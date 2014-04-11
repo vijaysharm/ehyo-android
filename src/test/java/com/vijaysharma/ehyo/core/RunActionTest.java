@@ -1,5 +1,6 @@
 package com.vijaysharma.ehyo.core;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -20,7 +21,6 @@ import org.mockito.Mockito;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.api.ManifestAction;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
@@ -55,7 +55,7 @@ public class RunActionTest {
 	
 	@Test(expected=RuntimeException.class)
 	public void run_throws_when_no_plugin_found() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		when(pluginOptions.getPlugin()).thenReturn(pluginName);
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.<Plugin>absent());
@@ -66,7 +66,7 @@ public class RunActionTest {
 	
 	@Test
 	public void run_calls_confiure_and_execute_on_plugin() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
 		ProjectRegistry registry = mock(ProjectRegistry.class);
@@ -84,7 +84,7 @@ public class RunActionTest {
 	
 	@Test
 	public void run_doesnt_call_execute_for_help_on_plugin() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
 		when(pluginOptions.getPlugin()).thenReturn(pluginName);
@@ -99,7 +99,7 @@ public class RunActionTest {
 	
 	@Test
 	public void run_loads_project_registry() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
 		PluginAction pluginAction = mock(PluginAction.class);
@@ -118,7 +118,7 @@ public class RunActionTest {
 	
 	@Test
 	public void run_asks_users_to_select_manifest_when_ManifestAction_is_passed() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
 		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
@@ -142,7 +142,7 @@ public class RunActionTest {
 	
 	@Test
 	public void run_does_not_execute_PluginHandler_if_not_found() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
 		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
@@ -173,7 +173,7 @@ public class RunActionTest {
 	
 	@Test
 	public void run_executes_changer_handler_perform_when_PluginHandler_is_found() {
-		String[] args = {};
+		List<String> args = newArrayList();
 		String pluginName = "some-name";
 		Plugin plugin = mock(Plugin.class);
 		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
@@ -211,11 +211,11 @@ public class RunActionTest {
 		return result;
 	}
 	
-	private RunAction create(String[] args) {
+	private RunAction create(List<String> args) {
 		return create(args, false, false);
 	}
 
-	private RunAction create(String[] args, boolean help, boolean dryrun) {
+	private RunAction create(List<String> args, boolean help, boolean dryrun) {
 		return new RunAction(args, 
 							 pluginOptions, 
 							 pluginLoader, 

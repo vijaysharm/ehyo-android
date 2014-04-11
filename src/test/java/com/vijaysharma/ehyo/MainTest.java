@@ -3,6 +3,7 @@ package com.vijaysharma.ehyo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,16 +25,16 @@ public class MainTest
 	
 	@Test
     public void run_calls_configure_on_factory() {
-		Mockito.when(factory.configure(null)).thenReturn(action);
+		when(factory.configure(Mockito.anyList())).thenReturn(action);
 		
         Main main = new Main(null, factory);
         main.run();
-        verify(factory, times(1)).configure(null);
+        verify(factory, times(1)).configure(Mockito.anyList());
     }
 	
 	@Test
     public void run_calls_run_on_action() {
-		Mockito.when(factory.configure(null)).thenReturn(action);
+		when(factory.configure(Mockito.anyList())).thenReturn(action);
 		
         Main main = new Main(null, factory);
         main.run();

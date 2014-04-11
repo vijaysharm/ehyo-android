@@ -48,7 +48,7 @@ public class RunAction implements Action {
 		}
 	};
 	
-	private final String[] args;
+	private final List<String> args;
 	private final ProjectRegistryLoader projectLoader;
 	private final PluginOptions pluginOptions;
 	private final boolean dryrun;
@@ -59,7 +59,7 @@ public class RunAction implements Action {
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
 
-	public RunAction(String[] args, 
+	public RunAction(List<String> args, 
 					 File root, 
 					 PluginOptions pluginOptions,
 					 boolean dryrun, 
@@ -76,7 +76,7 @@ public class RunAction implements Action {
 			 dryrun);
 	}
 
-	RunAction(String[] args, 
+	RunAction(List<String> args, 
 			  PluginOptions pluginOptions, 
 			  PluginLoader loader,
 			  ProjectRegistryLoader projectLoader, 
@@ -115,7 +115,7 @@ public class RunAction implements Action {
 			return;
 		}
 		
-		OptionSet options = parser.parse(this.args);
+		OptionSet options = parser.parse(this.args.toArray(new String[0]));
 		
 		ProjectRegistry registry = this.projectLoader.load();
 		Service service = create(plugin, registry);

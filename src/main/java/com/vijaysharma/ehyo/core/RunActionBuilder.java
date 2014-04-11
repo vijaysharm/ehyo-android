@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo.core;
 
 import java.io.File;
+import java.util.List;
 
 import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 
@@ -8,11 +9,11 @@ public class RunActionBuilder {
 
 	private boolean help;
 	private boolean dryrun;
-	private String[] args;
+	private List<String> args;
 	private PluginOptions pluginOptions;
 	private File root;
 
-	public RunActionBuilder(String[] args) {
+	public RunActionBuilder(List<String> args) {
 		this.args = args;
 		this.help = false;
 		this.dryrun = false;

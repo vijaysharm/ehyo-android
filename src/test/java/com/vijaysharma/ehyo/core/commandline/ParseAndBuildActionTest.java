@@ -1,5 +1,6 @@
 package com.vijaysharma.ehyo.core.commandline;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -29,7 +30,7 @@ public class ParseAndBuildActionTest {
 	
 	@Test(expected=UnsupportedOperationException.class)
 	public void run_throws_when_no_action_is_found() {
-		String[] args = {"test"};
+		List<String> args = newArrayList("test");
 		List<CommandLineAction> actions = Mockito.anyList();
 		when(factory.create(args)).thenReturn(actions);
 		new ParseAndBuildAction( args, factory ).run();
@@ -39,7 +40,7 @@ public class ParseAndBuildActionTest {
 	
 	@Test
 	public void run_calls_action_run_on_matching_command_line_action() {
-		String[] args = {"test"};
+		List<String> args = newArrayList("test");
 		Action action = mock(Action.class);
 		CommandLineAction stub = mock(CommandLineAction.class);
 		List<CommandLineAction> actions = Lists.newArrayList(); actions.add(stub);
@@ -53,7 +54,7 @@ public class ParseAndBuildActionTest {
 	
 	@Test
 	public void run_ignores_other_actions_when_first_is_found() {
-		String[] args = {"test"};
+		List<String> args = newArrayList("test");
 		Action action_1 = mock(Action.class);
 		Action action_2 = mock(Action.class);
 		CommandLineAction stub_1 = mock(CommandLineAction.class);
