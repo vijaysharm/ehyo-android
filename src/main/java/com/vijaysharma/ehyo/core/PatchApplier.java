@@ -45,7 +45,8 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 					save(file.getKey(), file.getValue());
 				}					
 			} catch (Exception ex) {
-				// TODO: What to do here?
+				// TODO: What to do here? Should I roll back the changes?
+				// TODO: At the very least, I should print there was an exception
 			}
 		}
 	}
