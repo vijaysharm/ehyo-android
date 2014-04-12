@@ -41,6 +41,8 @@ class ApplicationRunActionFactory implements CommandLineAction {
 	@Override
 	public void configure(CommandLineParser parser) {
 		parser.addOptions(help, dryrun);
+		directory.configure(parser);
+		plugins.configure(parser);
 	}
 	
 	@Override
@@ -48,8 +50,8 @@ class ApplicationRunActionFactory implements CommandLineAction {
 		RunActionBuilder run = factory.create(options.getRemainingArgs());
 		run.setShowHelp(options.has(help));
 		run.setDryrun(options.has(dryrun));
-//		run.setDirectory(directory.read(options));
-//		run.setPluginOptions(plugins.read(options));
+		run.setDirectory(directory.read(options));
+		run.setPluginNamespace(plugins.read(options));
 		
 		return run.build();
 	}

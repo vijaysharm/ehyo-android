@@ -36,7 +36,7 @@ TODO
 +++ etc...
 + Provide a way to add a new Component to the Android project (Activity, Services, etc..)
 ++ Includes adding the new Component to the Manifest
-+ Provide a plugin that lets you rename your namespace
++ Provide a plugin that lets you rename your package namespace
 + Make the command line more friendlier
 ++ ehyo permissions internet vs ehyo --plugin permissions --add internet
 ++ ehyo --directory <...> search blah vs ehyo --directory <...> --plugin search blah
@@ -53,3 +53,4 @@ TODO
 + Improve ManifestActionHandler to support removing permissions (defined in the xml)
 + Have the ManifestChangeManagerFactory not modify the formatting of the XML file
 + Read the gradle build to understand the project structure better.
++ FIX: ApplicationRunActionFactoryTest

@@ -33,7 +33,6 @@ import com.vijaysharma.ehyo.core.RunActionInternals.DefaultManifestActionFactory
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
-import com.vijaysharma.ehyo.core.commandline.PluginOptions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.BuildType;
 import com.vijaysharma.ehyo.core.models.Flavor;
@@ -50,7 +49,6 @@ public class RunAction implements Action {
 	
 	private final List<String> args;
 	private final ProjectRegistryLoader projectLoader;
-	private final PluginOptions pluginOptions;
 	private final boolean dryrun;
 	private final boolean help;
 	private final PluginLoader pluginLoader;
@@ -61,12 +59,11 @@ public class RunAction implements Action {
 
 	public RunAction(List<String> args, 
 					 File root, 
-					 PluginOptions pluginOptions,
+					 Set<String> pluginNamespaces,
 					 boolean dryrun, 
 					 boolean help) {
 		this(args, 
-			 pluginOptions, 
-			 new PluginLoader(pluginOptions.getPluginNamespaces()),
+			 new PluginLoader(pluginNamespaces),
 			 new ProjectRegistryLoader(root),
 			 new PluginActionHandlerFactory(),
 			 new OptionSelector<AndroidManifest>("Which of the following would you like to modify", MANIFEST_RENDERER),
@@ -77,7 +74,6 @@ public class RunAction implements Action {
 	}
 
 	RunAction(List<String> args, 
-			  PluginOptions pluginOptions, 
 			  PluginLoader loader,
 			  ProjectRegistryLoader projectLoader, 
 			  PluginActionHandlerFactory factory,
@@ -88,7 +84,6 @@ public class RunAction implements Action {
 			  boolean dryrun) {
 		this.args = args;
 		this.projectLoader = projectLoader;
-		this.pluginOptions = pluginOptions;
 		this.manifestSelector = manifestSelector;
 		this.dryrun = dryrun;
 		this.help = help;
@@ -100,16 +95,17 @@ public class RunAction implements Action {
 
 	@Override
 	public void run() {
-		Optional<Plugin> p = pluginLoader.findPlugin(this.pluginOptions.getPlugin());
+		String pluginName = find(args);
+		Optional<Plugin> p = pluginLoader.findPlugin(pluginName);
 		
 		if ( ! p.isPresent() ) {
-			throw new RuntimeException("Plugin [" + this.pluginOptions.getPlugin() + "] was not found.");
+			throw new RuntimeException("Plugin [" + pluginName + "] was not found.");
 		}
 		
 		Plugin plugin = p.get();
 		OptionParser parser = new OptionParser();
-		parser.allowsUnrecognizedOptions();
 		plugin.configure(parser);
+
 		if ( help ) {
 			printUsage(parser);
 			return;
@@ -205,6 +201,14 @@ public class RunAction implements Action {
 						   new DefaultManifestActionFactory(), 
 						   new DefaultBuildActionFactory(),
 						   new DefaultOptionSelectorFactory());
+	}
+	
+	private static String find(List<String> args) {
+		// TODO: Should result in showing usage
+		if ( args == null || args.isEmpty() )
+			throw new RuntimeException("No plugin defined");
+		
+		return args.remove(0);
 	}
 	
 	private void printUsage(OptionParser parser) {

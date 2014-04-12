@@ -32,18 +32,16 @@ public class Main implements Runnable {
 		String[] main = {
 //			"--version",
 //			"--plugins", "com.thirdparty.plugin", 
-//			"--dry-run",
+			"--dry-run",
 			"--directory", "/Users/vsharma/programming/android/MyApplication"
 		};
 		
-//		String[] plugin = {
-//			"--plugin", "manifest-permissions",
-//			"--add"
-//		};
-		
 		String[] plugin = {
-			"--plugin", "search-mvn-central",
-			"--lib", "butterknife"
+			"manifest-permissions",
+			"--add"
+			,
+//			"search-mvn-central",
+//			"--lib", "butterknife"
 		};
 		
 		new Main(concat(main, plugin)).run();
