@@ -7,7 +7,7 @@ import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilde
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 class BuiltInActions implements CommandLineAction {
-	private final ArgumentOption<String> version = new ArgumentOptionBuilder<String>("version").build();
+	private final ArgumentOption<String> version = new ArgumentOptionBuilder<String>("v", "version").build();
 	
 	@Override
 	public void configure(CommandLineParser parser) {

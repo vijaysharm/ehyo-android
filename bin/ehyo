@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+scriptpath='../target/ehyo-0.1.jar'
+java -jar `dirname $0`/"$scriptpath" $@
+

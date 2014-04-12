@@ -1,7 +1,6 @@
 package com.vijaysharma.ehyo.core.commandline;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -90,9 +89,7 @@ public class CommandLineParser {
 				Class<T> clazz = option.getRequiredArgType();
 				Constructor<T> constructor = clazz.getConstructor(String.class);
 				return constructor.newInstance(value);
-			} catch (NoSuchMethodException | SecurityException
-					| InstantiationException | IllegalAccessException
-					| IllegalArgumentException | InvocationTargetException e) {
+			} catch (Exception e) {
 //				throw new IllegalArgumentException("Unable to cast [" + value + "] to [" + clazz.getSimpleName() + "]");
 				return option.getDefaultArgValue();
 			}

@@ -45,9 +45,10 @@ TODO
 + Show user formatted error when the name given in plugin is not found
 + Show better version information
 + Have the custom logger respect debug mode
-+ Broke the --version command
++ Broke Usage
 + Better option description for usage
 + Check if the project structure is valid
+++ Maybe have the DirectoryCommandLineConverter load the project
 + Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
 + Improve ManifestActionHandler to only add permissions if defined in manifest
 + Improve ManifestActionHandler to support removing permissions (defined in the xml)

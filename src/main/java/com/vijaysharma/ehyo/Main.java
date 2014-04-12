@@ -24,7 +24,6 @@ public class Main implements Runnable {
     
     @Override
     public void run() {
-    	printArgs(this.args);
     	factory.configure(this.args).run();
     }
     
@@ -38,13 +37,14 @@ public class Main implements Runnable {
 		
 		String[] plugin = {
 			"manifest-permissions",
-			"--add"
-			,
+			"--add",
 //			"search-mvn-central",
 //			"--lib", "butterknife"
 		};
 		
-		new Main(concat(main, plugin)).run();
+		String[] arguments = concat(main, plugin);
+		printArgs(arguments);
+		new Main(arguments).run();
 	}
     
     private static String[] concat(String[]...strings) {
@@ -55,13 +55,13 @@ public class Main implements Runnable {
     	return result.toArray(new String[0]);
     }
     
-    private static void printArgs(List<String> args) {
+    private static void printArgs(String[] args) {
     	if ( args == null )
     		return;
     	
     	StringBuilder output = new StringBuilder();
-    	for ( int index = 0; index < args.size(); index++ ) {
-    		String arg = args.get(index);
+    	for ( int index = 0; index < args.length; index++ ) {
+    		String arg = args[index];
     		if ( arg.startsWith("--") ) {
     			if ( index != 0 )
     				output.append("\n");
