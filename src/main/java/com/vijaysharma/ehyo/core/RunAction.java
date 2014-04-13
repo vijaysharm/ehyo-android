@@ -1,6 +1,5 @@
 package com.vijaysharma.ehyo.core;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -45,24 +44,24 @@ public class RunAction implements Action {
 	};
 	
 	private final List<String> args;
-	private final ProjectRegistryLoader projectLoader;
-	private final boolean dryrun;
-	private final boolean help;
+	private final ProjectRegistry registry;
 	private final PluginLoader pluginLoader;
 	private final PluginActionHandlerFactory factory;
 	private final OptionSelector<AndroidManifest> manifestSelector;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
+	private final boolean dryrun;
+	private final boolean help;	
 	private final TextOutput out;
 
 	public RunAction(List<String> args, 
-					 File root, 
+					 ProjectRegistry registry, 
 					 Set<String> pluginNamespaces,
 					 boolean dryrun, 
 					 boolean help) {
 		this(args, 
 			 new PluginLoader(pluginNamespaces),
-			 new ProjectRegistryLoader(root),
+			 registry,
 			 new PluginActionHandlerFactory(),
 			 new OptionSelector<AndroidManifest>("Which of the following would you like to modify", MANIFEST_RENDERER),
 			 new ManifestChangeManagerFactory(),
@@ -74,7 +73,7 @@ public class RunAction implements Action {
 
 	RunAction(List<String> args, 
 			  PluginLoader loader,
-			  ProjectRegistryLoader projectLoader, 
+			  ProjectRegistry registry, 
 			  PluginActionHandlerFactory factory,
 			  OptionSelector<AndroidManifest> manifestSelector,
 			  ManifestChangeManagerFactory manifestChangeFactory,
@@ -83,7 +82,7 @@ public class RunAction implements Action {
 			  boolean dryrun,
 			  TextOutput out) {
 		this.args = args;
-		this.projectLoader = projectLoader;
+		this.registry = registry;
 		this.manifestSelector = manifestSelector;
 		this.dryrun = dryrun;
 		this.help = help;
@@ -98,10 +97,9 @@ public class RunAction implements Action {
 	public void run() {
 		Plugin plugin = find(args);
 		if ( help ) {
-			// print usage.
+			out.print("TODO: Print usage for: " + plugin.name());
 		} else {
-			ProjectRegistry registry = this.projectLoader.load();
-			Service service = create(plugin, registry);
+			Service service = create(plugin);
 			execute(plugin.name(), plugin.execute(args, service), registry);
 		}
 	}
@@ -147,7 +145,7 @@ public class RunAction implements Action {
 		}
 	}
 
-	private Service create(Plugin plugin, ProjectRegistry registry) {
+	private Service create(Plugin plugin) {
 		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
 		
 		final ImmutableList.Builder<BuildConfiguration> configuration = ImmutableList.builder();

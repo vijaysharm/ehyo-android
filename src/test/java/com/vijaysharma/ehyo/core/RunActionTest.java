@@ -32,7 +32,7 @@ import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunActionTest {
 	private PluginLoader pluginLoader;
-	private ProjectRegistryLoader projectLoader;
+	private ProjectRegistry registry;
 	private PluginActionHandlerFactory factory;
 	private OptionSelector<AndroidManifest> manifestSelector;
 	private ManifestChangeManagerFactory manifestChangeFactory;
@@ -42,7 +42,7 @@ public class RunActionTest {
 	@Before
 	public void before() {
 		pluginLoader = mock(PluginLoader.class);
-		projectLoader = mock(ProjectRegistryLoader.class);
+		registry = mock(ProjectRegistry.class);
 		factory = mock(PluginActionHandlerFactory.class);
 		manifestSelector = mock(OptionSelector.class);
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
@@ -75,10 +75,8 @@ public class RunActionTest {
 		String pluginName = "some-name";
 		List<String> args = newArrayList(pluginName);
 		Plugin plugin = mock(Plugin.class);
-		ProjectRegistry registry = mock(ProjectRegistry.class);
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-		when(projectLoader.load()).thenReturn(registry);
 		
 		RunAction action = create(args);
 		action.run();
@@ -100,35 +98,14 @@ public class RunActionTest {
 	}
 
 	@Test
-	public void run_loads_project_registry() {
-		String pluginName = "some-name";
-		List<String> args = newArrayList(pluginName);
-		Plugin plugin = mock(Plugin.class);
-		PluginAction pluginAction = mock(PluginAction.class);
-		ProjectRegistry registry = mock(ProjectRegistry.class);
-
-		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-		when(projectLoader.load()).thenReturn(registry);
-		when(plugin.execute(Mockito.eq(args), any(Service.class)))
-			.thenReturn(Arrays.asList(pluginAction));
-		
-		RunAction action = create(args);
-		action.run();
-		verify(projectLoader, times(1)).load();
-		verify(registry, never()).getAllAndroidManifests();
-	}
-
-	@Test
 	public void run_asks_users_to_select_manifest_when_ManifestAction_is_passed() {
 		String pluginName = "some-name";
 		List<String> args = newArrayList(pluginName);
 		Plugin plugin = mock(Plugin.class);
 		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
-		ProjectRegistry registry = mock(ProjectRegistry.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-		when(projectLoader.load()).thenReturn(registry);
 		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(asList(pluginAction));
 		when(manifestChangeFactory.create(Mockito.anyList()))
@@ -147,14 +124,12 @@ public class RunActionTest {
 		List<String> args = newArrayList(pluginName);
 		Plugin plugin = mock(Plugin.class);
 		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
-		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
 		AndroidManifestDocument doc = mock(AndroidManifestDocument.class);
 		ManifestActionHandler handler = mock(ManifestActionHandler.class);
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-		when(projectLoader.load()).thenReturn(registry);
 		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(asList(pluginAction));
 		when(manifestSelector.select(Mockito.anyList()))
@@ -177,14 +152,12 @@ public class RunActionTest {
 		List<String> args = newArrayList(pluginName);
 		Plugin plugin = mock(Plugin.class);
 		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
-		ProjectRegistry registry = mock(ProjectRegistry.class);
 		AndroidManifest manifest = mock(AndroidManifest.class);
 		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
 		AndroidManifestDocument doc = mock(AndroidManifestDocument.class);
 		ManifestActionHandler handler = mock(ManifestActionHandler.class);
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-		when(projectLoader.load()).thenReturn(registry);
 		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(asList(pluginAction));
 		when(manifestSelector.select(Mockito.anyList()))
@@ -217,7 +190,7 @@ public class RunActionTest {
 	private RunAction create(List<String> args, boolean help, boolean dryrun) {
 		return new RunAction(args, 
 							 pluginLoader, 
-							 projectLoader, 
+							 registry, 
 							 factory, 
 							 manifestSelector,
 							 manifestChangeFactory,

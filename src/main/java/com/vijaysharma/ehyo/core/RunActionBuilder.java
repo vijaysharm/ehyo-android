@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
+
 public class RunActionBuilder {
 	private boolean help;
 	private boolean dryrun;
 	private List<String> args;
 	private Set<String> pluginNamespaces;
-	private File root;
+	private ProjectRegistry registry;
 
 	public RunActionBuilder(List<String> args) {
 		this.args = args;
@@ -25,8 +27,8 @@ public class RunActionBuilder {
 		this.dryrun = dryrun;
 	}
 
-	public void setDirectory(File root) {
-		this.root = root;
+	public void setDirectory(ProjectRegistry projectRegistry) {
+		this.registry = projectRegistry;
 	}
 	
 	public void setPluginNamespace(Set<String> namespaces) {
@@ -34,6 +36,6 @@ public class RunActionBuilder {
 	}
 	
 	public Action build() {
-		return new RunAction(this.args, root, pluginNamespaces, dryrun, help);
+		return new RunAction(this.args, registry, pluginNamespaces, dryrun, help);
 	}
 }

@@ -2,23 +2,29 @@ package com.vijaysharma.ehyo.core.commandline.converters;
 
 import java.io.File;
 
+import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
-public class DirectoryCommandLineConverter implements CommandLineConverter<File>{
+public class DirectoryCommandLineConverter implements CommandLineConverter<ProjectRegistry>{
 	private final ArgumentOption<File> directory;
+	private final ProjectRegistryLoaderFactory factory;
 	
 	public DirectoryCommandLineConverter() {
 		this(new ArgumentOptionBuilder<File>("directory")
 				.withRequiredArg(File.class)
 				.defaultsTo(new File("."))
-				.build());
+				.build(),
+			new ProjectRegistryLoaderFactory());
 	}
 	
-	DirectoryCommandLineConverter( ArgumentOption<File> directory ) {
+	DirectoryCommandLineConverter(ArgumentOption<File> directory,
+								  ProjectRegistryLoaderFactory factory) {
 		this.directory = directory;
+		this.factory = factory;
 	}
 	
 	@Override
@@ -27,7 +33,16 @@ public class DirectoryCommandLineConverter implements CommandLineConverter<File>
 	}
 
 	@Override
-	public File read(ParsedSet options) {
-		return options.value(directory);
+	public ProjectRegistry read(ParsedSet options) {
+		File root = options.value(directory);
+		ProjectRegistryLoader loader = factory.create(root);
+
+		return loader.load();
+	}
+	
+	static class ProjectRegistryLoaderFactory {
+		ProjectRegistryLoader create(File root) {
+			return new ProjectRegistryLoader(root);
+		}
 	}
 }

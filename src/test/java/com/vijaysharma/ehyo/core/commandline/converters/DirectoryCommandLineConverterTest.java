@@ -13,19 +13,32 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
+import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class DirectoryCommandLineConverterTest {
-	private ArgumentOption<File> file;
+	private ArgumentOption<File> option;
 	private DirectoryCommandLineConverter converter;
+	private ProjectRegistryLoaderFactory factory;
+	private ProjectRegistryLoader loader;
+	private ProjectRegistry registry;
+	
+	private ArgumentCaptor<File> captor;
 	
 	@Before
 	public void before() {
-		file = mock(ArgumentOption.class);
-		converter = new DirectoryCommandLineConverter(file);
+		option = mock(ArgumentOption.class);
+		factory = mock(ProjectRegistryLoaderFactory.class);
+		captor = ArgumentCaptor.forClass(File.class);
+		loader = mock(ProjectRegistryLoader.class);
+		registry = mock(ProjectRegistry.class);
+		converter = new DirectoryCommandLineConverter(option, factory);
 	}
 	
 	@Test
@@ -33,31 +46,25 @@ public class DirectoryCommandLineConverterTest {
 		CommandLineParser parser = spy(new CommandLineParser());
 		converter.configure(parser);
 		
-		verify(parser, times(1)).addOptions(file);
+		verify(parser, times(1)).addOptions(option);
 	}
 
 	@Test
-	public void read_sets_directory_with_command_line_option() {
-		when(file.supports("--directory")).thenReturn(true);
-		when(file.hasRequiredArg()).thenReturn(true);
-		when(file.getRequiredArgType()).thenReturn(File.class);
+	public void read_calls_create_on_ProjectRegistryLoaderFactory() {
+		ParsedSet optionSet = mock(ParsedSet.class);
+		File file = mock(File.class);
+		when(optionSet.value(option)).thenReturn(file);
+		when(factory.create(file)).thenReturn(loader);
 		
-		CommandLineParser parser = spy(new CommandLineParser());
-		converter.configure(parser);
-		
-		String expectedDirectory = "/home/test";
-		List<String> args = newArrayList("--directory", expectedDirectory);
-		ParsedSet options = spy(parser.parse(args));
-		File directory = converter.read(options);
-		
-		assertEquals(expectedDirectory, directory.getAbsolutePath());
+		converter.read(optionSet);
+		verify(factory, times(1)).create(file);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void read_throws_when_no_argument_given_for_directory() {
-		when(file.supports("--directory")).thenReturn(true);
-		when(file.hasRequiredArg()).thenReturn(true);
-		when(file.getRequiredArgType()).thenReturn(File.class);
+		when(option.supports("--directory")).thenReturn(true);
+		when(option.hasRequiredArg()).thenReturn(true);
+		when(option.getRequiredArgType()).thenReturn(File.class);
 		
 		DirectoryCommandLineConverter converter = new DirectoryCommandLineConverter();
 		CommandLineParser parser = spy(new CommandLineParser());
@@ -65,23 +72,5 @@ public class DirectoryCommandLineConverterTest {
 		
 		List<String> args = newArrayList("--directory");
 		parser.parse(args);
-	}
-	
-	@Test
-	public void read_sets_default_directory_with_no_command_line_option() {
-		when(file.supports("--directory")).thenReturn(true);
-		when(file.hasRequiredArg()).thenReturn(true);
-		when(file.getRequiredArgType()).thenReturn(File.class);
-		when(file.getDefaultArgValue()).thenReturn(new File("."));
-
-		DirectoryCommandLineConverter converter = new DirectoryCommandLineConverter();
-		CommandLineParser parser = spy(new CommandLineParser());
-		converter.configure(parser);
-		
-		List<String> args = newArrayList();
-		ParsedSet options = spy(parser.parse(args));
-		File directory = converter.read(options);
-		
-		assertEquals(".", directory.getName());
 	}
 }
