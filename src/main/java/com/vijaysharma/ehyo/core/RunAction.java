@@ -1,13 +1,9 @@
 package com.vijaysharma.ehyo.core;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -21,7 +17,6 @@ import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
-import com.vijaysharma.ehyo.api.logging.Outputter;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
@@ -95,27 +90,14 @@ public class RunAction implements Action {
 
 	@Override
 	public void run() {
-		String pluginName = find(args);
-		Optional<Plugin> p = pluginLoader.findPlugin(pluginName);
-		
-		if ( ! p.isPresent() ) {
-			throw new RuntimeException("Plugin [" + pluginName + "] was not found.");
-		}
-		
-		Plugin plugin = p.get();
-		OptionParser parser = new OptionParser();
-		plugin.configure(parser);
-
+		Plugin plugin = find(args);
 		if ( help ) {
-			printUsage(parser);
-			return;
+			// print usage.
+		} else {
+			ProjectRegistry registry = this.projectLoader.load();
+			Service service = create(plugin, registry);
+			execute(plugin.name(), plugin.execute(args, service), registry);
 		}
-		
-		OptionSet options = parser.parse(this.args.toArray(new String[0]));
-		
-		ProjectRegistry registry = this.projectLoader.load();
-		Service service = create(plugin, registry);
-		execute(plugin.name(), plugin.execute(options, service), registry);
 	}
 
 	/**
@@ -203,19 +185,29 @@ public class RunAction implements Action {
 						   new DefaultOptionSelectorFactory());
 	}
 	
-	private static String find(List<String> args) {
-		// TODO: Should result in showing usage
-		if ( args == null || args.isEmpty() )
+	private Plugin find(List<String> args) {
+		if ( args == null || args.isEmpty() ) {
 			throw new RuntimeException("No plugin defined");
+		}
 		
-		return args.remove(0);
+		String pluginName = args.remove(0);
+		if ( pluginName == null ) {
+			throw new RuntimeException("No plugin given");
+		}
+		
+		Optional<Plugin> p = pluginLoader.findPlugin(pluginName);
+		if ( ! p.isPresent() ) {
+			throw new RuntimeException("Plugin [" + pluginName + "] was not found.");
+		}
+		
+		return p.get();
 	}
 	
-	private void printUsage(OptionParser parser) {
-		try {
-			parser.printHelpOn(System.err);
-		} catch (IOException e) {
-			Outputter.debug.exception("Failed to log usage", e);
-		}
-	}
+//	private void printUsage(OptionParser parser) {
+//		try {
+//			parser.printHelpOn(System.err);
+//		} catch (IOException e) {
+//			Outputter.debug.exception("Failed to log usage", e);
+//		}
+//	}
 }

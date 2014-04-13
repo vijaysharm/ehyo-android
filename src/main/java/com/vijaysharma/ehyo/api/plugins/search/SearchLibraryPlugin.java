@@ -5,9 +5,6 @@ import static com.google.common.base.Joiner.on;
 import java.util.ArrayList;
 import java.util.List;
 
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import retrofit.RestAdapter;
 
 import com.google.common.collect.Lists;
@@ -22,18 +19,10 @@ import com.vijaysharma.ehyo.api.plugins.search.models.QueryByNameResponse;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 
 public class SearchLibraryPlugin implements Plugin {
-	private ArgumentAcceptingOptionSpec<String> lib;
 
 	@Override
 	public String name() {
 		return "search-mvn-central";
-	}
-
-	@Override
-	public void configure(OptionParser parser) {
-		this.lib = parser.accepts("lib")
-				.withOptionalArg()
-				.ofType(String.class);
 	}
 
 	/**
@@ -42,12 +31,13 @@ public class SearchLibraryPlugin implements Plugin {
 	 * 'com.netflix.rxjava:rxjava-android:0.16.1')
 	 */
 	@Override
-	public List<PluginAction> execute(OptionSet options, Service service) {
+	public List<PluginAction> execute(List<String> args, Service service) {
 		ArrayList<PluginAction> actions = Lists.newArrayList();
 		
-		if ( options.has(lib) ) {
-			String searchValue = lib.value(options);
-			
+		String searchValue = getLib(args);
+		Outputter.out.println("Searching: " + searchValue);
+
+		if ( searchValue != null && searchValue == null ) {
 			RestAdapter restAdapter = new RestAdapter.Builder()
 		    	.setEndpoint("http://search.maven.org")
 		    	.build();
@@ -76,6 +66,20 @@ public class SearchLibraryPlugin implements Plugin {
 		return actions;
 	}
 
+	private static String getLib(List<String> args) {
+		int libIndex = args.indexOf("--lib");
+		
+		if (libIndex == -1) {
+			return null;
+		}
+		
+		int libValueIndex = libIndex + 1;
+		if ( libValueIndex >= args.size() )
+			return null;
+		
+		return args.get(libValueIndex);
+	}
+	
 	private String toProjectId(Artifact artifact) {
 		return on(":").join(artifact.getId(), artifact.getLatestVersion());
 	}

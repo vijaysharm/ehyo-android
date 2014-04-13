@@ -37,16 +37,14 @@ TODO
 + Provide a way to add a new Component to the Android project (Activity, Services, etc..)
 ++ Includes adding the new Component to the Manifest
 + Provide a plugin that lets you rename your package namespace
-+ Make the command line more friendlier
-++ ehyo permissions internet vs ehyo --plugin permissions --add internet
-++ ehyo --directory <...> search blah vs ehyo --directory <...> --plugin search blah
++ Provide a plugin that add the 'big cookie model to your project'
 
 ##Tasks
 + Show user formatted error when the name given in plugin is not found
 + Show better version information
 + Have the custom logger respect debug mode
 + Broke Usage
-+ Better option description for usage
+++ Better option description for usage
 + Check if the project structure is valid
 ++ Maybe have the DirectoryCommandLineConverter load the project
 + Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
@@ -54,4 +52,5 @@ TODO
 + Improve ManifestActionHandler to support removing permissions (defined in the xml)
 + Have the ManifestChangeManagerFactory not modify the formatting of the XML file
 + Read the gradle build to understand the project structure better.
++ Improve dry-run diff
 + FIX: ApplicationRunActionFactoryTest

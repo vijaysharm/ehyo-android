@@ -12,9 +12,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -83,8 +80,7 @@ public class RunActionTest {
 		RunAction action = create(args);
 		action.run();
 		verify(pluginLoader, times(1)).findPlugin(pluginName);
-		verify(plugin, times(1)).configure(any(OptionParser.class));
-		verify(plugin, times(1)).execute(any(OptionSet.class), any(Service.class));
+		verify(plugin, times(1)).execute(Mockito.eq(args), any(Service.class));
 	}
 
 	@Test
@@ -97,8 +93,7 @@ public class RunActionTest {
 		RunAction action = create(args, true, false);
 		action.run();
 		verify(pluginLoader, times(1)).findPlugin(pluginName);
-		verify(plugin, times(1)).configure(any(OptionParser.class));
-		verify(plugin, times(0)).execute(any(OptionSet.class), any(Service.class));
+		verify(plugin, times(0)).execute(Mockito.eq(args), any(Service.class));
 	}
 
 	@Test
@@ -111,7 +106,7 @@ public class RunActionTest {
 
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(projectLoader.load()).thenReturn(registry);
-		when(plugin.execute(any(OptionSet.class), any(Service.class)))
+		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(Arrays.asList(pluginAction));
 		
 		RunAction action = create(args);
@@ -131,7 +126,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(projectLoader.load()).thenReturn(registry);
-		when(plugin.execute(any(OptionSet.class), any(Service.class)))
+		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(asList(pluginAction));
 		when(manifestChangeFactory.create(Mockito.anyList()))
 			.thenReturn(changeManager);
@@ -157,7 +152,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(projectLoader.load()).thenReturn(registry);
-		when(plugin.execute(any(OptionSet.class), any(Service.class)))
+		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(asList(pluginAction));
 		when(manifestSelector.select(Mockito.anyList()))
 			.thenReturn(Arrays.asList(manifest));
@@ -187,7 +182,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(projectLoader.load()).thenReturn(registry);
-		when(plugin.execute(any(OptionSet.class), any(Service.class)))
+		when(plugin.execute(Mockito.eq(args), any(Service.class)))
 			.thenReturn(asList(pluginAction));
 		when(manifestSelector.select(Mockito.anyList()))
 			.thenReturn(Arrays.asList(manifest));
