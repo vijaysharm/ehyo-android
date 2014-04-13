@@ -11,7 +11,7 @@ import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConv
 import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConverter;
 
 /**
- * Captures the system arguments (help, dry-run, plugins, plugin, directory,
+ * Captures the system arguments (help, dry-run, plugins, directory,
  * etc...) before forwarding the commands on to the plugins
  */
 class ApplicationRunActionFactory implements CommandLineAction {
@@ -24,7 +24,7 @@ class ApplicationRunActionFactory implements CommandLineAction {
 	public ApplicationRunActionFactory() {
 		this(new DirectoryCommandLineConverter(), 
 			 new PluginsCommandLineConverter(),
-			 new DefaultRunActionBuilderFactory());
+			 new RunActionBuilderFactory());
 	}
 
 	ApplicationRunActionFactory(DirectoryCommandLineConverter directory,
@@ -34,8 +34,8 @@ class ApplicationRunActionFactory implements CommandLineAction {
 		this.plugins = plugins;
 		this.factory = factory;
 		
-		this.help = new ArgumentOptionBuilder<String>("help").build();
-		this.dryrun = new ArgumentOptionBuilder<String>("dry-run").build();
+		this.help = new ArgumentOptionBuilder<String>("help", "h").build();
+		this.dryrun = new ArgumentOptionBuilder<String>("dry-run", "n").build();
 	}
 	
 	@Override
@@ -56,12 +56,7 @@ class ApplicationRunActionFactory implements CommandLineAction {
 		return run.build();
 	}
 	
-	interface RunActionBuilderFactory {
-		RunActionBuilder create(List<String> args);
-	}
-	
-	private static class DefaultRunActionBuilderFactory implements RunActionBuilderFactory {
-		@Override
+	static class RunActionBuilderFactory {
 		public RunActionBuilder create(List<String> args) {
 			return new RunActionBuilder(args);
 		}

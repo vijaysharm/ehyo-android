@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.vijaysharma.ehyo.core.Action;
+import com.vijaysharma.ehyo.core.RunAction;
 import com.vijaysharma.ehyo.core.RunActionBuilder;
 import com.vijaysharma.ehyo.core.commandline.ApplicationRunActionFactory.RunActionBuilderFactory;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
@@ -43,6 +44,15 @@ public class ApplicationRunActionFactoryTest {
 		plugins = mock(PluginsCommandLineConverter.class);
 		factory = mock(RunActionBuilderFactory.class);
 		app = new ApplicationRunActionFactory(directory, plugins, factory);
+	}
+	
+	@Test
+	public void RunActionBuilderFactory_returns_instanceof_RunAction() {
+		RunActionBuilderFactory factory = new RunActionBuilderFactory();
+		RunActionBuilder builder = factory.create(null);
+		Action action = builder.build();
+
+		assertEquals(RunAction.class, action.getClass());
 	}
 	
 	@Test

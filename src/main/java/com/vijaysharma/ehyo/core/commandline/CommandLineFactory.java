@@ -8,7 +8,7 @@ public class CommandLineFactory {
 	private ActionFactory actionFactory;
 
 	public CommandLineFactory() {
-		this( new DefaultCommandLineActionFactory() );
+		this( new ActionFactory() );
 	}
 	
 	CommandLineFactory(ActionFactory actionFactory) {
@@ -18,12 +18,7 @@ public class CommandLineFactory {
 		return actionFactory.create(args);
 	}
 	
-	static interface ActionFactory {
-		Action create(List<String> args);
-	}
-	
-	private static class DefaultCommandLineActionFactory implements ActionFactory {
-		@Override
+	static class ActionFactory {
 		public Action create(List<String> args) {
 			return new ParseAndBuildAction( args );
 		}

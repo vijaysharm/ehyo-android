@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.api.logging.Output;
 
 public class OptionSelector<T> {
 	private final Scanner scanner;
@@ -38,7 +38,7 @@ public class OptionSelector<T> {
 		if ( multiselect ) dialog.append("[" + max + "] Apply to all\n");
 		
 		dialog.append("Select: ");
-		Outputter.out.println(dialog.toString());
+		Output.out.println(dialog.toString());
 		
 		int selection = read(1, max);
 

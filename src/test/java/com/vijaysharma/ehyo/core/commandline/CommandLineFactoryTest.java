@@ -38,4 +38,11 @@ public class CommandLineFactoryTest {
 		
 		Assert.assertEquals(action, actualAction);
 	}
+	
+	@Test
+	public void configure_returns_a_ParseAndBuildAction_object() {
+		CommandLineFactory clf = new CommandLineFactory();
+		Action action = clf.configure(null);
+		Assert.assertEquals(ParseAndBuildAction.class, action.getClass());
+	}
 }

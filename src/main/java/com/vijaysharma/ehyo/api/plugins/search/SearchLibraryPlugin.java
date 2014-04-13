@@ -13,7 +13,7 @@ import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
-import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.plugins.search.models.Artifact;
 import com.vijaysharma.ehyo.api.plugins.search.models.QueryByNameResponse;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
@@ -35,7 +35,7 @@ public class SearchLibraryPlugin implements Plugin {
 		ArrayList<PluginAction> actions = Lists.newArrayList();
 		
 		String searchValue = getLib(args);
-		Outputter.out.println("Searching: " + searchValue);
+		Output.out.println("Searching: " + searchValue);
 
 		if ( searchValue != null && searchValue == null ) {
 			RestAdapter restAdapter = new RestAdapter.Builder()
@@ -46,7 +46,7 @@ public class SearchLibraryPlugin implements Plugin {
 			QueryByNameResponse name = maven.searchByName(searchValue);
 			Artifact[] artifacts = name.getResponse().getArtifacts();
 			if ( artifacts.length == 0 ) {
-				Outputter.err.println(searchValue + " was not found in the remote maven repository");
+				Output.err.println(searchValue + " was not found in the remote maven repository");
 				return Lists.newArrayList();
 			}
 	

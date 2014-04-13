@@ -11,7 +11,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.vijaysharma.ehyo.api.Plugin;
-import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.api.logging.Output;
 
 public class PluginLoader {
 	private final Reflections reflections;
@@ -41,7 +41,7 @@ public class PluginLoader {
 				plugins.put(instance.name().toLowerCase(), instance);
 			}
 		} catch( Exception ex ) {
-			Outputter.debug.exception("Failed to load Plugins", ex);
+			Output.debug.exception("Failed to load Plugins", ex);
 		}
 		return plugins.build();
 	}

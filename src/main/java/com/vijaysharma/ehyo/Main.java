@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.core.commandline.CommandLineFactory;
 
 public class Main implements Runnable {
@@ -71,6 +71,6 @@ public class Main implements Runnable {
     		}
     	}
     	output.append("\n");
-    	Outputter.debug.print(output.toString());
+    	Output.debug.print(output.toString());
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Function;
-import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.core.models.AsListOfStrings;
 import com.vijaysharma.ehyo.core.models.HasDocument;
 import com.vijaysharma.ehyo.core.utils.EFileUtil;
@@ -56,21 +56,21 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	}
 	
 	private void show(T item, Patch diff) throws IOException {		
-		Outputter.out.println("Diff " + renderer.apply(item));
+		Output.out.println("Diff " + renderer.apply(item));
 		diffPrinter.print(diff);
 	}
 
 	private void save(T item, K modified) throws IOException {
-		Outputter.out.print("Writing " + renderer.apply(item) + "... ");
+		Output.out.print("Writing " + renderer.apply(item) + "... ");
 		List<String> changed = toListOfStrings(modified);
 		writer.write(item, changed);
-		Outputter.out.println("done");
+		Output.out.println("done");
 	}
 	
 	static class DiffPrinter {
 		public void print(Patch patch) {
 			for (Delta delta: patch.getDeltas()) {
-				Outputter.out.println(delta);
+				Output.out.println(delta);
 			}				
 		}
 	}

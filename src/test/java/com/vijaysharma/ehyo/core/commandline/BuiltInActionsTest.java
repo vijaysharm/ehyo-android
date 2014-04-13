@@ -15,13 +15,15 @@ import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.vijaysharma.ehyo.api.logging.TextOutput;
+import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BuiltInActionsTest {
 
 	@Captor
-	ArgumentCaptor<ArgumentOption<String>> captor;
+	private ArgumentCaptor<ArgumentOption<String>> captor;
 	
 	@Test
 	public void configure_sets_version_as_option() {
@@ -48,5 +50,16 @@ public class BuiltInActionsTest {
 		ParsedSet options = mock(ParsedSet.class);
 		when(options.has(Mockito.any(ArgumentOption.class))).thenReturn(true);
 		assertNotNull(action.getAction(options));
+	}
+	
+	@Test
+	public void running_run_on_action_prints_version_information() {
+		TextOutput out = mock(TextOutput.class);
+		BuiltInActions action = new BuiltInActions(out);
+		ParsedSet options = mock(ParsedSet.class);
+		when(options.has(Mockito.any(ArgumentOption.class))).thenReturn(true);
+		Action versionAction = action.getAction(options);
+		versionAction.run();
+		verify(out, times(1)).println(Mockito.anyString());
 	}
 }

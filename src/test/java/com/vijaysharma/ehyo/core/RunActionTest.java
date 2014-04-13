@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
+import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
@@ -36,6 +37,7 @@ public class RunActionTest {
 	private OptionSelector<AndroidManifest> manifestSelector;
 	private ManifestChangeManagerFactory manifestChangeFactory;
 	private GradleBuildChangeManagerFactory buildChangeFactory;
+	private TextOutput out;
 	
 	@Before
 	public void before() {
@@ -45,6 +47,7 @@ public class RunActionTest {
 		manifestSelector = mock(OptionSelector.class);
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
 		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
+		out = mock(TextOutput.class);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -220,6 +223,7 @@ public class RunActionTest {
 							 manifestChangeFactory,
 							 buildChangeFactory,
 							 help, 
-							 dryrun);
+							 dryrun,
+							 out);
 	}
 }

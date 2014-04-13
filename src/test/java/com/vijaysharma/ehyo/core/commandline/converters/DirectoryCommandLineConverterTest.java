@@ -64,8 +64,7 @@ public class DirectoryCommandLineConverterTest {
 		converter.configure(parser);
 		
 		List<String> args = newArrayList("--directory");
-		ParsedSet options = spy(parser.parse(args));
-		converter.read(options);
+		parser.parse(args);
 	}
 	
 	@Test

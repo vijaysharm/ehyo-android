@@ -17,6 +17,8 @@ import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
+import com.vijaysharma.ehyo.api.logging.Output;
+import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
@@ -51,6 +53,7 @@ public class RunAction implements Action {
 	private final OptionSelector<AndroidManifest> manifestSelector;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
+	private final TextOutput out;
 
 	public RunAction(List<String> args, 
 					 File root, 
@@ -65,7 +68,8 @@ public class RunAction implements Action {
 			 new ManifestChangeManagerFactory(),
 			 new GradleBuildChangeManagerFactory(),
 			 help,
-			 dryrun);
+			 dryrun,
+			 Output.out);
 	}
 
 	RunAction(List<String> args, 
@@ -76,7 +80,8 @@ public class RunAction implements Action {
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  GradleBuildChangeManagerFactory buildChangeFactory,
 			  boolean help,
-			  boolean dryrun) {
+			  boolean dryrun,
+			  TextOutput out) {
 		this.args = args;
 		this.projectLoader = projectLoader;
 		this.manifestSelector = manifestSelector;
@@ -86,6 +91,7 @@ public class RunAction implements Action {
 		this.factory = factory;
 		this.manifestChangeFactory = manifestChangeFactory; 
 		this.buildChangeFactory = buildChangeFactory;
+		this.out = out;
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
-import com.vijaysharma.ehyo.api.logging.Outputter;
+import com.vijaysharma.ehyo.api.logging.Output;
 
 public class ListPlugins implements Plugin {
 	
@@ -18,14 +18,14 @@ public class ListPlugins implements Plugin {
 	@Override
 	public List<PluginAction> execute(List<String> args, Service service) {
 		if ( args.contains("--about") ) {
-			Outputter.out.println("TODO: Print about information");
+			Output.out.println("TODO: Print about information");
 			return Lists.newArrayList();
 		}
 		
-		Outputter.out.println( "Installed plugins" );
-		Outputter.out.println( "-----------------" );
+		Output.out.println( "Installed plugins" );
+		Output.out.println( "-----------------" );
 		for ( Plugin plugin : service.getPlugins() ) {
-			Outputter.out.println( "+ " + plugin.name() );
+			Output.out.println( "+ " + plugin.name() );
 		}
 		return Lists.newArrayList();
 	}
