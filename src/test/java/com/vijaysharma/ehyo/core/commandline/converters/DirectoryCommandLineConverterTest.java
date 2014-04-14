@@ -1,7 +1,6 @@
 package com.vijaysharma.ehyo.core.commandline.converters;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;

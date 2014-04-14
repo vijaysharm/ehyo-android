@@ -11,7 +11,8 @@ import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
 
 class InternalActions {
 	static class InternalManifestAction implements ManifestAction {
-		private ImmutableMultimap.Builder<String, String> addedPermissions = ImmutableMultimap.builder();
+		private final ImmutableMultimap.Builder<String, String> addedPermissions = ImmutableMultimap.builder();
+		private final ImmutableMultimap.Builder<String, String> removedPermissions = ImmutableMultimap.builder();
 		
 		@Override
 		public void addPermission(ProjectManifest manifest, String permission) {
@@ -22,10 +23,21 @@ class InternalActions {
 		public Multimap<String, String> getAddedPermissions() {
 			return addedPermissions.build();
 		}
+		
+		@Override
+		public void removePermission(ProjectManifest manifest, String permission) {
+			DefaultProjectManifest projectManifest = (DefaultProjectManifest) manifest;
+			removedPermissions.put(projectManifest.getManifest().getId(), permission);
+		}
+		
+		public Multimap<String, String> getRemovedPermissions() {
+			return removedPermissions.build();
+		}
 	}
 	
 	static class InternalBuildAction implements BuildAction {
-		private ImmutableMultimap.Builder<String, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
+		private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
+		private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> removedDependencies = ImmutableMultimap.builder();
 		
 		@Override
 		public void addDependency(BuildConfiguration config, String dependency) {
@@ -37,6 +49,17 @@ class InternalActions {
 		public Multimap<String, BuildActionDependencyValue> getAddedDependencies() {
 			return addedDependencies.build();
 		}
+		
+		@Override
+		public void removeDependency(BuildConfiguration config, String dependency) {
+			DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
+			BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
+			removedDependencies.put(configuration.getBuild().getId(), value);
+		}
+		
+		public Multimap<String, BuildActionDependencyValue> getRemovedDependencies() {
+			return removedDependencies.build();
+		}		
 	}
 	
 	static class BuildActionDependencyValue {

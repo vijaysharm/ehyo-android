@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -84,8 +85,10 @@ public class RunAction implements Action {
 	@Override
 	public void run() {
 		Plugin plugin = find(args);
+		out.println("Executing plugin: " + plugin.getClass().getCanonicalName() + " with args: " + Joiner.on(" ").join(args));
+
 		if ( help ) {
-			out.print("TODO: Print usage for: " + plugin.name());
+			out.println("TODO: Print usage for: " + plugin.name());
 		} else {
 			Service service = create(plugin);
 			execute(plugin.name(), plugin.execute(args, service), registry);

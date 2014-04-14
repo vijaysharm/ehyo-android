@@ -47,6 +47,7 @@ TODO
 ++ Better option description for usage
 + Finish the Permissions plugin
 ++ Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
+++ Check what permissions are already applied to the manifest
 ++ Support removal
 + Improve ManifestActionHandler to only add permissions if defined in manifest
 + Improve ManifestActionHandler to support removing permissions (defined in the xml)
@@ -59,3 +60,7 @@ TODO
 ++ You also don't want to show an exception when all they want to do is run list
 + FIX: ApplicationRunActionFactoryTest
 + As part of the list plugin, we should be able to provide a filter option
++ Should all actions be named so that output is more legible?
++ Add support for a --debug for verbose printing
++ Move maven search into the Service
+

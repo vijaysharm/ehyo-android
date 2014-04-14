@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo.api.plugins.manifestpermissions;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.ManifestAction;
@@ -28,19 +29,59 @@ public class Permissions implements Plugin {
 
 	@Override
 	public List<PluginAction> execute(List<String> args, Service service) {
+		List<PluginAction> result = Lists.newArrayList();
 		
+		String argValue = getArgValue("--add", args);
+		if ( argValue != null ) {
+			List<ProjectManifest> selectedManifests = selectManifests(service);
+			Set<String> permissions = registry.find(argValue);
+			
+			ManifestAction action = service.createManifestAction();
+	
+			for ( ProjectManifest manifest : selectedManifests ) {
+				for ( String permission : permissions ) {
+					action.addPermission(manifest, permission);
+				}
+			}
+			result.add(action);
+		}
+		
+		argValue = getArgValue("--remove", args);
+		if ( argValue != null ) {
+			List<ProjectManifest> selectedManifests = selectManifests(service);	
+			// TODO: Should probably get the set from the manifests themselves
+			Set<String> permissions = registry.find(argValue);
+			
+			ManifestAction action = service.createManifestAction();
+			for ( ProjectManifest manifest : selectedManifests ) {
+				for ( String permission : permissions ) {
+					action.removePermission(manifest, permission);
+				}
+			}
+			result.add(action);
+		}
+
+		return result;
+	}
+
+	private List<ProjectManifest> selectManifests(Service service) {
 		List<ProjectManifest> manifests = service.getManifests();
 		OptionSelector<ProjectManifest> selector = service.createSelector(ProjectManifest.class);
 		List<ProjectManifest> selectedManifests = selector.select(manifests, false);
+		return selectedManifests;
+	}
+	
+	private static String getArgValue(String arg, List<String> args) {
+		int libIndex = args.indexOf(arg);
 		
-		ManifestAction action = service.createManifestAction();
-		List<PluginAction> result = Lists.newArrayList();
-
-		for ( ProjectManifest manifest : selectedManifests ) {
-			action.addPermission(manifest, "android.permission.INTERNET");
+		if (libIndex == -1) {
+			return null;
 		}
-		result.add(action);
 		
-		return result;
+		int libValueIndex = libIndex + 1;
+		if ( libValueIndex >= args.size() )
+			return null;
+		
+		return args.get(libValueIndex);
 	}
 }
