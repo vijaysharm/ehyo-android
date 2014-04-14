@@ -8,20 +8,23 @@ import java.util.Scanner;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.logging.Output;
+import com.vijaysharma.ehyo.api.logging.TextOutput;
 
 public class OptionSelector<T> {
 	private final Scanner scanner;
 	private final Function<T, String> renderer;
-	private String header;
+	private final String header;
+	private final TextOutput out;
 	
 	public OptionSelector(String header, Function<T, String> renderer) {
-		this(header, renderer, System.in);
+		this(header, renderer, System.in, Output.out);
 	}
 	
-	OptionSelector(String header, Function<T, String> renderer, InputStream in) {
+	OptionSelector(String header, Function<T, String> renderer, InputStream in, TextOutput out) {
 		this.renderer = renderer;
 		this.header = header;
 		this.scanner = new Scanner(new InputStreamReader(in));
+		this.out = out;
 	}
 	
 	public List<T> select(List<T> items, boolean multiselect) {
@@ -41,7 +44,7 @@ public class OptionSelector<T> {
 		if ( multiselect ) dialog.append("[" + max + "] Apply to all\n");
 		
 		dialog.append("Select: ");
-		Output.out.println(dialog.toString());
+		out.println(dialog.toString());
 		
 		int selection = read(1, max);
 

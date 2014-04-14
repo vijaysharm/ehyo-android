@@ -1,11 +1,11 @@
 package com.vijaysharma.ehyo.core;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.PatchApplier.DiffPrinter;
 import com.vijaysharma.ehyo.core.PatchApplier.FileWriter;
 import com.vijaysharma.ehyo.core.models.AsListOfStrings;
@@ -29,14 +30,16 @@ public class PatchApplierTest {
 	private PatchApplier<HasDocument, AsListOfStrings> patcher;
 	private FileWriter writer;
 	private DiffPrinter printer;
+	private TextOutput out;
 	
 	@Before
 	public void before() {
 		renderer = mock(Function.class);
 		writer = mock(FileWriter.class);
 		printer = mock(DiffPrinter.class);
+		out = mock(TextOutput.class);
 		
-		patcher = new PatchApplier<HasDocument, AsListOfStrings>(writer, printer, renderer);
+		patcher = new PatchApplier<HasDocument, AsListOfStrings>(writer, printer, renderer, out);
 	}
 	
 	@Test

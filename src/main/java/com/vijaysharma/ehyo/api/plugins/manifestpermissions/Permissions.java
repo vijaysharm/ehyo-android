@@ -11,6 +11,16 @@ import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 
 public class Permissions implements Plugin {
+	private final PermissionRegistry registry;
+	
+	public Permissions() {
+		this(new PermissionRegistry());
+	}
+	
+	Permissions(PermissionRegistry registry) {
+		this.registry = registry;
+	}
+
 	@Override
 	public String name() {
 		return "manifest-permissions";

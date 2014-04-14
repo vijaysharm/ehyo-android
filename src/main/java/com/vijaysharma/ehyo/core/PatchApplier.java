@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.vijaysharma.ehyo.api.logging.Output;
+import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.models.AsListOfStrings;
 import com.vijaysharma.ehyo.core.models.HasDocument;
 import com.vijaysharma.ehyo.core.utils.EFileUtil;
@@ -18,15 +19,17 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	private final Function<T, String> renderer;
 	private final FileWriter writer;
 	private final DiffPrinter diffPrinter;
+	private final TextOutput out;
 	
 	public PatchApplier(Function<T, String> renderer) {
-		this(new FileWriter(), new DiffPrinter(), renderer);
+		this(new FileWriter(), new DiffPrinter(), renderer, Output.out);
 	}
 	
-	PatchApplier(FileWriter writer, DiffPrinter printer, Function<T, String> renderer) {
+	PatchApplier(FileWriter writer, DiffPrinter printer, Function<T, String> renderer, TextOutput out) {
 		this.renderer = renderer;
 		this.writer = writer;
 		this.diffPrinter = printer;
+		this.out = out;
 	}
 	
 	public void apply(Map<T, K> files, boolean dryrun) {
@@ -56,15 +59,15 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	}
 	
 	private void show(T item, Patch diff) throws IOException {		
-		Output.out.println("Diff " + renderer.apply(item));
+		out.println("Diff " + renderer.apply(item));
 		diffPrinter.print(diff);
 	}
 
 	private void save(T item, K modified) throws IOException {
-		Output.out.print("Writing " + renderer.apply(item) + "... ");
+		out.print("Writing " + renderer.apply(item) + "... ");
 		List<String> changed = toListOfStrings(modified);
 		writer.write(item, changed);
-		Output.out.println("done");
+		out.println("done");
 	}
 	
 	static class DiffPrinter {

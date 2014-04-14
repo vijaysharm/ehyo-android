@@ -42,6 +42,10 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		this.manifestId = id;
 	}
 
+	public String getManifestId() {
+		return manifestId;
+	}
+	
 	@Override
 	public List<String> toListOfStrings() {
 		try {
