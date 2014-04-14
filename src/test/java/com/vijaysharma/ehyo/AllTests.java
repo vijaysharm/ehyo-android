@@ -14,9 +14,11 @@ import com.vijaysharma.ehyo.core.commandline.CommandLineParserTest;
 import com.vijaysharma.ehyo.core.commandline.ParseAndBuildActionTest;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverterTest;
 import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConverterTest;
+import com.vijaysharma.ehyo.core.models.AndroidManifestDocumentTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+	AndroidManifestDocumentTest.class,
 	ApplicationRunActionFactoryTest.class,
 	BuiltInActionsTest.class,
 	CommandLineFactoryTest.class,

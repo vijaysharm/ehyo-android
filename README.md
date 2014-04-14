@@ -45,12 +45,14 @@ TODO
 + Have the custom logger respect debug mode
 + Broke Usage
 ++ Better option description for usage
-+ Check if the project structure is valid
-++ Maybe have the DirectoryCommandLineConverter load the project
 + Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
 + Improve ManifestActionHandler to only add permissions if defined in manifest
 + Improve ManifestActionHandler to support removing permissions (defined in the xml)
 + Have the ManifestChangeManagerFactory not modify the formatting of the XML file
 + Read the gradle build to understand the project structure better.
 + Improve dry-run diff
++ Check if the project structure is valid
+++ Need to determine when to notify the user that the directory they are loading from is invalid.
+++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
+++ You also don't want to show an exception when all they want to do is run list
 + FIX: ApplicationRunActionFactoryTest
