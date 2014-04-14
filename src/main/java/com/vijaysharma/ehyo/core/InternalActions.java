@@ -8,29 +8,22 @@ import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.ManifestAction;
+import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
 
 class InternalActions {
 	static class InternalManifestAction implements ManifestAction {
-		private ImmutableList.Builder<String> addedPermissions = ImmutableList.builder();
-		private ImmutableList.Builder<String> removedPermissions = ImmutableList.builder();
-
+		private ImmutableMultimap.Builder<String, String> addedPermissions = ImmutableMultimap.builder();
+		
 		@Override
-		public void addPermission(String permission) {
-			this.addedPermissions.add(permission);
+		public void addPermission(ProjectManifest manifest, String permission) {
+			DefaultProjectManifest projectManifest = (DefaultProjectManifest) manifest;
+			addedPermissions.put(projectManifest.getManifest().getId(), permission);
 		}
 		
-		public List<String> getAddedPermissions() {
+		public Multimap<String, String> getAddedPermissions() {
 			return addedPermissions.build();
-		}
-		
-		@Override
-		public void removePermission(String permission) {
-			this.removedPermissions.add(permission);
-		}
-		
-		public List<String> getRemovedPermissions() {
-			return removedPermissions.build();
 		}
 	}
 	

@@ -59,6 +59,15 @@ class RunActionInternals {
 		public DefaultProjectManifest(AndroidManifest manifest) {
 			this.manifest = manifest;
 		}
+		
+		public AndroidManifest getManifest() {
+			return manifest;
+		}
+		
+		@Override
+		public String toString() {
+			return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
+		}
 	}
 
 	static class DefaultProjectBuild implements ProjectBuild {

@@ -18,7 +18,6 @@ import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
-import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
@@ -36,18 +35,10 @@ import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunAction implements Action {
-	private static final Function<AndroidManifest, String> MANIFEST_RENDERER = new Function<AndroidManifest, String>() {
-		@Override
-		public String apply(AndroidManifest manifest) {
-			return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
-		}
-	};
-	
 	private final List<String> args;
 	private final ProjectRegistry registry;
 	private final PluginLoader pluginLoader;
 	private final PluginActionHandlerFactory factory;
-	private final OptionSelector<AndroidManifest> manifestSelector;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
 	private final boolean dryrun;
@@ -63,7 +54,6 @@ public class RunAction implements Action {
 			 new PluginLoader(pluginNamespaces),
 			 registry,
 			 new PluginActionHandlerFactory(),
-			 new OptionSelector<AndroidManifest>("Which of the following would you like to modify", MANIFEST_RENDERER),
 			 new ManifestChangeManagerFactory(),
 			 new GradleBuildChangeManagerFactory(),
 			 help,
@@ -75,7 +65,6 @@ public class RunAction implements Action {
 			  PluginLoader loader,
 			  ProjectRegistry registry, 
 			  PluginActionHandlerFactory factory,
-			  OptionSelector<AndroidManifest> manifestSelector,
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  GradleBuildChangeManagerFactory buildChangeFactory,
 			  boolean help,
@@ -83,7 +72,6 @@ public class RunAction implements Action {
 			  TextOutput out) {
 		this.args = args;
 		this.registry = registry;
-		this.manifestSelector = manifestSelector;
 		this.dryrun = dryrun;
 		this.help = help;
 		this.pluginLoader = loader;
@@ -124,8 +112,7 @@ public class RunAction implements Action {
 		}
 		
 		if ( ! manifestActions.isEmpty() ) {
-			List<AndroidManifest> manifests = manifestSelector.select(registry.getAllAndroidManifests());
-			ManifestChangeManager changes = manifestChangeFactory.create(manifests);
+			ManifestChangeManager changes = manifestChangeFactory.create(registry, manifestActions);
 			for ( InternalManifestAction action : manifestActions ) {
 				ManifestActionHandler handler = factory.createManifestActionHandler(action);
 				changes.apply(handler);

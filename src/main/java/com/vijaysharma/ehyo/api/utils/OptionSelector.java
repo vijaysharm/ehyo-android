@@ -25,6 +25,9 @@ public class OptionSelector<T> {
 	}
 	
 	public List<T> select(List<T> items, boolean multiselect) {
+		if ( items.size() == 1 ) 
+			return items;
+
 		StringBuilder dialog = new StringBuilder();
 		int max = items.size() + (multiselect ? 1 : 0);
 		

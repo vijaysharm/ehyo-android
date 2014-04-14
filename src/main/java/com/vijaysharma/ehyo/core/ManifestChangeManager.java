@@ -1,12 +1,14 @@
 package com.vijaysharma.ehyo.core;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class ManifestChangeManager implements ChangeManager<AndroidManifestDocument>{
 	private static final Function<AndroidManifest, String> MANIFEST_RENDERER = new Function<AndroidManifest, String>() {
@@ -17,15 +19,19 @@ public class ManifestChangeManager implements ChangeManager<AndroidManifestDocum
 	};
 	
 	static class ManifestChangeManagerFactory {
-		public ManifestChangeManager create(List<AndroidManifest> manifests) {
+		public ManifestChangeManager create(ProjectRegistry registry, Set<InternalManifestAction> manifestActions) {
 			PatchApplier<AndroidManifest, AndroidManifestDocument> patcher = new PatchApplier<AndroidManifest, AndroidManifestDocument>(MANIFEST_RENDERER);
-			return new ManifestChangeManager(transform(manifests), patcher);
+			return new ManifestChangeManager(transform(registry, manifestActions), patcher);
 		}
 		
-		private static Map<AndroidManifest, AndroidManifestDocument> transform(List<AndroidManifest> manifests) {
+		private static Map<AndroidManifest, AndroidManifestDocument> transform(ProjectRegistry registry, Set<InternalManifestAction> manifests) {
 			ImmutableMap.Builder<AndroidManifest, AndroidManifestDocument> mapping = ImmutableMap.builder();
-			for ( AndroidManifest manifest : manifests ) {
-				mapping.put(manifest, manifest.asDocument());
+			for ( InternalManifestAction action : manifests ) {
+				Set<String> manifestIds = action.getAddedPermissions().keySet();
+				for ( String id : manifestIds ) {
+					AndroidManifest manifest = registry.getAndroidManifest(id);
+					mapping.put(manifest, manifest.asDocument());
+				}
 			}
 
 			return mapping.build();

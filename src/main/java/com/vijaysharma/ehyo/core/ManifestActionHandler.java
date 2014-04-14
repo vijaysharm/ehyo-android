@@ -16,14 +16,14 @@ public class ManifestActionHandler implements PluginActionHandler<AndroidManifes
 	//VTD-XML
 	@Override
 	public void modify(AndroidManifestDocument doc) {
-		List<String> permissions = action.getAddedPermissions();
-		for (String permission : permissions) {
-			doc.addPermission(permission);
-		}
-		
-		permissions = action.getRemovedPermissions();
-		for (String permission : permissions) {
-			doc.removePermission(permission);
-		}
+//		List<String> permissions = action.getAddedPermissions();
+//		for (String permission : permissions) {
+//			doc.addPermission(permission);
+//		}
+//		
+//		permissions = action.getRemovedPermissions();
+//		for (String permission : permissions) {
+//			doc.removePermission(permission);
+//		}
 	}
 }

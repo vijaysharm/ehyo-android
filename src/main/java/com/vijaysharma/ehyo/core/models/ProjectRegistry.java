@@ -53,4 +53,13 @@ public class ProjectRegistry {
 		
 		throw new IllegalArgumentException("Uknown Gradle file: " + id);
 	}
+	
+	public AndroidManifest getAndroidManifest(String id) {
+		for ( AndroidManifest manifest : getAllAndroidManifests() ) {
+			if ( manifest.getId().equals(id) )
+				return manifest;
+		}
+		
+		throw new IllegalArgumentException("Uknown Android Manifest file: " + id);
+	}
 }

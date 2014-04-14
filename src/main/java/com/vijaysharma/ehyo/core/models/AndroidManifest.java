@@ -27,6 +27,10 @@ public class AndroidManifest implements HasDocument {
 		return file.getParentFile().getName();
 	}
 	
+	public String getId() {
+		return id;
+	}
+	
 	public File getFile() {
 		return file;
 	}
