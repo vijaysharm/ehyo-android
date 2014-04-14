@@ -63,4 +63,6 @@ TODO
 + Should all actions be named so that output is more legible?
 + Add support for a --debug for verbose printing
 + Move maven search into the Service
-
++ Instead of a "build action" or "manifest action", let the plugin just work with the ProjectManifest/ProjectBuild directly.
+++ This requires changing the API for execute to void.
+++ Have each ProjectManifest and ProjectBuild have the Internal action objects

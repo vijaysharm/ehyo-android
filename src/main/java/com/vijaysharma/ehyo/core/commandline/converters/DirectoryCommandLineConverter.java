@@ -35,14 +35,14 @@ public class DirectoryCommandLineConverter implements CommandLineConverter<Proje
 	@Override
 	public ProjectRegistry read(ParsedSet options) {
 		File root = options.value(directory);
-		ProjectRegistryLoader loader = factory.create(root);
+		ProjectRegistryLoader loader = factory.create();
 
-		return loader.load();
+		return loader.load(root);
 	}
 	
 	static class ProjectRegistryLoaderFactory {
-		ProjectRegistryLoader create(File root) {
-			return new ProjectRegistryLoader(root);
+		ProjectRegistryLoader create() {
+			return new ProjectRegistryLoader();
 		}
 	}
 }

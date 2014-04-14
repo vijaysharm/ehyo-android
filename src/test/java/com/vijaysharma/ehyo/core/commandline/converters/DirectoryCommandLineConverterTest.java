@@ -53,10 +53,11 @@ public class DirectoryCommandLineConverterTest {
 		ParsedSet optionSet = mock(ParsedSet.class);
 		File file = mock(File.class);
 		when(optionSet.value(option)).thenReturn(file);
-		when(factory.create(file)).thenReturn(loader);
+		when(factory.create()).thenReturn(loader);
 		
 		converter.read(optionSet);
-		verify(factory, times(1)).create(file);
+		verify(factory, times(1)).create();
+		verify(loader, times(1)).load(file);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
