@@ -2,9 +2,7 @@ package com.vijaysharma.ehyo.api.plugins.list;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Plugin;
-import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 
@@ -16,10 +14,10 @@ public class ListPlugins implements Plugin {
 	}
 	
 	@Override
-	public List<PluginAction> execute(List<String> args, Service service) {
+	public void execute(List<String> args, Service service) {
 		if ( args.contains("--about") ) {
 			Output.out.println("TODO: Print about information");
-			return Lists.newArrayList();
+			return;
 		}
 		
 		Output.out.println( "Installed plugins" );
@@ -27,6 +25,5 @@ public class ListPlugins implements Plugin {
 		for ( Plugin plugin : service.getPlugins() ) {
 			Output.out.println( "+ " + plugin.name() );
 		}
-		return Lists.newArrayList();
 	}
 }

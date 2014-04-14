@@ -2,19 +2,17 @@ package com.vijaysharma.ehyo.core;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.vijaysharma.ehyo.api.BuildAction;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
-import com.vijaysharma.ehyo.api.ManifestAction;
+import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
 
 class InternalActions {
-	static class InternalManifestAction implements ManifestAction {
+	static class InternalManifestAction implements PluginAction {
 		private final ImmutableMultimap.Builder<String, String> addedPermissions = ImmutableMultimap.builder();
 		private final ImmutableMultimap.Builder<String, String> removedPermissions = ImmutableMultimap.builder();
 		
-		@Override
 		public void addPermission(ProjectManifest manifest, String permission) {
 			DefaultProjectManifest projectManifest = (DefaultProjectManifest) manifest;
 			addedPermissions.put(projectManifest.getManifest().getId(), permission);
@@ -24,7 +22,6 @@ class InternalActions {
 			return addedPermissions.build();
 		}
 		
-		@Override
 		public void removePermission(ProjectManifest manifest, String permission) {
 			DefaultProjectManifest projectManifest = (DefaultProjectManifest) manifest;
 			removedPermissions.put(projectManifest.getManifest().getId(), permission);
@@ -33,13 +30,16 @@ class InternalActions {
 		public Multimap<String, String> getRemovedPermissions() {
 			return removedPermissions.build();
 		}
+		
+		public boolean hasChanges() {
+			return  (! addedPermissions.build().isEmpty()) || (! removedPermissions.build().isEmpty() );
+		}
 	}
 	
-	static class InternalBuildAction implements BuildAction {
+	static class InternalBuildAction implements PluginAction {
 		private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
 		private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> removedDependencies = ImmutableMultimap.builder();
 		
-		@Override
 		public void addDependency(BuildConfiguration config, String dependency) {
 			DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
 			BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
@@ -50,7 +50,6 @@ class InternalActions {
 			return addedDependencies.build();
 		}
 		
-		@Override
 		public void removeDependency(BuildConfiguration config, String dependency) {
 			DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
 			BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
@@ -59,7 +58,11 @@ class InternalActions {
 		
 		public Multimap<String, BuildActionDependencyValue> getRemovedDependencies() {
 			return removedDependencies.build();
-		}		
+		}
+
+		public boolean hasChanges() {
+			return  (! addedDependencies.build().isEmpty()) || (! removedDependencies.build().isEmpty() );
+		}
 	}
 	
 	static class BuildActionDependencyValue {

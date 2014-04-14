@@ -58,7 +58,7 @@ TODO
 ++ Need to determine when to notify the user that the directory they are loading from is invalid.
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
 ++ You also don't want to show an exception when all they want to do is run list
-+ FIX: ApplicationRunActionFactoryTest
++ FIX: ApplicationRunActionFactoryTest, RunActionTest
 + As part of the list plugin, we should be able to provide a filter option
 + Should all actions be named so that output is more legible?
 + Add support for a --debug for verbose printing

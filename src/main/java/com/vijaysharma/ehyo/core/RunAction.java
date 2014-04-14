@@ -23,9 +23,7 @@ import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManag
 import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildActionFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultManifestActionFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
@@ -42,6 +40,7 @@ public class RunAction implements Action {
 	private final PluginActionHandlerFactory factory;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
+	private final ServiceFactory serviceFactory;
 	private final boolean dryrun;
 	private final boolean help;	
 	private final TextOutput out;
@@ -57,6 +56,7 @@ public class RunAction implements Action {
 			 new PluginActionHandlerFactory(),
 			 new ManifestChangeManagerFactory(),
 			 new GradleBuildChangeManagerFactory(),
+			 new ServiceFactory(),
 			 help,
 			 dryrun,
 			 Output.out);
@@ -68,6 +68,7 @@ public class RunAction implements Action {
 			  PluginActionHandlerFactory factory,
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  GradleBuildChangeManagerFactory buildChangeFactory,
+			  ServiceFactory serviceFactory,
 			  boolean help,
 			  boolean dryrun,
 			  TextOutput out) {
@@ -79,6 +80,7 @@ public class RunAction implements Action {
 		this.factory = factory;
 		this.manifestChangeFactory = manifestChangeFactory; 
 		this.buildChangeFactory = buildChangeFactory;
+		this.serviceFactory = serviceFactory;
 		this.out = out;
 	}
 
@@ -90,8 +92,9 @@ public class RunAction implements Action {
 		if ( help ) {
 			out.println("TODO: Print usage for: " + plugin.name());
 		} else {
-			Service service = create(plugin);
-			execute(plugin.name(), plugin.execute(args, service), registry);
+			Service service = serviceFactory.create(pluginLoader, registry);
+			plugin.execute(args, service);
+			execute(plugin.name(), gather(service), registry);
 		}
 	}
 
@@ -134,50 +137,6 @@ public class RunAction implements Action {
 			changes.commit(dryrun);
 		}
 	}
-
-	private Service create(Plugin plugin) {
-		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
-		
-		final ImmutableList.Builder<BuildConfiguration> configuration = ImmutableList.builder();
-		
-		List<ProjectBuild> builds = registry.getAllGradleBuilds(new Function<GradleBuild, ProjectBuild>() {
-			@Override
-			public ProjectBuild apply(GradleBuild build) {
-				configuration.addAll(buildConfiguration(build));
-				return new DefaultProjectBuild(build);
-			}
-
-			private List<BuildConfiguration> buildConfiguration(GradleBuild build) {
-				List<BuildConfiguration> configuration = Lists.newArrayList();
-				List<BuildType> buildTypes = build.getBuildTypes();
-				List<Flavor> flavors = build.getFlavors();
-
-				for ( BuildType buildType : buildTypes ) {
-					configuration.add(new DefaultBuildConfiguration( buildType, null, build));
-					for ( Flavor flavor : flavors ) {
-						configuration.add(new DefaultBuildConfiguration( buildType, flavor, build ));
-					}
-				}
-				
-				return configuration;
-			}
-		});
-		
-		List<ProjectManifest> manifests = registry.getAllAndroidManifests(new Function<AndroidManifest, ProjectManifest>() {
-			@Override
-			public ProjectManifest apply(AndroidManifest manifest) {
-				return new DefaultProjectManifest(manifest);
-			}
-		});
-		
-		return new Service(plugins, 
-						   manifests,
-						   builds,
-						   configuration.build(),
-						   new DefaultManifestActionFactory(), 
-						   new DefaultBuildActionFactory(),
-						   new DefaultOptionSelectorFactory());
-	}
 	
 	private Plugin find(List<String> args) {
 		if ( args == null || args.isEmpty() ) {
@@ -196,7 +155,27 @@ public class RunAction implements Action {
 		
 		return p.get();
 	}
-	
+
+	private List<PluginAction> gather(Service service) {
+		ImmutableList.Builder<PluginAction> actions = ImmutableList.builder();
+		List<BuildConfiguration> configurations = service.getConfigurations();
+		for ( BuildConfiguration config : configurations ) {
+			DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
+			if ( configuration.getBuildAction().hasChanges() )
+				actions.add(configuration.getBuildAction());
+		}
+		
+		List<ProjectManifest> manifests = service.getManifests();
+		for ( ProjectManifest man : manifests ) {
+			DefaultProjectManifest manifest = (DefaultProjectManifest) man;
+			if ( manifest.getManifestActions().hasChanges() ) {
+				actions.add(manifest.getManifestActions());
+			}
+		}
+		
+		return actions.build();
+	}
+
 //	private void printUsage(OptionParser parser) {
 //		try {
 //			parser.printHelpOn(System.err);
