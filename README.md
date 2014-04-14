@@ -45,7 +45,9 @@ TODO
 + Have the custom logger respect debug mode
 + Broke Usage
 ++ Better option description for usage
-+ Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
++ Finish the Permissions plugin
+++ Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
+++ Support removal
 + Improve ManifestActionHandler to only add permissions if defined in manifest
 + Improve ManifestActionHandler to support removing permissions (defined in the xml)
 + Have the ManifestChangeManagerFactory not modify the formatting of the XML file
@@ -56,3 +58,4 @@ TODO
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
 ++ You also don't want to show an exception when all they want to do is run list
 + FIX: ApplicationRunActionFactoryTest
++ As part of the list plugin, we should be able to provide a filter option

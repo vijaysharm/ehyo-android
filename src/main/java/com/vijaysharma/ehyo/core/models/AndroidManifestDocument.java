@@ -81,6 +81,17 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		return activities.build();
 	}
 	
+	public List<String> getServices() {
+		ImmutableList.Builder<String> activities = ImmutableList.builder();
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+		for (Element target : application.getChildren("service")) {
+			activities.add(target.getAttributeValue("name", ANDROID_NAMESPACE));
+		}
+		
+		return activities.build();
+	}
+	
 	public void addPermission(String permission) {
 		Element usesPermission = new Element("uses-permission")
 			.setAttribute("name", permission, ANDROID_NAMESPACE);

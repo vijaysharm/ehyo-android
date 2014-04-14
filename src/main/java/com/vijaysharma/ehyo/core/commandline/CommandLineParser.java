@@ -30,8 +30,11 @@ public class CommandLineParser {
 	}
 	
 	public ParsedSet parse(List<String> args) {
+		return parse(args, options.build());
+	}
+	
+	public ParsedSet parse(List<String> args, List<ArgumentOption<?>> ops) {
 		ImmutableMap.Builder<ArgumentOption<?>, Object> parsed = ImmutableMap.builder();
-		ImmutableList<ArgumentOption<?>> ops = options.build();
 		for ( Iterator<String> it = args.iterator(); it.hasNext(); ) {
 			String arg = it.next();
 			for ( ArgumentOption<?> op : ops ) {

@@ -37,7 +37,7 @@ public class SearchLibraryPlugin implements Plugin {
 		String searchValue = getLib(args);
 		Output.out.println("Searching: " + searchValue);
 
-		if ( searchValue != null && searchValue == null ) {
+		if ( searchValue != null ) {
 			RestAdapter restAdapter = new RestAdapter.Builder()
 		    	.setEndpoint("http://search.maven.org")
 		    	.build();
