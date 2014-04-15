@@ -5,28 +5,20 @@ import java.util.Set;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
-import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.Plugin;
-import com.vijaysharma.ehyo.api.PluginAction;
-import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
-import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
-import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
+import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
+import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunAction implements Action {
 	private final List<String> args;
 	private final ProjectRegistry registry;
 	private final PluginLoader pluginLoader;
-	private final PluginActionHandlerFactory factory;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
 	private final ServiceFactory serviceFactory;
@@ -42,7 +34,6 @@ public class RunAction implements Action {
 		this(args, 
 			 new PluginLoader(pluginNamespaces),
 			 registry,
-			 new PluginActionHandlerFactory(),
 			 new ManifestChangeManagerFactory(),
 			 new GradleBuildChangeManagerFactory(),
 			 new ServiceFactory(),
@@ -54,7 +45,6 @@ public class RunAction implements Action {
 	RunAction(List<String> args, 
 			  PluginLoader loader,
 			  ProjectRegistry registry, 
-			  PluginActionHandlerFactory factory,
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  GradleBuildChangeManagerFactory buildChangeFactory,
 			  ServiceFactory serviceFactory,
@@ -66,7 +56,6 @@ public class RunAction implements Action {
 		this.dryrun = dryrun;
 		this.help = help;
 		this.pluginLoader = loader;
-		this.factory = factory;
 		this.manifestChangeFactory = manifestChangeFactory; 
 		this.buildChangeFactory = buildChangeFactory;
 		this.serviceFactory = serviceFactory;
@@ -81,9 +70,11 @@ public class RunAction implements Action {
 		if ( help ) {
 			out.println("TODO: Print usage for: " + plugin.name());
 		} else {
-			Service service = serviceFactory.create(pluginLoader, registry);
+			ManifestActions manifestAction = new ManifestActions();
+			BuildActions buildAction = new BuildActions();
+			Service service = serviceFactory.create(pluginLoader, registry, manifestAction, buildAction);
 			plugin.execute(args, service);
-			execute(plugin.name(), gather(service), registry);
+			execute(plugin.name(), manifestAction, buildAction, registry);
 		}
 	}
 
@@ -94,35 +85,19 @@ public class RunAction implements Action {
 	 * 4) Ask the user which file (if many) the handler should be run against
 	 * 5) Show the diff to the user
 	 * 6) Apply the diff and save the modified files
+	 * 
+	 * TODO: Collapse ManifestActions and BuildActions into a single object
 	 */
-	private void execute(String pluginName, List<PluginAction> actions, ProjectRegistry registry) {
-		if ( actions == null || actions.isEmpty() )
-			return;
-
-		Set<InternalManifestAction> manifestActions = Sets.newHashSet();
-		Set<InternalBuildAction> buildActions = Sets.newHashSet();
-		for ( PluginAction action : actions ) {
-			if ( action instanceof InternalManifestAction ) manifestActions.add((InternalManifestAction)action);
-			if ( action instanceof InternalBuildAction ) buildActions.add((InternalBuildAction)action);
-		}
-		
-		if ( ! manifestActions.isEmpty() ) {
-			ManifestChangeManager changes = manifestChangeFactory.create(registry, manifestActions);
-			for ( InternalManifestAction action : manifestActions ) {
-				ManifestActionHandler handler = factory.createManifestActionHandler(action);
-				changes.apply(handler);
-			}
-			
+	private void execute(String pluginName, ManifestActions manifestAction, BuildActions buildAction, ProjectRegistry registry) {
+		if ( manifestAction.hasChanges() ) {
+			ManifestChangeManager changes = manifestChangeFactory.create(registry);
+			changes.apply(manifestAction);
 			changes.commit(dryrun);
 		}
 		
-		if ( ! buildActions.isEmpty() ) {
-			GradleBuildChangeManager changes = buildChangeFactory.create(registry, buildActions);
-			for ( InternalBuildAction action : buildActions ) {
-				BuildActionHandler handler = factory.createBuildActionHandler(action);
-				changes.apply(handler);
-			}
-			
+		if ( buildAction.hasChanges() ) {
+			GradleBuildChangeManager changes = buildChangeFactory.create(registry);
+			changes.apply(buildAction);
 			changes.commit(dryrun);
 		}
 	}
@@ -143,29 +118,6 @@ public class RunAction implements Action {
 		}
 		
 		return p.get();
-	}
-
-	/**
-	 * TODO: This is ugly, I need to track the changes in the Service itself 
-	 */
-	private List<PluginAction> gather(Service service) {
-		ImmutableList.Builder<PluginAction> actions = ImmutableList.builder();
-		List<BuildConfiguration> configurations = service.getConfigurations();
-		for ( BuildConfiguration config : configurations ) {
-			DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
-			if ( configuration.getBuildAction().hasChanges() )
-				actions.add(configuration.getBuildAction());
-		}
-		
-		List<ProjectManifest> manifests = service.getManifests();
-		for ( ProjectManifest man : manifests ) {
-			DefaultProjectManifest manifest = (DefaultProjectManifest) man;
-			if ( manifest.getManifestActions().hasChanges() ) {
-				actions.add(manifest.getManifestActions());
-			}
-		}
-		
-		return actions.build();
 	}
 
 //	private void printUsage(OptionParser parser) {

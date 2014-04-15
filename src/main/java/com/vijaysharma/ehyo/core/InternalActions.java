@@ -4,27 +4,25 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.PluginAction;
-import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
+import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 class InternalActions {
-	static class InternalManifestAction implements PluginAction {
+	static class ManifestActions implements PluginAction {
 		private final ImmutableMultimap.Builder<String, String> addedPermissions = ImmutableMultimap.builder();
 		private final ImmutableMultimap.Builder<String, String> removedPermissions = ImmutableMultimap.builder();
 		
-		public void addPermission(ProjectManifest manifest, String permission) {
-			DefaultProjectManifest projectManifest = (DefaultProjectManifest) manifest;
-			addedPermissions.put(projectManifest.getManifest().getId(), permission);
+		public void addPermission(AndroidManifest manifest, String permission) {
+			addedPermissions.put(manifest.getId(), permission);
 		}
 		
 		public Multimap<String, String> getAddedPermissions() {
 			return addedPermissions.build();
 		}
 		
-		public void removePermission(ProjectManifest manifest, String permission) {
-			DefaultProjectManifest projectManifest = (DefaultProjectManifest) manifest;
-			removedPermissions.put(projectManifest.getManifest().getId(), permission);
+		public void removePermission(AndroidManifest manifest, String permission) {
+			removedPermissions.put(manifest.getId(), permission);
 		}
 		
 		public Multimap<String, String> getRemovedPermissions() {
@@ -34,9 +32,14 @@ class InternalActions {
 		public boolean hasChanges() {
 			return  (! addedPermissions.build().isEmpty()) || (! removedPermissions.build().isEmpty() );
 		}
+
+		// TODO: Return an interface that is only applied to a single manifest
+		public ManifestActions from(AndroidManifest key) {
+			return this;
+		}
 	}
 	
-	static class InternalBuildAction implements PluginAction {
+	static class BuildActions implements PluginAction {
 		private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
 		private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> removedDependencies = ImmutableMultimap.builder();
 		
@@ -63,6 +66,15 @@ class InternalActions {
 		public boolean hasChanges() {
 			return  (! addedDependencies.build().isEmpty()) || (! removedDependencies.build().isEmpty() );
 		}
+
+		// TODO: Return an interface that is only applied to a single manifest
+		public BuildActions from(GradleBuild key) {
+			return this;
+		}
+	}
+	
+	static class DefaultPluginActions implements PluginAction {
+		
 	}
 	
 	static class BuildActionDependencyValue {

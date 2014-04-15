@@ -22,7 +22,7 @@ import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
-import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
+import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
@@ -31,7 +31,6 @@ import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 public class RunActionTest {
 	private PluginLoader pluginLoader;
 	private ProjectRegistry registry;
-	private PluginActionHandlerFactory factory;
 	private ManifestChangeManagerFactory manifestChangeFactory;
 	private GradleBuildChangeManagerFactory buildChangeFactory;
 	private ServiceFactory serviceFactory;
@@ -41,7 +40,6 @@ public class RunActionTest {
 	public void before() {
 		pluginLoader = mock(PluginLoader.class);
 		registry = mock(ProjectRegistry.class);
-		factory = mock(PluginActionHandlerFactory.class);
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
 		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
 		serviceFactory = mock(ServiceFactory.class);
@@ -167,7 +165,6 @@ public class RunActionTest {
 		return new RunAction(args, 
 							 pluginLoader, 
 							 registry, 
-							 factory, 
 							 manifestChangeFactory,
 							 buildChangeFactory,
 							 serviceFactory,

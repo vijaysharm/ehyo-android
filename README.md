@@ -60,9 +60,11 @@ TODO
 ++ You also don't want to show an exception when all they want to do is run list
 + FIX: ApplicationRunActionFactoryTest, RunActionTest
 + As part of the list plugin, we should be able to provide a filter option
-+ Should all actions be named so that output is more legible?
++ Should all actions have names so that output is more legible?
+++ Might be useful for --debug (Track when an action is added, whether its executed or not, etc...)
 + Add support for a --debug for verbose printing
 + Move maven search into the Service
-+ Instead of a "build action" or "manifest action", let the plugin just work with the ProjectManifest/ProjectBuild directly.
-++ This requires changing the API for execute to void.
-++ Have each ProjectManifest and ProjectBuild have the Internal action objects
+
+##Bugs
++ There's a bug with the optionselector
+++ I entered 2 when two manifests we're shown to me, and both manifests we're used (should have just been the second one, not all)
