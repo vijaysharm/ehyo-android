@@ -1,20 +1,15 @@
 package com.vijaysharma.ehyo.core;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.PluginAction;
-import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
@@ -24,13 +19,7 @@ import com.vijaysharma.ehyo.core.InternalActions.InternalBuildAction;
 import com.vijaysharma.ehyo.core.InternalActions.InternalManifestAction;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
-import com.vijaysharma.ehyo.core.models.AndroidManifest;
-import com.vijaysharma.ehyo.core.models.BuildType;
-import com.vijaysharma.ehyo.core.models.Flavor;
-import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunAction implements Action {
@@ -156,6 +145,9 @@ public class RunAction implements Action {
 		return p.get();
 	}
 
+	/**
+	 * TODO: This is ugly, I need to track the changes in the Service itself 
+	 */
 	private List<PluginAction> gather(Service service) {
 		ImmutableList.Builder<PluginAction> actions = ImmutableList.builder();
 		List<BuildConfiguration> configurations = service.getConfigurations();

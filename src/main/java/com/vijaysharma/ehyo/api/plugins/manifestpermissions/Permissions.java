@@ -3,6 +3,7 @@ package com.vijaysharma.ehyo.api.plugins.manifestpermissions;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
@@ -28,7 +29,8 @@ public class Permissions implements Plugin {
 	public void execute(List<String> args, Service service) {
 		String argValue = getArgValue("--add", args);
 		if ( argValue != null ) {
-			List<ProjectManifest> selectedManifests = selectManifests(service);
+			List<ProjectManifest> selectedManifests = 
+					selectManifests(service.getManifests(), service);
 			Set<String> permissions = registry.find(argValue);
 			
 			for ( ProjectManifest manifest : selectedManifests ) {
@@ -38,21 +40,22 @@ public class Permissions implements Plugin {
 		
 		argValue = getArgValue("--remove", args);
 		if ( argValue != null ) {
-			List<ProjectManifest> selectedManifests = selectManifests(service);	
-			// TODO: Should probably get the set from the manifests themselves
-			Set<String> permissions = registry.find(argValue);
-			
-			for ( ProjectManifest manifest : selectedManifests ) {
-				manifest.removePermissions(permissions);
+			Set<String> toRemove = registry.find(argValue);
+			List<ProjectManifest> toClean = Lists.newArrayList();
+			for ( ProjectManifest manifest : service.getManifests() ) {
+				if ( manifest.getPermissions().containsAll(toRemove) )
+					toClean.add(manifest);
 			}
+			
+			List<ProjectManifest> selectedManifests = selectManifests(toClean, service);
+			for ( ProjectManifest manifest : selectedManifests ) 
+				manifest.removePermissions(toRemove);
 		}
 	}
 
-	private List<ProjectManifest> selectManifests(Service service) {
-		List<ProjectManifest> manifests = service.getManifests();
+	private List<ProjectManifest> selectManifests(List<ProjectManifest> manifests, Service service) {
 		OptionSelector<ProjectManifest> selector = service.createSelector(ProjectManifest.class);
-		List<ProjectManifest> selectedManifests = selector.select(manifests, false);
-		return selectedManifests;
+		return selector.select(manifests, false);
 	}
 	
 	private static String getArgValue(String arg, List<String> args) {

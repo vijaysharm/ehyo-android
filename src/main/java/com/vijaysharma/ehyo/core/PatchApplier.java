@@ -11,24 +11,25 @@ import com.vijaysharma.ehyo.core.models.AsListOfStrings;
 import com.vijaysharma.ehyo.core.models.HasDocument;
 import com.vijaysharma.ehyo.core.utils.EFileUtil;
 
+import difflib.ChangeDelta;
+import difflib.DeleteDelta;
 import difflib.Delta;
 import difflib.DiffUtils;
+import difflib.InsertDelta;
 import difflib.Patch;
 
 public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	private final Function<T, String> renderer;
 	private final FileWriter writer;
-	private final DiffPrinter diffPrinter;
 	private final TextOutput out;
 	
 	public PatchApplier(Function<T, String> renderer) {
-		this(new FileWriter(), new DiffPrinter(), renderer, Output.out);
+		this(new FileWriter(), renderer, Output.out);
 	}
 	
-	PatchApplier(FileWriter writer, DiffPrinter printer, Function<T, String> renderer, TextOutput out) {
+	PatchApplier(FileWriter writer, Function<T, String> renderer, TextOutput out) {
 		this.renderer = renderer;
 		this.writer = writer;
-		this.diffPrinter = printer;
 		this.out = out;
 	}
 	
@@ -43,7 +44,7 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 				}
 				
 				if ( dryrun ) {
-					show(file.getKey(), diff);
+					show(file.getKey(), baseline, diff);
 				} else {
 					save(file.getKey(), file.getValue());
 				}					
@@ -58,9 +59,14 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		return document.toListOfStrings();
 	}
 	
-	private void show(T item, Patch diff) throws IOException {		
-		out.println("Diff " + renderer.apply(item));
-		diffPrinter.print(diff);
+	private void show(T item, List<String> baseline, Patch diff) throws IOException {
+		StringBuilder output = new StringBuilder();
+		output.append("Diff " + renderer.apply(item) + "\n");
+		for (Delta delta: diff.getDeltas()) {
+			printDelta(baseline, output, delta);
+		}
+		
+		out.print(output.toString());
 	}
 
 	private void save(T item, K modified) throws IOException {
@@ -70,17 +76,68 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		out.println("done");
 	}
 	
-	static class DiffPrinter {
-		public void print(Patch patch) {
-			for (Delta delta: patch.getDeltas()) {
-				Output.out.println(delta);
-			}				
-		}
-	}
-	
 	static class FileWriter {
 		public void write(HasDocument document, List<String> lines) {
 			EFileUtil.write(document.getFile(), lines);			
 		}
 	}
+	
+	private static void printDelta(List<String> baseline, StringBuilder out, Delta delta) {
+		if ( delta instanceof ChangeDelta ) {
+			printChange(delta, baseline, out);
+		} else if ( delta instanceof InsertDelta ) {
+			printInsert(delta, baseline, out);
+		} else if ( delta instanceof DeleteDelta ) {
+			printDelete(delta, baseline, out);	
+		}
+		out.append("\n");
+	}
+
+	private static void printDelete(Delta delta, List<String> baseline, StringBuilder out) {
+		int position = delta.getOriginal().getPosition();
+		
+		if (position > 0)
+			out.append( (position-1) + "  "  + baseline.get((position-1)) + "\n");
+		
+		List<Object> revised = (List<Object>) delta.getOriginal().getLines();
+		for ( Object obj : revised )
+			out.append( (position++) + " -"  + obj + "\n");
+		
+		if ( position < baseline.size() )
+			out.append( (position) + "  "  + baseline.get((position)) + "\n");		
+	}
+	
+	private static void printInsert(Delta delta, List<String> baseline, StringBuilder out) {
+		int position = delta.getOriginal().getPosition();
+		
+		if (position > 0)
+			out.append( (position-1) + "  "  + baseline.get((position-1)) + "\n");
+		
+		List<Object> revised = (List<Object>) delta.getRevised().getLines();
+		for ( Object obj : revised )
+			out.append( (position++) + " +"  + obj + "\n");
+		
+		if ( position < baseline.size() )
+			out.append( (position) + "  "  + baseline.get((position)) + "\n");
+	}
+
+	private static void printChange(Delta delta, List<String> baseline, StringBuilder out) {
+		int position = delta.getOriginal().getPosition();
+		
+		if (position > 0)
+			out.append( (position-1) + "  "  + baseline.get((position-1)) + "\n");
+
+		List<Object> original = (List<Object>) delta.getOriginal().getLines();
+		for ( Object obj : original )
+			out.append( (position++) + " -"  + obj + "\n");
+		
+		position = delta.getRevised().getPosition();
+		List<Object> revised = (List<Object>) delta.getRevised().getLines();
+		for ( Object obj : revised )
+			out.append( (position++) + " +"  + obj + "\n");
+		
+		if ( position < baseline.size() )
+			out.append( (position) + "  "  + baseline.get((position)) + "\n");		
+	}
+	
 }

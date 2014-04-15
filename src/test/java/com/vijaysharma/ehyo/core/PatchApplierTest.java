@@ -18,28 +18,23 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
-import com.vijaysharma.ehyo.core.PatchApplier.DiffPrinter;
 import com.vijaysharma.ehyo.core.PatchApplier.FileWriter;
 import com.vijaysharma.ehyo.core.models.AsListOfStrings;
 import com.vijaysharma.ehyo.core.models.HasDocument;
-
-import difflib.Patch;
 
 public class PatchApplierTest {
 	private Function<HasDocument, String> renderer;
 	private PatchApplier<HasDocument, AsListOfStrings> patcher;
 	private FileWriter writer;
-	private DiffPrinter printer;
 	private TextOutput out;
 	
 	@Before
 	public void before() {
 		renderer = mock(Function.class);
 		writer = mock(FileWriter.class);
-		printer = mock(DiffPrinter.class);
 		out = mock(TextOutput.class);
 		
-		patcher = new PatchApplier<HasDocument, AsListOfStrings>(writer, printer, renderer, out);
+		patcher = new PatchApplier<HasDocument, AsListOfStrings>(writer, renderer, out);
 	}
 	
 	@Test
@@ -60,7 +55,7 @@ public class PatchApplierTest {
 		patcher.apply(files, false);
 		verify(renderer, never()).apply(any(HasDocument.class));
 		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
-		verify(printer, never()).print(any(Patch.class));
+		verify(out, never()).println(Mockito.anyString());
 	}
 	
 	@Test
@@ -81,7 +76,7 @@ public class PatchApplierTest {
 		patcher.apply(files, true);
 		verify(renderer, never()).apply(any(HasDocument.class));
 		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
-		verify(printer, never()).print(any(Patch.class));
+		verify(out, never()).println(Mockito.anyString());
 	}
 	
 	@Test
@@ -95,6 +90,7 @@ public class PatchApplierTest {
 		when(document.asDocument()).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
+		when(renderer.apply(document)).thenReturn("test");
 		
 		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
 		files.put(document, modifiedObject);
@@ -102,7 +98,9 @@ public class PatchApplierTest {
 		patcher.apply(files, true);
 		verify(renderer, times(1)).apply(document);
 		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
-		verify(printer, times(1)).print(any(Patch.class));
+		verify(out, times(1)).print(
+				"Diff test\n"+ 
+				"0 +New Line\n\n" );
 	}
 	
 	@Test
@@ -116,6 +114,7 @@ public class PatchApplierTest {
 		when(document.asDocument()).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
+		when(renderer.apply(document)).thenReturn("test");
 		
 		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
 		files.put(document, modifiedObject);
@@ -123,6 +122,8 @@ public class PatchApplierTest {
 		patcher.apply(files, false);
 		verify(renderer, times(1)).apply(document);
 		verify(writer, times(1)).write(document, modified);
-		verify(printer, never()).print(any(Patch.class));
+		
+		verify(out, times(1)).print("Writing test... ");
+		verify(out, times(1)).println("done");
 	}	
 }

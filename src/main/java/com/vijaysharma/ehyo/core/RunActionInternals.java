@@ -86,6 +86,11 @@ class RunActionInternals {
 			}
 		}
 		
+		@Override
+		public Set<String> getPermissions() {
+			return manifest.asDocument().getPermissions();
+		}
+		
 		public AndroidManifest getManifest() {
 			return manifest;
 		}
