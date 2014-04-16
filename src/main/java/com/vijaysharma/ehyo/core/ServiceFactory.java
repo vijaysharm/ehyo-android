@@ -12,8 +12,6 @@ import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
-import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
-import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
@@ -25,7 +23,7 @@ import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class ServiceFactory {
-	public Service create(PluginLoader pluginLoader, ProjectRegistry registry, final ManifestActions manifestAction, final BuildActions buildAction) {
+	public Service create(PluginLoader pluginLoader, ProjectRegistry registry, final PluginActions actions) {
 		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
 		
 		final ImmutableList.Builder<BuildConfiguration> configuration = ImmutableList.builder();
@@ -43,9 +41,9 @@ public class ServiceFactory {
 				List<Flavor> flavors = build.getFlavors();
 
 				for ( BuildType buildType : buildTypes ) {
-					configuration.add(new DefaultBuildConfiguration(buildType, null, build, buildAction));
+					configuration.add(new DefaultBuildConfiguration(buildType, null, build, actions));
 					for ( Flavor flavor : flavors ) {
-						configuration.add(new DefaultBuildConfiguration(buildType, flavor, build, buildAction));
+						configuration.add(new DefaultBuildConfiguration(buildType, flavor, build, actions));
 					}
 				}
 				
@@ -56,7 +54,7 @@ public class ServiceFactory {
 		List<ProjectManifest> manifests = registry.getAllAndroidManifests(new Function<AndroidManifest, ProjectManifest>() {
 			@Override
 			public ProjectManifest apply(AndroidManifest manifest) {
-				return new DefaultProjectManifest(manifest, manifestAction);
+				return new DefaultProjectManifest(manifest, actions);
 			}
 		});
 		

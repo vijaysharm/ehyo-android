@@ -1,30 +1,19 @@
 package com.vijaysharma.ehyo.core.commandline;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.RunAction;
 import com.vijaysharma.ehyo.core.RunActionBuilder;
 import com.vijaysharma.ehyo.core.commandline.ApplicationRunActionFactory.RunActionBuilderFactory;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter;
 import com.vijaysharma.ehyo.core.commandline.converters.PluginsCommandLineConverter;
 

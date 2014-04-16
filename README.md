@@ -20,11 +20,11 @@ This project was designed around the default Android Studio project structure, a
 
 Usage
 -----
-ehyo manage-permissions add internet
-ehyo manage-permissions delete internet
-ehyo search butterknife
-ehyo --plugins <ns> --directory <dir> search add flow
-ehyo --plugins <ns> --directory <dir> --plugin search --lib flow --add
+ehyo list
+ehyo manage-permissions --add internet
+ehyo manage-permissions --remove internet
+ehyo search --lib butterknife
+ehyo --plugins <ns> --directory <dir> search --add flow
 
 TODO
 ----
@@ -43,7 +43,6 @@ TODO
 + Show user formatted error when the name given in plugin is not found
 + Show better version information
 + Have the custom logger respect debug mode
-+ Broke Usage
 ++ Better option description for usage
 + Finish the Permissions plugin
 ++ Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
@@ -64,7 +63,10 @@ TODO
 ++ Might be useful for --debug (Track when an action is added, whether its executed or not, etc...)
 + Add support for a --debug for verbose printing
 + Move maven search into the Service
++ Have the *Actions index by Manifest or Build instead of IDs
 
 ##Bugs
 + There's a bug with the optionselector
 ++ I entered 2 when two manifests we're shown to me, and both manifests we're used (should have just been the second one, not all)
++ Broke Usage
+++ It is no longer shown

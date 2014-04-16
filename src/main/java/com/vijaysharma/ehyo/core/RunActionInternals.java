@@ -10,8 +10,6 @@ import com.vijaysharma.ehyo.api.OptionSelectorFactory;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
-import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
-import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.BuildType;
 import com.vijaysharma.ehyo.core.models.Flavor;
@@ -23,18 +21,18 @@ class RunActionInternals {
 		private final GradleBuild build;
 		private final BuildType buildType;
 		private final Flavor flavor;
-		private final BuildActions buildAction;
+		private final PluginActions actions;
 		
-		public DefaultBuildConfiguration(BuildType buildType, Flavor flavor, GradleBuild build, BuildActions buildAction) {
+		public DefaultBuildConfiguration(BuildType buildType, Flavor flavor, GradleBuild build, PluginActions actions) {
 			this.flavor = flavor;
 			this.build = build;
 			this.buildType = buildType;
-			this.buildAction = buildAction;
+			this.actions = actions;
 		}
 		
 		@Override
 		public void addDependency(String projectId) {
-			buildAction.addDependency(this, projectId);
+			actions.addDependency(this, projectId);
 		}
 		
 		public BuildType getBuildType() {
@@ -47,10 +45,6 @@ class RunActionInternals {
 		
 		public Flavor getFlavor() {
 			return flavor;
-		}
-		
-		public BuildActions getBuildAction() {
-			return buildAction;
 		}
 
 		@Override
@@ -65,24 +59,24 @@ class RunActionInternals {
 	
 	static class DefaultProjectManifest implements ProjectManifest {
 		private final AndroidManifest manifest;
-		private final ManifestActions manifestActions;
+		private final PluginActions actions;
 		
-		public DefaultProjectManifest(AndroidManifest manifest, ManifestActions manifestActions) {
+		public DefaultProjectManifest(AndroidManifest manifest, PluginActions actions) {
 			this.manifest = manifest;
-			this.manifestActions = manifestActions;
+			this.actions = actions;
 		}
 		
 		@Override
 		public void addPermissions(Set<String> permissions) {
 			for ( String permission : permissions ) {
-				manifestActions.addPermission(manifest, permission);
+				actions.addPermission(manifest, permission);
 			}
 		}
 		
 		@Override
 		public void removePermissions(Set<String> permissions) {
 			for ( String permission : permissions ) {
-				manifestActions.removePermission(manifest, permission);
+				actions.removePermission(manifest, permission);
 			}
 		}
 		
@@ -101,6 +95,10 @@ class RunActionInternals {
 		private final GradleBuild build;
 		public DefaultProjectBuild(GradleBuild build) {
 			this.build = build;
+		}
+		
+		public GradleBuild getBuild() {
+			return build;
 		}
 	}
 	

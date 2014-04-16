@@ -5,12 +5,11 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
-public class ManifestChangeManager implements ChangeManager<ManifestActions>{
+public class ManifestChangeManager implements ChangeManager<PluginActions>{
 	private static final Function<AndroidManifest, String> MANIFEST_RENDERER = new Function<AndroidManifest, String>() {
 		@Override
 		public String apply(AndroidManifest manifest) {
@@ -44,7 +43,7 @@ public class ManifestChangeManager implements ChangeManager<ManifestActions>{
 	}
 	
 	@Override
-	public void apply(ManifestActions actions) {
+	public void apply(PluginActions actions) {
 		// TODO: You have to check manifest IDs from ALL points that can be modified
 		Set<String> manifestIds = actions.getAddedPermissions().keySet();
 		for ( String id : manifestIds ) {
@@ -54,7 +53,7 @@ public class ManifestChangeManager implements ChangeManager<ManifestActions>{
 		
 		ManifestActionHandler handler = factory.createManifestActionHandler();
 		for ( Map.Entry<AndroidManifest, AndroidManifestDocument> manifest : changes.build().entrySet() ) {
-			handler.modify(manifest.getValue(), actions.from(manifest.getKey()));
+			handler.modify(manifest.getValue(), actions.getManifestActions(manifest.getKey()));
 		}
 	}
 

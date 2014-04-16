@@ -42,7 +42,7 @@ public class PluginLoader {
 				plugins.put(instance.name().toLowerCase(), instance);
 			}
 		} catch( Exception ex ) {
-			Output.debug.exception("Failed to load Plugins", ex);
+			Output.out.exception("Failed to load Plugins", ex);
 		}
 		return plugins.build();
 	}

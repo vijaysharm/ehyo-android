@@ -29,4 +29,8 @@ public class Project {
 	public Collection<GradleBuild> getBuilds() {
 		return builds.values();
 	}
+	
+	public String getName() {
+		return name;
+	}
 }

@@ -10,8 +10,6 @@ import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
-import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
-import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
@@ -70,11 +68,10 @@ public class RunAction implements Action {
 		if ( help ) {
 			out.println("TODO: Print usage for: " + plugin.name());
 		} else {
-			ManifestActions manifestAction = new ManifestActions();
-			BuildActions buildAction = new BuildActions();
-			Service service = serviceFactory.create(pluginLoader, registry, manifestAction, buildAction);
+			PluginActions actions = new PluginActions();
+			Service service = serviceFactory.create(pluginLoader, registry, actions);
 			plugin.execute(args, service);
-			execute(plugin.name(), manifestAction, buildAction, registry);
+			execute(plugin.name(), actions, registry);
 		}
 	}
 
@@ -88,16 +85,16 @@ public class RunAction implements Action {
 	 * 
 	 * TODO: Collapse ManifestActions and BuildActions into a single object
 	 */
-	private void execute(String pluginName, ManifestActions manifestAction, BuildActions buildAction, ProjectRegistry registry) {
-		if ( manifestAction.hasChanges() ) {
+	private void execute(String pluginName, PluginActions actions, ProjectRegistry registry) {
+		if ( actions.hasManifestChanges() ) {
 			ManifestChangeManager changes = manifestChangeFactory.create(registry);
-			changes.apply(manifestAction);
+			changes.apply(actions);
 			changes.commit(dryrun);
 		}
 		
-		if ( buildAction.hasChanges() ) {
+		if ( actions.hasBuildChanges() ) {
 			GradleBuildChangeManager changes = buildChangeFactory.create(registry);
-			changes.apply(buildAction);
+			changes.apply(actions);
 			changes.commit(dryrun);
 		}
 	}

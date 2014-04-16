@@ -5,12 +5,11 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
-public class GradleBuildChangeManager implements ChangeManager<BuildActions> {
+public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 	private static final Function<GradleBuild, String> BUILD_FILE_RENDERER = new Function<GradleBuild, String>() {
 		@Override
 		public String apply(GradleBuild build) {
@@ -44,7 +43,7 @@ public class GradleBuildChangeManager implements ChangeManager<BuildActions> {
 	}
 
 	@Override
-	public void apply(BuildActions actions) {
+	public void apply(PluginActions actions) {
 		Set<String> gradleIds = actions.getAddedDependencies().keySet();
 		for ( String id : gradleIds ) {
 			GradleBuild build = registry.getGradleBuild(id);
@@ -53,19 +52,12 @@ public class GradleBuildChangeManager implements ChangeManager<BuildActions> {
 		
 		BuildActionHandler handler = factory.createBuildActionHandler();
 		for ( Map.Entry<GradleBuild, GradleBuildDocument> entry : buildFiles.build().entrySet() ) {
-			handler.modify(entry.getValue(), actions.from(entry.getKey()));
+			handler.modify(entry.getValue(), actions.getBuildActions(entry.getKey()));
 		}		
 	}
 	
 	@Override
 	public void commit(boolean dryrun) {
 		patcher.apply(buildFiles.build(), dryrun);
-	}
-	
-	private static Map<GradleBuild, GradleBuildDocument> transform(ProjectRegistry registry, BuildActions actions) {
-		ImmutableMap.Builder<GradleBuild, GradleBuildDocument> map = ImmutableMap.builder();
-		
-		
-		return map.build();
 	}	
 }

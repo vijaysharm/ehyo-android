@@ -2,9 +2,8 @@ package com.vijaysharma.ehyo.core;
 
 import java.util.Collection;
 
-import com.google.common.collect.Multimap;
-import com.vijaysharma.ehyo.core.InternalActions.BuildActionDependencyValue;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
+import com.vijaysharma.ehyo.core.PluginActions.BuildActionDependencyValue;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
 import com.vijaysharma.ehyo.core.models.BuildType;
 import com.vijaysharma.ehyo.core.models.Flavor;
@@ -13,8 +12,7 @@ import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 public class BuildActionHandler implements PluginActionHandler<GradleBuildDocument, BuildActions>{
 	@Override
 	public void modify(GradleBuildDocument document, BuildActions action ) {
-		Multimap<String, BuildActionDependencyValue> dependencies = action.getAddedDependencies();
-		Collection<BuildActionDependencyValue> libraries = dependencies.get(document.getGradleId());
+		Collection<BuildActionDependencyValue> libraries = action.getAddedDependencies();
 		for ( BuildActionDependencyValue lib : libraries ) {
 			String dependency = formatDependency( lib );
 			document.appendDependency(dependency);

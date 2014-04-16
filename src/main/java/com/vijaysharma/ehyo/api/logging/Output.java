@@ -11,22 +11,15 @@ import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 public class Output implements TextOutput {
 	public static final TextOutput out = new Output(System.out);
 	public static final TextOutput err = new Output(System.err);
-	public static final TextOutput debug = new Output(System.out, true);
 	
 	private final Appendable appendable;
 	private final Flushable flushable;
-	private final boolean isDebug;
 	
 	public Output(Appendable appendable) {
-		this(appendable, false);
-	}
-
-	private Output(Appendable appendable, boolean debug) {
 		this.appendable = appendable;
-		this.isDebug = debug;
 		this.flushable = create(appendable);
 	}
-	
+
 	@Override
 	public TextOutput print(Object text) {
 		text(text);

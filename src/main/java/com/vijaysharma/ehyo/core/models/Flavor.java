@@ -7,6 +7,6 @@ public class Flavor {
 	}
 	
 	public String getCompileString(BuildType buildType) {
-		return "<FLAVOR????>";
+		return "<FLAVOR????>: " + flavor;
 	}
 }

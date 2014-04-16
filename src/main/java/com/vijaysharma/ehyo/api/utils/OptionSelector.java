@@ -2,6 +2,7 @@ package com.vijaysharma.ehyo.api.utils;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -54,7 +55,7 @@ public class OptionSelector<T> {
 		if ( selection == max )
 			return items;
 		
-		return Lists.newArrayList(items.get(selection - 1));	
+		return Arrays.asList(items.get(selection-1));
 	}
 	
 	public List<T> select(List<T> items) {

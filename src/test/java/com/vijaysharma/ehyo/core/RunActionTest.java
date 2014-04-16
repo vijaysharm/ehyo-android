@@ -2,9 +2,7 @@ package com.vijaysharma.ehyo.core;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,16 +14,11 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Plugin;
-import com.vijaysharma.ehyo.api.PluginAction;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
-import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
-import com.vijaysharma.ehyo.core.models.AndroidManifest;
-import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunActionTest {
@@ -147,15 +140,6 @@ public class RunActionTest {
 //		verify(changeManager, times(1)).apply(handler);
 //		verify(changeManager, times(1)).commit(false);
 //	}
-
-	private static List<PluginAction> asList(PluginAction...actions) {
-		List<PluginAction> result = Lists.newArrayList();
-		for( PluginAction action : actions ) {
-			result.add(action);
-		}
-		
-		return result;
-	}
 	
 	private RunAction create(List<String> args) {
 		return create(args, false, false);

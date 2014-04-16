@@ -72,6 +72,7 @@ public class Main implements Runnable {
     		}
     	}
     	output.append("\n");
-    	Output.debug.print(output.toString());
+
+    	Output.out.print(output.toString());
     }
 }
