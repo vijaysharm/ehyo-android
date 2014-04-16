@@ -52,7 +52,7 @@ public class OptionSelector<T> {
 		if ( selection < 1 || selection > max)
 			return Lists.newArrayList();
 
-		if ( selection == max )
+		if ( multiselect && selection == max )
 			return items;
 		
 		return Arrays.asList(items.get(selection-1));

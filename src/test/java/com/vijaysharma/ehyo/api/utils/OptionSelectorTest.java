@@ -75,6 +75,15 @@ public class OptionSelectorTest {
 		assertEquals(0, selection.size());
 	}
 	
+	@Test
+	public void selecting_last_item_without_multi_select_returns_one_item() {
+		Function<String, String> renderer = Functions.identity();
+		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("2"), out);
+		List<String> list = Lists.newArrayList("one", "two");
+		List<String> selection = selectors.select(list, false);
+		assertEquals(1, selection.size());
+	}
+	
 	private static final ByteArrayInputStream string(String data) {
 		return new ByteArrayInputStream(data.getBytes());
 	}

@@ -27,6 +27,7 @@ public class RunActionTest {
 	private ManifestChangeManagerFactory manifestChangeFactory;
 	private GradleBuildChangeManagerFactory buildChangeFactory;
 	private ServiceFactory serviceFactory;
+	private ObjectFactory<PluginActions> actionsFactory;
 	private TextOutput out;
 	
 	@Before
@@ -36,42 +37,86 @@ public class RunActionTest {
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
 		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
 		serviceFactory = mock(ServiceFactory.class);
+		actionsFactory = mock(ObjectFactory.class);
 		out = mock(TextOutput.class);
 	}
 	
 	@Test(expected=RuntimeException.class)
-	public void run_throws_when_no_plugin_found() {
+	public void run_throws_when_args_are_null() {
 		List<String> args = newArrayList();
-		String pluginName = "some-name";
-		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.<Plugin>absent());
-		
 		RunAction action = create(args);
 		action.run();
 	}
 	
 	@Test(expected=RuntimeException.class)
-	public void run_throws_when_null_plugin_found() {
-		List<String> args = null;
+	public void run_throws_when_args_are_empty() {
+		List<String> args = newArrayList();
+		RunAction action = create(args);
+		action.run();
+	}
+	
+	@Test(expected=RuntimeException.class)
+	public void run_throws_when_no_plugin_found() {
 		String pluginName = "some-name";
+		List<String> args = newArrayList(pluginName);
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.<Plugin>absent());
 		
 		RunAction action = create(args);
 		action.run();
 	}
 	
-//	@Test
-//	public void run_calls_confiure_and_execute_on_plugin() {
-//		String pluginName = "some-name";
-//		List<String> args = newArrayList(pluginName);
-//		Plugin plugin = mock(Plugin.class);
-//		
-//		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-//		
-//		RunAction action = create(args);
-//		action.run();
-//		verify(pluginLoader, times(1)).findPlugin(pluginName);
-//		verify(plugin, times(1)).execute(Mockito.eq(args), any(Service.class));
-//	}
+	@Test
+	public void run_calls_create_on_PluginActionsFactory() {
+		Plugin plugin = mock(Plugin.class);
+		PluginActions actions = mock(PluginActions.class);
+		String pluginName = "some-name";
+		List<String> args = newArrayList(pluginName);
+		
+		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(plugin.name()).thenReturn(pluginName);
+		when(actionsFactory.create()).thenReturn(actions);
+		
+		RunAction action = create(args);
+		action.run();
+		
+		verify(actionsFactory, times(1)).create();
+	}
+	
+	@Test
+	public void run_calls_create_on_ServiceFactory() {
+		Plugin plugin = mock(Plugin.class);
+		PluginActions actions = mock(PluginActions.class);
+		String pluginName = "some-name";
+		List<String> args = newArrayList(pluginName);
+		
+		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(plugin.name()).thenReturn(pluginName);
+		when(actionsFactory.create()).thenReturn(actions);
+		
+		RunAction action = create(args);
+		action.run();
+		
+		verify(serviceFactory, times(1)).create(pluginLoader, registry, actions);
+	}
+	
+	@Test
+	public void run_calls_execute_on_plugin() {
+		Plugin plugin = mock(Plugin.class);
+		PluginActions actions = mock(PluginActions.class);
+		String pluginName = "some-name";
+		List<String> args = newArrayList(pluginName);
+		Service service = mock(Service.class);
+		
+		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(plugin.name()).thenReturn(pluginName);
+		when(actionsFactory.create()).thenReturn(actions);
+		when(serviceFactory.create(pluginLoader, registry, actions)).thenReturn(service);
+		
+		RunAction action = create(args);
+		action.run();
+		
+		verify(plugin, times(1)).execute(Mockito.anyList(), Mockito.eq(service));
+	}
 
 	@Test
 	public void run_doesnt_call_execute_for_help_on_plugin() {
@@ -85,61 +130,48 @@ public class RunActionTest {
 		verify(pluginLoader, times(1)).findPlugin(pluginName);
 		verify(plugin, times(0)).execute(Mockito.eq(args), any(Service.class));
 	}
-
-//	@Test
-//	public void run_does_not_execute_PluginHandler_if_not_found() {
-//		String pluginName = "some-name";
-//		List<String> args = newArrayList(pluginName);
-//		Plugin plugin = mock(Plugin.class);
-//		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
-//		AndroidManifest manifest = mock(AndroidManifest.class);
-//		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
-//		AndroidManifestDocument doc = mock(AndroidManifestDocument.class);
-//		ManifestActionHandler handler = mock(ManifestActionHandler.class);
-//		
-//		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-////		when(plugin.execute(Mockito.eq(args), any(Service.class)))
-////			.thenReturn(asList(pluginAction));
-//		when(manifest.asDocument()).thenReturn(doc);
-//		when(factory.createManifestActionHandler(pluginAction)).thenReturn(null);
-//		when(manifestChangeFactory.create(Mockito.eq(registry), Mockito.anySet()))
-//			.thenReturn(changeManager);
-//	
-//		RunAction action = create(args);
-//		action.run();
-//		
-//		verify(changeManager, never()).apply(handler);
-//		verify(changeManager, times(1)).commit(false);
-//	}
 	
-//	@Test
-//	public void run_executes_changer_handler_perform_when_PluginHandler_is_found() {
-//		String pluginName = "some-name";
-//		List<String> args = newArrayList(pluginName);
-//		Plugin plugin = mock(Plugin.class);
-//		InternalManifestAction pluginAction = mock(InternalManifestAction.class);
-//		AndroidManifest manifest = mock(AndroidManifest.class);
-//		ManifestChangeManager changeManager = mock(ManifestChangeManager.class);
-//		AndroidManifestDocument doc = mock(AndroidManifestDocument.class);
-//		ManifestActionHandler handler = mock(ManifestActionHandler.class);
-//		Service service = mock(Service.class);
-//		
-//		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
-////		when(plugin.execute(Mockito.eq(args), any(Service.class)))
-////			.thenReturn(asList(pluginAction));
-//		when(serviceFactory.create(pluginLoader, registry)).thenReturn(service);
-////		when(service.ge)
-//		when(manifest.asDocument()).thenReturn(doc);
-//		doReturn(handler).when(factory).createManifestActionHandler(pluginAction);
-//		when(manifestChangeFactory.create(Mockito.eq(registry), Mockito.anySet()))
-//			.thenReturn(changeManager);
-//	
-//		RunAction action = create(args);
-//		action.run();
-//		
-//		verify(changeManager, times(1)).apply(handler);
-//		verify(changeManager, times(1)).commit(false);
-//	}
+	@Test
+	public void run_creates_manifest_change_manager_if_changes_exists() {
+		Plugin plugin = mock(Plugin.class);
+		PluginActions actions = mock(PluginActions.class);
+		String pluginName = "some-name";
+		List<String> args = newArrayList(pluginName);
+		ManifestChangeManager changes = mock(ManifestChangeManager.class);
+		
+		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(plugin.name()).thenReturn(pluginName);
+		when(actionsFactory.create()).thenReturn(actions);
+		when(actions.hasManifestChanges()).thenReturn(true);
+		when(manifestChangeFactory.create(registry)).thenReturn(changes);
+		
+		RunAction action = create(args);
+		action.run();
+		
+		verify(changes, times(1)).apply(Mockito.eq(actions));
+		verify(changes, times(1)).commit(Mockito.eq(false));
+	}
+	
+	@Test
+	public void run_creates_build_change_manager_if_changes_exists() {
+		Plugin plugin = mock(Plugin.class);
+		PluginActions actions = mock(PluginActions.class);
+		String pluginName = "some-name";
+		List<String> args = newArrayList(pluginName);
+		GradleBuildChangeManager changes = mock(GradleBuildChangeManager.class);
+		
+		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
+		when(plugin.name()).thenReturn(pluginName);
+		when(actionsFactory.create()).thenReturn(actions);
+		when(actions.hasBuildChanges()).thenReturn(true);
+		when(buildChangeFactory.create(registry)).thenReturn(changes);
+		
+		RunAction action = create(args);
+		action.run();
+		
+		verify(changes, times(1)).apply(Mockito.eq(actions));
+		verify(changes, times(1)).commit(Mockito.eq(false));
+	}
 	
 	private RunAction create(List<String> args) {
 		return create(args, false, false);
@@ -152,6 +184,7 @@ public class RunActionTest {
 							 manifestChangeFactory,
 							 buildChangeFactory,
 							 serviceFactory,
+							 actionsFactory,
 							 help, 
 							 dryrun,
 							 out);

@@ -20,6 +20,7 @@ public class RunAction implements Action {
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
 	private final ServiceFactory serviceFactory;
+	private final ObjectFactory<PluginActions> actionFactory;
 	private final boolean dryrun;
 	private final boolean help;	
 	private final TextOutput out;
@@ -35,6 +36,7 @@ public class RunAction implements Action {
 			 new ManifestChangeManagerFactory(),
 			 new GradleBuildChangeManagerFactory(),
 			 new ServiceFactory(),
+			 new DefaultPluginActionFactory(),
 			 help,
 			 dryrun,
 			 Output.out);
@@ -46,6 +48,7 @@ public class RunAction implements Action {
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  GradleBuildChangeManagerFactory buildChangeFactory,
 			  ServiceFactory serviceFactory,
+			  ObjectFactory<PluginActions> actionFactory,
 			  boolean help,
 			  boolean dryrun,
 			  TextOutput out) {
@@ -57,6 +60,7 @@ public class RunAction implements Action {
 		this.manifestChangeFactory = manifestChangeFactory; 
 		this.buildChangeFactory = buildChangeFactory;
 		this.serviceFactory = serviceFactory;
+		this.actionFactory = actionFactory;
 		this.out = out;
 	}
 
@@ -68,24 +72,14 @@ public class RunAction implements Action {
 		if ( help ) {
 			out.println("TODO: Print usage for: " + plugin.name());
 		} else {
-			PluginActions actions = new PluginActions();
+			PluginActions actions = actionFactory.create();
 			Service service = serviceFactory.create(pluginLoader, registry, actions);
 			plugin.execute(args, service);
-			execute(plugin.name(), actions, registry);
+			execute(actions, registry);
 		}
 	}
 
-	/**
-	 * 1) Load the file structure(??)
-	 * 2) Figure out what action was returned by the plugin
-	 * 3) run the handler for that action against the project structure
-	 * 4) Ask the user which file (if many) the handler should be run against
-	 * 5) Show the diff to the user
-	 * 6) Apply the diff and save the modified files
-	 * 
-	 * TODO: Collapse ManifestActions and BuildActions into a single object
-	 */
-	private void execute(String pluginName, PluginActions actions, ProjectRegistry registry) {
+	private void execute(PluginActions actions, ProjectRegistry registry) {
 		if ( actions.hasManifestChanges() ) {
 			ManifestChangeManager changes = manifestChangeFactory.create(registry);
 			changes.apply(actions);
@@ -115,6 +109,13 @@ public class RunAction implements Action {
 		}
 		
 		return p.get();
+	}
+
+	private static class DefaultPluginActionFactory implements ObjectFactory<PluginActions> {
+		@Override
+		public PluginActions create() {
+			return new PluginActions();
+		}
 	}
 
 //	private void printUsage(OptionParser parser) {
