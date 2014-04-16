@@ -7,7 +7,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
-import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 	private static final Function<GradleBuild, String> BUILD_FILE_RENDERER = new Function<GradleBuild, String>() {
@@ -17,36 +16,33 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 		}
 	};
 	
+	// TODO: Replace with ObjectFactory
 	static class GradleBuildChangeManagerFactory {
-		GradleBuildChangeManager create(ProjectRegistry registry) {
-			return new GradleBuildChangeManager(registry, new PatchApplier<GradleBuild, GradleBuildDocument>(BUILD_FILE_RENDERER));
+		GradleBuildChangeManager create() {
+			return new GradleBuildChangeManager(new PatchApplier<GradleBuild, GradleBuildDocument>(BUILD_FILE_RENDERER));
 		}	
 	}
 	
 	private final ImmutableMap.Builder<GradleBuild, GradleBuildDocument> buildFiles;
 	private final PatchApplier<GradleBuild, GradleBuildDocument> patcher;
-	private final ProjectRegistry registry;
 	private final PluginActionHandlerFactory factory;
 	
-	GradleBuildChangeManager(ProjectRegistry registry, 
-							 PatchApplier<GradleBuild, GradleBuildDocument> applier,
+	GradleBuildChangeManager(PatchApplier<GradleBuild, GradleBuildDocument> applier,
 							 PluginActionHandlerFactory factory) {
 		this.buildFiles = ImmutableMap.builder();
 		this.patcher = applier;
-		this.registry = registry;
 		this.factory = factory;
 	}
 
-	public GradleBuildChangeManager(ProjectRegistry registry,
-									PatchApplier<GradleBuild, GradleBuildDocument> patcher) {
-		this(registry, patcher, new PluginActionHandlerFactory());
+	public GradleBuildChangeManager(PatchApplier<GradleBuild, GradleBuildDocument> patcher) {
+		this(patcher, new PluginActionHandlerFactory());
 	}
 
 	@Override
 	public void apply(PluginActions actions) {
-		Set<String> gradleIds = actions.getAddedDependencies().keySet();
-		for ( String id : gradleIds ) {
-			GradleBuild build = registry.getGradleBuild(id);
+		// TODO: Don't just look at the ADDED dependencies
+		Set<GradleBuild> builds = actions.getAddedDependencies().keySet();
+		for ( GradleBuild build : builds ) {
 			buildFiles.put(build, build.asDocument());
 		}
 		

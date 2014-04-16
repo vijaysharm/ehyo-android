@@ -44,22 +44,4 @@ public class ProjectRegistry {
 		
 		return builds.build();
 	}
-
-	public GradleBuild getGradleBuild(String id) {
-		for ( GradleBuild build : getAllGradleBuilds() ) {
-			if ( build.getId().equals(id) )
-				return build;
-		}
-		
-		throw new IllegalArgumentException("Uknown Gradle file: " + id);
-	}
-	
-	public AndroidManifest getAndroidManifest(String id) {
-		for ( AndroidManifest manifest : getAllAndroidManifests() ) {
-			if ( manifest.getId().equals(id) )
-				return manifest;
-		}
-		
-		throw new IllegalArgumentException("Uknown Android Manifest file: " + id);
-	}
 }

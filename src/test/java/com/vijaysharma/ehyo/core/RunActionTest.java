@@ -143,7 +143,7 @@ public class RunActionTest {
 		when(plugin.name()).thenReturn(pluginName);
 		when(actionsFactory.create()).thenReturn(actions);
 		when(actions.hasManifestChanges()).thenReturn(true);
-		when(manifestChangeFactory.create(registry)).thenReturn(changes);
+		when(manifestChangeFactory.create()).thenReturn(changes);
 		
 		RunAction action = create(args);
 		action.run();
@@ -164,7 +164,7 @@ public class RunActionTest {
 		when(plugin.name()).thenReturn(pluginName);
 		when(actionsFactory.create()).thenReturn(actions);
 		when(actions.hasBuildChanges()).thenReturn(true);
-		when(buildChangeFactory.create(registry)).thenReturn(changes);
+		when(buildChangeFactory.create()).thenReturn(changes);
 		
 		RunAction action = create(args);
 		action.run();

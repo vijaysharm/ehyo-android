@@ -12,45 +12,45 @@ import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 public class PluginActions {
-	private final ImmutableMultimap.Builder<String, String> addedPermissions = ImmutableMultimap.builder();
-	private final ImmutableMultimap.Builder<String, String> removedPermissions = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<AndroidManifest, String> addedPermissions = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<AndroidManifest, String> removedPermissions = ImmutableMultimap.builder();
 	
-	private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
-	private final ImmutableMultimap.Builder<String, BuildActionDependencyValue> removedDependencies = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<GradleBuild, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<GradleBuild, BuildActionDependencyValue> removedDependencies = ImmutableMultimap.builder();
 	
 	public void addDependency(BuildConfiguration config, String dependency) {
 		DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
 		BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
-		addedDependencies.put(configuration.getBuild().getId(), value);
+		addedDependencies.put(configuration.getBuild(), value);
 	}
 	
-	public Multimap<String, BuildActionDependencyValue> getAddedDependencies() {
+	public Multimap<GradleBuild, BuildActionDependencyValue> getAddedDependencies() {
 		return addedDependencies.build();
 	}
 	
 	public void removeDependency(BuildConfiguration config, String dependency) {
 		DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
 		BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
-		removedDependencies.put(configuration.getBuild().getId(), value);
+		removedDependencies.put(configuration.getBuild(), value);
 	}
 	
-	public Multimap<String, BuildActionDependencyValue> getRemovedDependencies() {
+	public Multimap<GradleBuild, BuildActionDependencyValue> getRemovedDependencies() {
 		return removedDependencies.build();
 	}
 	
 	public void addPermission(AndroidManifest manifest, String permission) {
-		addedPermissions.put(manifest.getId(), permission);
+		addedPermissions.put(manifest, permission);
 	}
 	
-	public Multimap<String, String> getAddedPermissions() {
+	public Multimap<AndroidManifest, String> getAddedPermissions() {
 		return addedPermissions.build();
 	}
 	
 	public void removePermission(AndroidManifest manifest, String permission) {
-		removedPermissions.put(manifest.getId(), permission);
+		removedPermissions.put(manifest, permission);
 	}
 	
-	public Multimap<String, String> getRemovedPermissions() {
+	public Multimap<AndroidManifest, String> getRemovedPermissions() {
 		return removedPermissions.build();
 	}
 	
@@ -66,7 +66,7 @@ public class PluginActions {
 		return new BuildActions() {
 			@Override
 			public Collection<BuildActionDependencyValue> getAddedDependencies() {
-				return addedDependencies.build().get(key.getId());
+				return addedDependencies.build().get(key);
 			}
 		};
 	}
@@ -75,7 +75,7 @@ public class PluginActions {
 		return new ManifestActions() {
 			@Override
 			public Collection<String> getAddedPermissions() {
-				return addedPermissions.build().get(key.getId());
+				return addedPermissions.build().get(key);
 			}
 		};
 	}

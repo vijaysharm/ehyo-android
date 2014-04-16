@@ -81,13 +81,13 @@ public class RunAction implements Action {
 
 	private void execute(PluginActions actions, ProjectRegistry registry) {
 		if ( actions.hasManifestChanges() ) {
-			ManifestChangeManager changes = manifestChangeFactory.create(registry);
+			ManifestChangeManager changes = manifestChangeFactory.create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}
 		
 		if ( actions.hasBuildChanges() ) {
-			GradleBuildChangeManager changes = buildChangeFactory.create(registry);
+			GradleBuildChangeManager changes = buildChangeFactory.create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}
