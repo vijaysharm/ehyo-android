@@ -7,6 +7,7 @@ import com.vijaysharma.ehyo.core.PluginActions.BuildActionDependencyValue;
 class InternalActions {
 	static interface ManifestActions {
 		Collection<String> getAddedPermissions();
+		Collection<String> getRemovedPermissions();
 	}
 	
 	static interface BuildActions {

@@ -62,6 +62,7 @@ TODO
 ++ Might be useful with --debug (Track when an action is added, whether its executed or not, etc...)
 + Move maven search into the Service
 + Have the *Actions index by Manifest or Build instead of IDs
++ PatchApplier should print the number of documents modified (look a the way git does commits)
 
 ##Bugs
 + Broke Usage

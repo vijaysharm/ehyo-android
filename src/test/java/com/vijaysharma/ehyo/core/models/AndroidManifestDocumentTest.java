@@ -4,16 +4,25 @@ import static com.vijaysharma.ehyo.core.models.AndroidManifestDocument.read;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 public class AndroidManifestDocumentTest {
 	private String id = "id";
 	
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+    
 	@Test
 	public void can_read_package() {
 		File file = get("/test1.xml");
@@ -32,10 +41,54 @@ public class AndroidManifestDocumentTest {
 	
 	@Test
 	public void can_read_activities() {
-		File file = get("/test2.xml");
-		AndroidManifestDocument document = read(file, id);
-		List<String> ac = document.getActivities();
-		System.out.println(ac);
+//		File file = get("/test2.xml");
+//		AndroidManifestDocument document = read(file, id);
+//		List<String> ac = document.getActivities();
+//		System.out.println(ac);
+	}
+	
+	@Test
+	public void can_add_permission() {
+		File manifest = newManifest("manifest.xml");
+		AndroidManifestDocument document = read(manifest, manifest.getAbsolutePath());
+		Set<String> permissions = document.getPermissions();
+		assertEquals(0, permissions.size());
+		
+		document.addPermission("android.permission.INTERNET");
+		permissions = document.getPermissions();
+		assertEquals(1, permissions.size());
+	}
+	
+	@Test
+	public void can_remove_permission() {
+		File manifest = newManifest("manifest.xml");
+		AndroidManifestDocument document = read(manifest, manifest.getAbsolutePath());
+		Set<String> permissions = document.getPermissions();
+		assertEquals(0, permissions.size());
+		
+		document.addPermission("android.permission.INTERNET");
+		permissions = document.getPermissions();
+		assertEquals(1, permissions.size());
+		
+		document.removePermission("android.permission.INTERNET");
+		permissions = document.getPermissions();
+		assertEquals(0, permissions.size());
+	}
+	
+	private File newManifest(String filename) {
+		try {
+			File file = folder.newFile(filename);
+			
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+	        out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	        out.write("<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">\n");
+	        out.write("</manifest>");
+	        
+	        out.close();
+	        return file;
+		} catch (IOException e) {
+			throw new UncheckedIoException(e);
+		}
 	}
 	
 	private File get(String filename) {

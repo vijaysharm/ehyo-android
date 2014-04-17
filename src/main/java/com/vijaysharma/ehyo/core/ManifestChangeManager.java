@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 
@@ -41,7 +42,8 @@ public class ManifestChangeManager implements ChangeManager<PluginActions>{
 	@Override
 	public void apply(PluginActions actions) {
 		// TODO: You have to check manifest IDs from ALL points that can be modified
-		Set<AndroidManifest> manifests = actions.getAddedPermissions().keySet();
+		Set<AndroidManifest> manifests = Sets.newHashSet(actions.getAddedPermissions().keySet());
+		manifests.addAll(actions.getRemovedPermissions().keySet());
 		for ( AndroidManifest manifest : manifests ) {
 			changes.put(manifest, manifest.asDocument());
 		}

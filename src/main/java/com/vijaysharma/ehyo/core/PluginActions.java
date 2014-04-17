@@ -11,6 +11,7 @@ import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
+// TODO: Delegate component action changes to smaller classes
 public class PluginActions {
 	private final ImmutableMultimap.Builder<AndroidManifest, String> addedPermissions = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<AndroidManifest, String> removedPermissions = ImmutableMultimap.builder();
@@ -76,6 +77,11 @@ public class PluginActions {
 			@Override
 			public Collection<String> getAddedPermissions() {
 				return addedPermissions.build().get(key);
+			}
+			
+			@Override
+			public Collection<String> getRemovedPermissions() {
+				return removedPermissions.build().get(key);
 			}
 		};
 	}

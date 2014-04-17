@@ -95,7 +95,7 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		
 		return activities.build();
 	}
-	
+
 	public void addPermission(String permission) {
 		Element usesPermission = new Element("uses-permission")
 			.setAttribute("name", permission, ANDROID_NAMESPACE);
@@ -104,6 +104,11 @@ public class AndroidManifestDocument implements AsListOfStrings {
 	}
 
 	public void removePermission(String permission) {
-		
+		Element root = document.getRootElement();
+		for (Element target : root.getChildren("uses-permission")) {
+			if ( permission.equals(target.getAttributeValue("name", ANDROID_NAMESPACE)) ) {
+				root.removeContent(target);
+			}
+		}
 	}
 }

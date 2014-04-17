@@ -37,8 +37,8 @@ public class Main implements Runnable {
 		
 		String[] plugin = {
 			"manifest-permissions",
-			"--add", "access"
-//			"--remove", "access"
+//			"--add", "internet"
+			"--remove", "internet"
 //			"search-mvn-central",
 //			"--lib", "butterknife"
 		};
