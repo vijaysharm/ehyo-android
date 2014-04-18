@@ -4,11 +4,12 @@ import java.util.Collection;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultBuildConfiguration;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.BuildType;
+import com.vijaysharma.ehyo.core.models.Dependency;
+import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 // TODO: Delegate component action changes to smaller classes
@@ -16,26 +17,24 @@ public class PluginActions {
 	private final ImmutableMultimap.Builder<AndroidManifest, String> addedPermissions = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<AndroidManifest, String> removedPermissions = ImmutableMultimap.builder();
 	
-	private final ImmutableMultimap.Builder<GradleBuild, BuildActionDependencyValue> addedDependencies = ImmutableMultimap.builder();
-	private final ImmutableMultimap.Builder<GradleBuild, BuildActionDependencyValue> removedDependencies = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<GradleBuild, Dependency> addedDependencies = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<GradleBuild, Dependency> removedDependencies = ImmutableMultimap.builder();
 	
-	public void addDependency(BuildConfiguration config, String dependency) {
-		DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
-		BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
-		addedDependencies.put(configuration.getBuild(), value);
+	public void addDependency(GradleBuild build, BuildType type, Flavor flavor, String projectId) {
+		Dependency dependency = new Dependency(type, flavor, projectId);
+		addedDependencies.put(build, dependency);
 	}
 	
-	public Multimap<GradleBuild, BuildActionDependencyValue> getAddedDependencies() {
+	public Multimap<GradleBuild, Dependency> getAddedDependencies() {
 		return addedDependencies.build();
 	}
 	
-	public void removeDependency(BuildConfiguration config, String dependency) {
-		DefaultBuildConfiguration configuration = (DefaultBuildConfiguration) config;
-		BuildActionDependencyValue value = new BuildActionDependencyValue(configuration, dependency);
-		removedDependencies.put(configuration.getBuild(), value);
+	public void removeDependency(GradleBuild build, BuildType type, Flavor flavor, String projectId) {
+		Dependency dependency = new Dependency(type, flavor, projectId);
+		removedDependencies.put(build, dependency);
 	}
 	
-	public Multimap<GradleBuild, BuildActionDependencyValue> getRemovedDependencies() {
+	public Multimap<GradleBuild, Dependency> getRemovedDependencies() {
 		return removedDependencies.build();
 	}
 	
@@ -66,8 +65,13 @@ public class PluginActions {
 	public BuildActions getBuildActions(final GradleBuild key) {
 		return new BuildActions() {
 			@Override
-			public Collection<BuildActionDependencyValue> getAddedDependencies() {
+			public Collection<Dependency> getAddedDependencies() {
 				return addedDependencies.build().get(key);
+			}
+			
+			@Override
+			public Collection<Dependency> getRemovedDependencies() {
+				return removedDependencies.build().get(key);
 			}
 		};
 	}
@@ -85,22 +89,4 @@ public class PluginActions {
 			}
 		};
 	}
-	
-	static class BuildActionDependencyValue {
-		private final DefaultBuildConfiguration configuration;
-		private final String dependency;
-		
-		public BuildActionDependencyValue(DefaultBuildConfiguration config, String dependency) {
-			this.configuration = config;
-			this.dependency = dependency;
-		}
-		
-		public String getDependency() {
-			return dependency;
-		}
-		
-		public DefaultBuildConfiguration getConfiguration() {
-			return configuration;
-		}
-	}	
 }

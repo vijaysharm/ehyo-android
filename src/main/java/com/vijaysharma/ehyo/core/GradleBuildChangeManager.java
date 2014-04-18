@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 
@@ -41,7 +42,8 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 	@Override
 	public void apply(PluginActions actions) {
 		// TODO: Don't just look at the ADDED dependencies
-		Set<GradleBuild> builds = actions.getAddedDependencies().keySet();
+		Set<GradleBuild> builds = Sets.newHashSet(actions.getAddedDependencies().keySet());
+		builds.addAll(actions.getRemovedDependencies().keySet());
 		for ( GradleBuild build : builds ) {
 			buildFiles.put(build, build.asDocument());
 		}

@@ -12,31 +12,24 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
-import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class DirectoryCommandLineConverterTest {
 	private ArgumentOption<File> option;
 	private DirectoryCommandLineConverter converter;
 	private ProjectRegistryLoaderFactory factory;
 	private ProjectRegistryLoader loader;
-	private ProjectRegistry registry;
-	
-	private ArgumentCaptor<File> captor;
 	
 	@Before
 	public void before() {
 		option = mock(ArgumentOption.class);
 		factory = mock(ProjectRegistryLoaderFactory.class);
-		captor = ArgumentCaptor.forClass(File.class);
 		loader = mock(ProjectRegistryLoader.class);
-		registry = mock(ProjectRegistry.class);
 		converter = new DirectoryCommandLineConverter(option, factory);
 	}
 	

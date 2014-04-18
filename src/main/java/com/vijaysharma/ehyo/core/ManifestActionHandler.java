@@ -30,30 +30,47 @@ public class ManifestActionHandler implements PluginActionHandler<AndroidManifes
 	// TODO: Need to output permissions that are not defined in the document
 	// during removal, and need to output when adding an existing permission 
 	private void modifyPermissions(AndroidManifestDocument doc, ManifestActions action) {
-		Set<String> added = Sets.newHashSet(action.getAddedPermissions());
-		Collection<String> permissions = action.getRemovedPermissions();
-		Collection<String> all = permissions = doc.getPermissions();
+		Collection<String> add = action.getAddedPermissions();
+		Collection<String> remove = action.getRemovedPermissions();
+		Collection<String> all = doc.getPermissions();
 		
-		for ( String permission : permissions ) {
-			if ( all.contains(permission) ) {
-				doc.removePermission(permission);
-			} else {
-				out.println( permission + " does not exist in manifest" );
-			}
-			
-			added.remove(permission);
+		Set<String> toBeAdded = Sets.newHashSet(add);
+		Set<String> toBeRemoved = Sets.newHashSet(remove);
+		toBeAdded.removeAll(remove);
+		toBeRemoved.removeAll(add);
+		
+		for ( String permission : remove ) {
+			if (!all.contains(permission))
+				toBeRemoved.remove(permission);
 		}
 		
-		all = doc.getPermissions();
-		for ( String permission : all ) {
-			if ( all.contains(permission) ) {
-				out.println( permission + " already exists in manifest" );
-				added.remove(permission);
-			}
-		}
+		toBeAdded.removeAll(all);
 		
-		for (String permission : added) {
-			doc.addPermission(permission);
-		}
+		if ( ! toBeAdded.isEmpty() )
+			doc.addPermission(toBeAdded);
+		
+		if ( !toBeRemoved.isEmpty() )
+			doc.removePermission(toBeRemoved);
+		
+//		for ( String permission : remove ) {
+//			if ( all.contains(permission) ) {
+//				doc.removePermission(permission);
+//			} else {
+//				out.println( permission + " does not exist in manifest" );
+//			}
+//			
+//			add.remove(permission);
+//		}
+//		
+//		for ( String permission : all ) {
+//			if ( add.contains(permission) ) {
+//				out.println( permission + " already exists in manifest" );
+//				add.remove(permission);
+//			}
+//		}
+//		
+//		for (String permission : add) {
+//			doc.addPermission(permission);
+//		}
 	}
 }

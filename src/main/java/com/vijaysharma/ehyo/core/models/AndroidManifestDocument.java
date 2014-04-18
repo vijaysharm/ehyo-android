@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 public class AndroidManifestDocument implements AsListOfStrings {
-	public static AndroidManifestDocument read(File file, String id) {
+	public static AndroidManifestDocument read(File file) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
-			return new AndroidManifestDocument(id, builder.build(file));
+			return new AndroidManifestDocument(builder.build(file), file);
 		} catch (IOException ioe) {
 			throw new UncheckedIoException(ioe);
 		} catch (JDOMException jde) {
@@ -33,19 +33,14 @@ public class AndroidManifestDocument implements AsListOfStrings {
 	}
 
 	private static final Namespace ANDROID_NAMESPACE = Namespace.getNamespace("android", "http://schemas.android.com/apk/res/android");
-
 	private final Document document;
-	private final String manifestId;
+	private final File file;
 	
-	public AndroidManifestDocument(String id, Document document) {
+	public AndroidManifestDocument(Document document, File file) {
 		this.document = document;
-		this.manifestId = id;
+		this.file = file;
 	}
 
-	public String getManifestId() {
-		return manifestId;
-	}
-	
 	@Override
 	public List<String> toListOfStrings() {
 		try {
@@ -95,20 +90,26 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		
 		return activities.build();
 	}
-
-	public void addPermission(String permission) {
-		Element usesPermission = new Element("uses-permission")
+	
+	public void addPermission(Set<String> permissions) {
+		for ( String permission : permissions ) {
+			Element usesPermission = new Element("uses-permission")
 			.setAttribute("name", permission, ANDROID_NAMESPACE);
 
-		document.getRootElement().addContent(0, usesPermission);
+			document.getRootElement().addContent(0, usesPermission);			
+		}
 	}
 
-	public void removePermission(String permission) {
+	public void removePermission(Set<String> permission) {
 		Element root = document.getRootElement();
 		for (Element target : root.getChildren("uses-permission")) {
-			if ( permission.equals(target.getAttributeValue("name", ANDROID_NAMESPACE)) ) {
+			if ( permission.contains(target.getAttributeValue("name", ANDROID_NAMESPACE)) ) {
 				root.removeContent(target);
 			}
-		}
+		}	
+	}
+
+	public AndroidManifestDocument copy() {
+		return AndroidManifestDocument.read(this.file);
 	}
 }

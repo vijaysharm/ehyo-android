@@ -2,7 +2,7 @@ package com.vijaysharma.ehyo.core;
 
 import java.util.Collection;
 
-import com.vijaysharma.ehyo.core.PluginActions.BuildActionDependencyValue;
+import com.vijaysharma.ehyo.core.models.Dependency;
 
 class InternalActions {
 	static interface ManifestActions {
@@ -11,6 +11,7 @@ class InternalActions {
 	}
 	
 	static interface BuildActions {
-		Collection<BuildActionDependencyValue> getAddedDependencies();
+		Collection<Dependency> getAddedDependencies();
+		Collection<Dependency> getRemovedDependencies();
 	}
 }

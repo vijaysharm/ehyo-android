@@ -63,6 +63,7 @@ TODO
 + Move maven search into the Service
 + Have the *Actions index by Manifest or Build instead of IDs
 + PatchApplier should print the number of documents modified (look a the way git does commits)
++ Make all core models package protected
 
 ##Bugs
 + Broke Usage

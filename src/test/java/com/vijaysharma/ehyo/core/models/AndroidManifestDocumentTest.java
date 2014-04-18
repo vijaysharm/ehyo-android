@@ -1,5 +1,6 @@
 package com.vijaysharma.ehyo.core.models;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static com.vijaysharma.ehyo.core.models.AndroidManifestDocument.read;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -18,7 +19,6 @@ import org.junit.rules.TemporaryFolder;
 import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 public class AndroidManifestDocumentTest {
-	private String id = "id";
 	
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -26,14 +26,14 @@ public class AndroidManifestDocumentTest {
 	@Test
 	public void can_read_package() {
 		File file = get("/test1.xml");
-		AndroidManifestDocument document = read(file, id);
+		AndroidManifestDocument document = read(file);
 		assertEquals("com.vijay.app", document.getPackage());
 	}
 	
 	@Test
 	public void can_read_permissions() {
 		File file = get("/test1.xml");
-		AndroidManifestDocument document = read(file, id);
+		AndroidManifestDocument document = read(file);
 		Set<String> permissions = document.getPermissions();
 		assertEquals(1, permissions.size());
 		assertTrue(permissions.contains("android.permission.INTERNET"));
@@ -50,11 +50,11 @@ public class AndroidManifestDocumentTest {
 	@Test
 	public void can_add_permission() {
 		File manifest = newManifest("manifest.xml");
-		AndroidManifestDocument document = read(manifest, manifest.getAbsolutePath());
+		AndroidManifestDocument document = read(manifest);
 		Set<String> permissions = document.getPermissions();
 		assertEquals(0, permissions.size());
 		
-		document.addPermission("android.permission.INTERNET");
+		document.addPermission(newHashSet("android.permission.INTERNET"));
 		permissions = document.getPermissions();
 		assertEquals(1, permissions.size());
 	}
@@ -62,15 +62,15 @@ public class AndroidManifestDocumentTest {
 	@Test
 	public void can_remove_permission() {
 		File manifest = newManifest("manifest.xml");
-		AndroidManifestDocument document = read(manifest, manifest.getAbsolutePath());
+		AndroidManifestDocument document = read(manifest);
 		Set<String> permissions = document.getPermissions();
 		assertEquals(0, permissions.size());
 		
-		document.addPermission("android.permission.INTERNET");
+		document.addPermission(newHashSet("android.permission.INTERNET"));
 		permissions = document.getPermissions();
 		assertEquals(1, permissions.size());
 		
-		document.removePermission("android.permission.INTERNET");
+		document.removePermission(newHashSet("android.permission.INTERNET"));
 		permissions = document.getPermissions();
 		assertEquals(0, permissions.size());
 	}

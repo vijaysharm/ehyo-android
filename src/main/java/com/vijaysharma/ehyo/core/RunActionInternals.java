@@ -1,10 +1,10 @@
 package com.vijaysharma.ehyo.core;
 
-import static com.google.common.base.Joiner.on;
-
 import java.util.Set;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.OptionSelectorFactory;
 import com.vijaysharma.ehyo.api.ProjectBuild;
@@ -12,6 +12,7 @@ import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.BuildType;
+import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
@@ -23,7 +24,10 @@ class RunActionInternals {
 		private final Flavor flavor;
 		private final PluginActions actions;
 		
-		public DefaultBuildConfiguration(BuildType buildType, Flavor flavor, GradleBuild build, PluginActions actions) {
+		public DefaultBuildConfiguration(BuildType buildType,
+										 Flavor flavor,
+										 GradleBuild build, 
+										 PluginActions actions) {
 			this.flavor = flavor;
 			this.build = build;
 			this.buildType = buildType;
@@ -32,7 +36,12 @@ class RunActionInternals {
 		
 		@Override
 		public void addDependency(String projectId) {
-			actions.addDependency(this, projectId);
+			actions.addDependency(build, buildType, flavor, projectId);
+		}
+		
+		@Override
+		public Set<String> getDependencies() {
+			return build.getDependencies(buildType, flavor);
 		}
 		
 		public BuildType getBuildType() {
@@ -49,11 +58,8 @@ class RunActionInternals {
 
 		@Override
 		public String toString() {
-			if ( flavor == null ) {
-				return on(":").join(build.getProject(), buildType.getCompileString());
-			} else {
-				return on(":").join(build.getProject(), flavor.getCompileString(buildType));	
-			}
+			return Joiner.on(":").join(build.getProject(), 
+									   buildType.getCompileString(flavor));
 		}
 	}
 	
@@ -82,7 +88,7 @@ class RunActionInternals {
 		
 		@Override
 		public Set<String> getPermissions() {
-			return manifest.asDocument().getPermissions();
+			return manifest.getPermissions();
 		}
 		
 		@Override
@@ -93,12 +99,47 @@ class RunActionInternals {
 
 	static class DefaultProjectBuild implements ProjectBuild {
 		private final GradleBuild build;
-		public DefaultProjectBuild(GradleBuild build) {
+		private final PluginActions actions;
+		
+		public DefaultProjectBuild(GradleBuild build, PluginActions actions) {
 			this.build = build;
+			this.actions = actions;
 		}
 		
 		public GradleBuild getBuild() {
 			return build;
+		}
+
+		@Override
+		public Set<String> getFlavors() {
+			ImmutableSet.Builder<String> flavors = ImmutableSet.builder();
+			for ( Flavor flavor : build.getFlavors() ) 
+				flavors.add(flavor.getFlavor());
+
+			return flavors.build();
+		}
+
+		@Override
+		public Set<String> getBuildTypes() {
+			ImmutableSet.Builder<String> buildtype = ImmutableSet.builder();
+			for ( BuildType type : build.getBuildTypes() ) 
+				buildtype.add(type.getType());
+
+			return buildtype.build();
+		}
+
+		@Override
+		public Set<BuildConfiguration> getBuildConfigurations() {
+			ImmutableSet.Builder<BuildConfiguration> buildtype = ImmutableSet.builder();
+			
+			for ( Dependency dependency : build.getDependencies() ) {
+				buildtype.add(new DefaultBuildConfiguration(dependency.getBuildType(), 
+															dependency.getFlavor(), 
+															build, 
+															actions));
+			}
+			
+			return buildtype.build();
 		}
 	}
 	

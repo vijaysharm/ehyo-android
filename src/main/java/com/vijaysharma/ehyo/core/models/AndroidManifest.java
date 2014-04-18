@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo.core.models;
 
 import java.io.File;
+import java.util.Set;
 
 public class AndroidManifest implements HasDocument {
 	public static AndroidManifest read(File file) {
@@ -9,10 +10,12 @@ public class AndroidManifest implements HasDocument {
 
 	private final File file;
 	private final String id;
+	private final AndroidManifestDocument document;
 	
 	public AndroidManifest(File file) {
 		this.file = file;
 		this.id = file.getAbsolutePath();
+		this.document = AndroidManifestDocument.read(file);
 	}
 
 	public String getProject() {
@@ -31,12 +34,17 @@ public class AndroidManifest implements HasDocument {
 		return id;
 	}
 	
+	@Override
 	public File getFile() {
 		return file;
 	}
 
 	@Override
 	public AndroidManifestDocument asDocument() {
-		return AndroidManifestDocument.read(this.file, this.id);
+		return document.copy();
+	}
+
+	public Set<String> getPermissions() {
+		return document.getPermissions();
 	}
 }
