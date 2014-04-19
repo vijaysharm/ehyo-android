@@ -101,7 +101,7 @@ public class GradleBuildDocumentModelTest {
 	}
 	
 	@Test
-	public void build_() {
+	public void getKeysStartingWith_returns_keys_from_deep_roots() {
 		List<String> lines = Lists.newArrayList(
 			"android {",
 			"	productFlavors {",
@@ -116,5 +116,39 @@ public class GradleBuildDocumentModelTest {
 		Set<String> keys = model.getKeysStartingWith("root.android.productFlavors.");
 		assertEquals(1, keys.size());
 		assertTrue(keys.contains("root.android.productFlavors.flavor1"));
+	}
+	
+	@Test
+	public void can_add_to_existing_section() {
+		List<String> lines = Lists.newArrayList(
+			"dependencies {",
+			"	compile 'com.squareup.dagger:dagger:1.2.1'",
+			"}"
+		);
+
+		GradleBuildDocumentModel model = new GradleBuildDocumentModel(lines);
+		model.addTo("root.dependencies", "compile 'com.squareup.okhttp:okhttp:1.3.0'");
+		Collection<String> dependencies = model.getProperties("root.dependencies");
+		
+		assertEquals(2, dependencies.size());
+		assertTrue(dependencies.contains("compile 'com.squareup.dagger:dagger:1.2.1'"));
+		assertTrue(dependencies.contains("compile 'com.squareup.okhttp:okhttp:1.3.0'"));
+	}
+	
+	@Test
+	public void can_remove_to_existing_section() {
+		List<String> lines = Lists.newArrayList(
+			"dependencies {",
+			"	compile 'com.squareup.dagger:dagger:1.2.1'",
+			"	compile 'com.squareup.okhttp:okhttp:1.3.0'",
+			"}"
+		);
+
+		GradleBuildDocumentModel model = new GradleBuildDocumentModel(lines);
+		model.removeFrom("root.dependencies", "compile 'com.squareup.okhttp:okhttp:1.3.0'");
+		Collection<String> dependencies = model.getProperties("root.dependencies");
+		
+		assertEquals(1, dependencies.size());
+		assertTrue(dependencies.contains("compile 'com.squareup.dagger:dagger:1.2.1'"));
 	}
 }

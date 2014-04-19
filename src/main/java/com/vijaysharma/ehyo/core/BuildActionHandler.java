@@ -9,6 +9,9 @@ import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 
 public class BuildActionHandler implements PluginActionHandler<GradleBuildDocument, BuildActions>{
+	
+	// TODO: Need to output permissions that are not defined in the document
+	// during removal, and need to output when adding an existing permission 
 	@Override
 	public void modify(GradleBuildDocument document, BuildActions action) {
 		Collection<Dependency> add = action.getAddedDependencies();
@@ -30,25 +33,10 @@ public class BuildActionHandler implements PluginActionHandler<GradleBuildDocume
 				toBeAdded.remove(dependency);
 		}
 		
-		for ( Dependency dependency : toBeAdded ) {
-			document.addDependency(dependency);
-		}
+		if ( ! toBeAdded.isEmpty() )
+			document.addDependencies(toBeAdded);
 		
-		for ( Dependency dependency : toBeRemoved ) {
-			document.removeDependency(dependency);
-		}		
+		if ( ! toBeRemoved.isEmpty() )
+			document.removeDependencies(toBeRemoved);
 	}
-
-//	private String formatDependency(BuildActionDependencyValue lib) {
-//		StringBuilder dependency = new StringBuilder();
-//		
-//		DefaultBuildConfiguration configuration = lib.getConfiguration();
-//		BuildType buildType = configuration.getBuildType();
-//		Flavor flavor = configuration.getFlavor();
-//		
-//		String compileString = buildType.getCompileString(flavor);
-//		dependency.append(compileString).append(" \'" + lib.getDependency() + "\'");
-//		
-//		return dependency.toString();
-//	}
 }

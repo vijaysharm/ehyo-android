@@ -15,19 +15,17 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return new GradleBuildDocument(readLines(file), file);
 	}
 	
-	private final List<String> lines;
 	private final GradleBuildDocumentModel model;
 	private final File file;
 	
 	private GradleBuildDocument(List<String> lines, File file) {
-		this.lines = lines;
-		this.model = new GradleBuildDocumentModel(lines);
 		this.file = file;
+		this.model = new GradleBuildDocumentModel(lines);
 	}
 	
 	@Override
 	public List<String> toListOfStrings() {
-		return lines;
+		return model.getLines();
 	}
 
 	public Set<BuildType> getBuildTypes() {
@@ -104,30 +102,31 @@ public class GradleBuildDocument implements AsListOfStrings {
 		int indexof = buildType.getCompileString(flavor).length();
 		return property.substring(indexof + 2, property.length() -1);
 	}
-	
-	/**
-	 * TODO: This may add to the dependencies defined in buildscript 
-	 */
-//	public GradleBuildDocument appendDependency(String dependency) {
-//		for ( int index = 0; index < lines.size(); index++ ) {
-//			String line = lines.get(index);
-//			if ( line.trim().startsWith("dependencies") ) {
-//				lines.add(index + 1, "\t" + dependency);
-//				break;
-//			}
-//		}
-//		
-//		return this;
-//	}
 
-	public void addDependency(Dependency dependency) {
-		
+	public void addDependencies(Set<Dependency> toBeAdded) {
+		for ( Dependency dependency : toBeAdded ) {
+			model.addTo("root.dependencies", formatDependency(dependency));
+		}
 	}
 	
-	public void removeDependency(Dependency dependency) {
-		
+	public void removeDependencies(Set<Dependency> toBeRemoved) {
+		for ( Dependency dependency : toBeRemoved ) {
+			model.removeFrom("root.dependencies", formatDependency(dependency));
+		}
 	}
 
+	private String formatDependency(Dependency lib) {
+		StringBuilder dependency = new StringBuilder();
+
+		BuildType buildType = lib.getBuildType();
+		Flavor flavor = lib.getFlavor();
+
+		String compileString = buildType.getCompileString(flavor);
+		dependency.append(compileString).append(" \'" + lib.getDependency() + "\'");
+
+		return dependency.toString();
+	}
+	
 	public GradleBuildDocument copy() {
 		return GradleBuildDocument.read(file);
 	}

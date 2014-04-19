@@ -43,15 +43,11 @@ TODO
 + Show user formatted error when the name given in plugin is not found
 + Show better version information
 ++ Better option description for usage
-+ Finish the Permissions plugin
-++ Have Permissions plugin take the permission type from the command line, or search a repository of known permissions
-++ Check what permissions are already applied to the manifest
-++ Support removal
-+ Improve ManifestActionHandler to only add permissions if defined in manifest
-+ Improve ManifestActionHandler to support removing permissions (defined in the xml)
 + Have the PatchApplier not modify the formatting of the XML file
 + Read the gradle build to understand the project structure better.
+++ Fails for certain types (e.g. tasks)
 + Improve dry-run diff
+++ Remove line numbers
 + Check if the project structure is valid
 ++ Need to determine when to notify the user that the directory they are loading from is invalid.
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
@@ -61,11 +57,19 @@ TODO
 + Should all actions have names so that output is more legible?
 ++ Might be useful with --debug (Track when an action is added, whether its executed or not, etc...)
 + Move maven search into the Service
-+ Have the *Actions index by Manifest or Build instead of IDs
 + PatchApplier should print the number of documents modified (look a the way git does commits)
 + Make all core models package protected
+++ Document public API
++ Support https://github.com/jgilfelt/android-adt-templates
++ Finish the maven search library plugin
+++ Clean up add / remove
+++ Support adding libraries directly from command line (i.e. no searching, just raw text)
 
 ##Bugs
 + Broke Usage
 ++ It is no longer shown
 + FIX: ApplicationRunActionFactoryTest
++ GradleBuildDocumentModel doesn't support the following kind of dependency
+++ This was seen in the Muzei Gradle build
+++ compile ('de.greenrobot:eventbus:2.2.0') { exclude group:'com.google.android', module: 'support-v4' // already included below }
+++ Current model will think its a context
