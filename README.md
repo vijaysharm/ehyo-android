@@ -36,8 +36,9 @@ TODO
 +++ etc...
 + Provide a way to add a new Component to the Android project (Activity, Services, etc..)
 ++ Includes adding the new Component to the Manifest
+++ This is similar to the android template project
+++ Provide a plugin that add the 'big cookie model to your project'
 + Provide a plugin that lets you rename your package namespace
-+ Provide a plugin that add the 'big cookie model to your project'
 
 ##Tasks
 + Show user formatted error when the name given in plugin is not found
@@ -60,10 +61,13 @@ TODO
 + PatchApplier should print the number of documents modified (look a the way git does commits)
 + Make all core models package protected
 ++ Document public API
-+ Support https://github.com/jgilfelt/android-adt-templates
++ Support https://github.com/jgilfelt/android-adt-templates & /Applications/Android Studio.app/plugins/android/lib/templates
 + Finish the maven search library plugin
+++ Should it be renamed to dependency, providing a search, add, remove capability?
 ++ Clean up add / remove
 ++ Support adding libraries directly from command line (i.e. no searching, just raw text)
++ Finish the manifest-permission plugin
+++ It should support an optional remove argument, which should display the list of existing permissions to remove
 
 ##Bugs
 + Broke Usage

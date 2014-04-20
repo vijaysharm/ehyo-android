@@ -36,11 +36,11 @@ public class Main implements Runnable {
 		};
 		
 		String[] plugin = {
-			"manifest-permissions",
-			"--add", "access",
-			"--remove", "internet"
-//			"search-mvn-central",
-//			"--lib", "butterknife"
+//			"manifest-permissions",
+//			"--add", "access",
+//			"--remove", "internet"
+			"search-mvn-central",
+			"--lib", "butterknife"
 		};
 		
 		String[] arguments = concat(main, plugin);

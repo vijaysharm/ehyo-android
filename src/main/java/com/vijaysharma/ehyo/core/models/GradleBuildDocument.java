@@ -38,7 +38,7 @@ public class GradleBuildDocument implements AsListOfStrings {
 		String key = "root.android.buildTypes.";
 		Set<String> keys = model.getKeysStartingWith(key);
 		for ( String k : keys ) {
-			String build = k.substring(key.length()+1);
+			String build = k.substring(key.length());
 			builtypes.add(new BuildType(build));
 		}
 		
@@ -51,7 +51,7 @@ public class GradleBuildDocument implements AsListOfStrings {
 		Set<String> keys = model.getKeysStartingWith(key);
 		
 		for ( String k : keys ) {
-			String flavor = k.substring(key.length()+1);
+			String flavor = k.substring(key.length());
 			flavors.add(new Flavor(flavor));
 		}
 		

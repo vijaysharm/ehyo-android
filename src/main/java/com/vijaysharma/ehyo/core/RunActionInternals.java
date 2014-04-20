@@ -12,7 +12,6 @@ import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.BuildType;
-import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
@@ -132,14 +131,19 @@ class RunActionInternals {
 		public Set<BuildConfiguration> getBuildConfigurations() {
 			ImmutableSet.Builder<BuildConfiguration> buildtype = ImmutableSet.builder();
 			
-			for ( Dependency dependency : build.getDependencies() ) {
-				buildtype.add(new DefaultBuildConfiguration(dependency.getBuildType(), 
-															dependency.getFlavor(), 
-															build, 
-															actions));
+			for ( BuildType type : build.getBuildTypes() ) {
+				buildtype.add(create(type, null));
+
+				for ( Flavor flavor : build.getFlavors() ) {
+					buildtype.add(create(type, flavor));
+				}
 			}
 			
 			return buildtype.build();
+		}
+
+		private DefaultBuildConfiguration create(BuildType type, Flavor flavor) {
+			return new DefaultBuildConfiguration(type, flavor, build, actions);
 		}
 	}
 	
