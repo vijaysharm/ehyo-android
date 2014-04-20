@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.api.plugins.search.models;
+package com.vijaysharma.ehyo.plugins.search.models;
 
 public class Artifact {
 	private String id;

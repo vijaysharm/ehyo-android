@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.api.plugins.list;
+package com.vijaysharma.ehyo.plugins.list;
 
 import java.util.List;
 

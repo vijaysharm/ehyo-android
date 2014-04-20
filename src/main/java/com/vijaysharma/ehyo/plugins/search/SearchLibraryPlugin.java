@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.api.plugins.search;
+package com.vijaysharma.ehyo.plugins.search;
 
 import static com.google.common.base.Joiner.on;
 
@@ -12,9 +12,9 @@ import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
-import com.vijaysharma.ehyo.api.plugins.search.models.Artifact;
-import com.vijaysharma.ehyo.api.plugins.search.models.QueryByNameResponse;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.plugins.search.models.Artifact;
+import com.vijaysharma.ehyo.plugins.search.models.QueryByNameResponse;
 
 public class SearchLibraryPlugin implements Plugin {
 

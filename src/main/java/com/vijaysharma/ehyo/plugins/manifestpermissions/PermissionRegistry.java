@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.api.plugins.manifestpermissions;
+package com.vijaysharma.ehyo.plugins.manifestpermissions;
 
 import java.util.Set;
 

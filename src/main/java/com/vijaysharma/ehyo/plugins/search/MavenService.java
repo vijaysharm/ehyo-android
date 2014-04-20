@@ -1,6 +1,6 @@
-package com.vijaysharma.ehyo.api.plugins.search;
+package com.vijaysharma.ehyo.plugins.search;
 
-import com.vijaysharma.ehyo.api.plugins.search.models.QueryByNameResponse;
+import com.vijaysharma.ehyo.plugins.search.models.QueryByNameResponse;
 
 import retrofit.http.GET;
 import retrofit.http.Query;
