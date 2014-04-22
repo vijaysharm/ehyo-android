@@ -68,6 +68,7 @@ TODO
 ++ Support adding libraries directly from command line (i.e. no searching, just raw text)
 + Finish the manifest-permission plugin
 ++ It should support an optional remove argument, which should display the list of existing permissions to remove
++ Should I move the Manifests into the Project as far as the API is concerned?
 
 ##Bugs
 + Broke Usage

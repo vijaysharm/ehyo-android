@@ -39,8 +39,11 @@ public class Main implements Runnable {
 //			"manifest-permissions",
 //			"--add", "access",
 //			"--remove", "internet"
-			"search-mvn-central",
-			"--lib", "butterknife"
+				
+//			"search-mvn-central",
+//			"--lib", "butterknife"
+				
+			"android-templates"
 		};
 		
 		String[] arguments = concat(main, plugin);

@@ -1,5 +1,6 @@
 package com.vijaysharma.ehyo.core;
 
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Function;
@@ -9,6 +10,7 @@ import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.OptionSelectorFactory;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
+import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.BuildType;
@@ -41,6 +43,11 @@ class RunActionInternals {
 		@Override
 		public Set<String> getDependencies() {
 			return build.getDependencies(buildType, flavor);
+		}
+		
+		@Override
+		public void applyTemplate(String templatePath, List<TemplateParameters> parameters) {
+			throw new UnsupportedOperationException("applyTemplate!!");
 		}
 		
 		public BuildType getBuildType() {
