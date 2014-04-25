@@ -7,14 +7,15 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
+import com.vijaysharma.ehyo.api.BuildType;
+import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.OptionSelectorFactory;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
+import com.vijaysharma.ehyo.api.ProjectSourceSet;
 import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
-import com.vijaysharma.ehyo.core.models.BuildType;
-import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.SourceSet;
 
@@ -39,11 +40,6 @@ class RunActionInternals {
 		@Override
 		public void addDependency(String projectId) {
 			actions.addDependency(build, buildType, flavor, projectId);
-		}
-		
-		@Override
-		public void applyTemplate(String templatePath, List<TemplateParameters> parameters) {
-			throw new UnsupportedOperationException("applyTemplate!!");
 		}
 		
 		public BuildType getBuildType() {
@@ -113,21 +109,13 @@ class RunActionInternals {
 		}
 
 		@Override
-		public Set<String> getFlavors() {
-			ImmutableSet.Builder<String> flavors = ImmutableSet.builder();
-			for ( Flavor flavor : build.getFlavors() ) 
-				flavors.add(flavor.getFlavor());
-
-			return flavors.build();
+		public Set<Flavor> getFlavors() {
+			return build.getFlavors();
 		}
 
 		@Override
-		public Set<String> getBuildTypes() {
-			ImmutableSet.Builder<String> buildtype = ImmutableSet.builder();
-			for ( BuildType type : build.getBuildTypes() ) 
-				buildtype.add(type.getType());
-
-			return buildtype.build();
+		public Set<BuildType> getBuildTypes() {
+			return build.getBuildTypes();
 		}
 
 		@Override
@@ -143,6 +131,19 @@ class RunActionInternals {
 			}
 			
 			return buildtype.build();
+		}
+
+		@Override
+		public Set<ProjectSourceSet> getSourceSets() {
+			ImmutableSet.Builder<ProjectSourceSet> sourceSets = ImmutableSet.builder();
+
+			for ( SourceSet sourceSet : build.getSourceSets() ) {
+				for ( AndroidManifest manifest : sourceSet.getManifests() ) {
+					sourceSets.add(new DefaultProjectSourceSet(build, manifest, actions));
+				}
+			}
+			
+			return sourceSets.build();
 		}
 		
 		@Override
@@ -160,6 +161,28 @@ class RunActionInternals {
 
 		private DefaultBuildConfiguration create(BuildType type, Flavor flavor) {
 			return new DefaultBuildConfiguration(type, flavor, build, actions);
+		}
+	}
+	
+	static class DefaultProjectSourceSet implements ProjectSourceSet {
+		private final GradleBuild build;
+		private final AndroidManifest manifest;
+		private final PluginActions actions;
+
+		public DefaultProjectSourceSet(GradleBuild build, AndroidManifest manifest, PluginActions actions) {
+			this.build = build;
+			this.manifest = manifest;
+			this.actions = actions;
+		}
+
+		@Override
+		public void applyTemplate(String templatePath, List<TemplateParameters> parameters) {
+			actions.applyTemplate(templatePath, parameters);
+		}
+		
+		@Override
+		public String toString() {
+			return Joiner.on(":").join(manifest.getProject(), manifest.getSourceSet().getType());
 		}
 	}
 	

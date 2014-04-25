@@ -26,6 +26,7 @@ public class ServiceFactory {
 		
 		return new Service(plugins, 
 						   builds,
+						   new DefaultTemplateService(),
 						   new DefaultOptionSelectorFactory());
 	}
 }

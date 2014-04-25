@@ -12,6 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.vijaysharma.ehyo.api.BuildType;
+
 public class GradleBuildDocumentTest {
 	
     @Rule

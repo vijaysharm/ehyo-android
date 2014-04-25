@@ -42,10 +42,10 @@ public class Main implements Runnable {
 //			"--add", "access",
 //			"--remove", "internet"
 				
-			"search-mvn-central",
-			"--lib", "butterknife"
+//			"search-mvn-central",
+//			"--lib", "butterknife"
 				
-//			"android-templates"
+			"android-templates"
 		};
 		
 		String[] arguments = concat(main, plugin);

@@ -1,15 +1,17 @@
 package com.vijaysharma.ehyo.core;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.vijaysharma.ehyo.api.BuildType;
+import com.vijaysharma.ehyo.api.Flavor;
+import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
-import com.vijaysharma.ehyo.core.models.BuildType;
 import com.vijaysharma.ehyo.core.models.Dependency;
-import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 
 // TODO: Delegate component action changes to smaller classes
@@ -88,5 +90,9 @@ public class PluginActions {
 				return removedPermissions.build().get(key);
 			}
 		};
+	}
+
+	public void applyTemplate(String templatePath, List<TemplateParameters> parameters) {
+		throw new UnsupportedOperationException();
 	}
 }

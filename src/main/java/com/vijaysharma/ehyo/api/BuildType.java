@@ -1,4 +1,5 @@
-package com.vijaysharma.ehyo.core.models;
+package com.vijaysharma.ehyo.api;
+
 
 public class BuildType {
 	public static final BuildType COMPILE = new BuildType("compile");

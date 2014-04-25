@@ -9,6 +9,8 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.vijaysharma.ehyo.api.BuildType;
+import com.vijaysharma.ehyo.api.Flavor;
 
 public class GradleBuildDocument implements AsListOfStrings {
 	public static GradleBuildDocument read(File file) {

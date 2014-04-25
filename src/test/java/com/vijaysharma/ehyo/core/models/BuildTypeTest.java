@@ -4,6 +4,9 @@ import static junit.framework.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.vijaysharma.ehyo.api.BuildType;
+import com.vijaysharma.ehyo.api.Flavor;
+
 public class BuildTypeTest {
 
 	@Test

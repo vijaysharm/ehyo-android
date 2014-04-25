@@ -4,15 +4,21 @@ public class TemplateParameters {
 	private final String id;
 	private final String defaultValue;
 	private final String type;
+	private final String name;
 
-	public TemplateParameters(String id, String type, String defaultValue) {
+	public TemplateParameters(String id, String name, String type, String defaultValue) {
 		this.id = id;
 		this.type = type;
 		this.defaultValue = defaultValue;
+		this.name = name;
 	}
 	
 	public String getId() {
 		return id;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public Object getDefaultValue() {

@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.core.models;
+package com.vijaysharma.ehyo.api;
 
 public class Flavor {
 	private final String flavor;

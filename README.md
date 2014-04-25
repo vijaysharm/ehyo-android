@@ -49,6 +49,7 @@ TODO
 ++ Fails for certain types (e.g. tasks)
 + Improve dry-run diff
 ++ Remove line numbers
+++ Should print the number of documents modified (look a the way git does commits)
 + Check if the project structure is valid
 ++ Need to determine when to notify the user that the directory they are loading from is invalid.
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
@@ -58,7 +59,6 @@ TODO
 + Should all actions have names so that output is more legible?
 ++ Might be useful with --debug (Track when an action is added, whether its executed or not, etc...)
 + Move maven search into the Service
-+ PatchApplier should print the number of documents modified (look a the way git does commits)
 + Make all core models package protected
 ++ Document public API
 + Support https://github.com/jgilfelt/android-adt-templates & /Applications/Android Studio.app/plugins/android/lib/templates
@@ -68,7 +68,9 @@ TODO
 ++ Support adding libraries directly from command line (i.e. no searching, just raw text)
 + Finish the manifest-permission plugin
 ++ It should support an optional remove argument, which should display the list of existing permissions to remove
-+ Should I move the Manifests into the Project as far as the API is concerned?
++ Finish Template Plugin
+++ Should support applying a template to a sourceset without a manifest
+++ Prompt user to fill in fields (without resorting to default values)
 
 ##Bugs
 + Broke Usage

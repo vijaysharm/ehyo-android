@@ -4,7 +4,6 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 
-
 public class SourceSet {
 	private final Optional<AndroidManifest> manifests;
 	private final SourceSetType sourceSet;

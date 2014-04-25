@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import com.vijaysharma.ehyo.api.BuildType;
+import com.vijaysharma.ehyo.api.Flavor;
+
 public class GradleBuild implements HasDocument {
 	private final File file;
 	private final String id;

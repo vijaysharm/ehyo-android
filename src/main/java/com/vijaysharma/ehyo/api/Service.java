@@ -10,13 +10,16 @@ public class Service {
 	private final Collection<Plugin> plugins;
 	private final List<ProjectBuild> projectBuilds;
 	private final OptionSelectorFactory selectorFactory;
+	private final TemplateService templateService;
 	
 	public Service(Collection<Plugin> plugins, 
 				   List<ProjectBuild> projectBuilds,
+				   TemplateService templateService,
 				   OptionSelectorFactory selectorFactory) {
 		this.plugins = plugins;
 		this.projectBuilds = projectBuilds;
 		this.selectorFactory = selectorFactory;
+		this.templateService = templateService;
 	}
 
 	public Collection<Plugin> getPlugins() {
@@ -47,5 +50,9 @@ public class Service {
 		}
 
 		return configs.build();
+	}
+
+	public List<TemplateParameters> loadTemplateParameters(String path) {
+		return templateService.loadParameters(path);
 	}	
 }

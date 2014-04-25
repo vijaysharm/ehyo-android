@@ -1,5 +1,8 @@
 package com.vijaysharma.ehyo.core.models;
 
+import com.vijaysharma.ehyo.api.BuildType;
+import com.vijaysharma.ehyo.api.Flavor;
+
 public class Dependency {
 	private final BuildType buildType;
 	private final Flavor flavor;

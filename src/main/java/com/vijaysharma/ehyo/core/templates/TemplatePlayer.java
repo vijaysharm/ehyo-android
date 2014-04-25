@@ -70,8 +70,6 @@ public class TemplatePlayer {
 		};
 
 		String templateRootDirectory = templates[0];
-		
-		final Configuration config = config( TemplatePlayer.class, templateRootDirectory );
 		URL templateRoot = TemplatePlayer.class.getResource(templateRootDirectory);
 		File templateFileRoot = new File(templateRoot.getFile());
 		
@@ -103,6 +101,7 @@ public class TemplatePlayer {
 		mapping.put("extractLetters", new ExtractLetters());
 		mapping.put("activityToLayout", new ActivityToLayout());
 
+		final Configuration config = config( TemplatePlayer.class, templateRootDirectory );
 		Template globalTemplate = get(config, model.getGlobalsFilename());
 		Document globalDocument = asDocument(globalTemplate, mapping);
 		GlobalDocumentModel globalModel = new GlobalDocumentModel(globalDocument);
@@ -297,7 +296,7 @@ public class TemplatePlayer {
 				String type = element.getAttributeValue("type");
 				String defaultValue = element.getAttributeValue("default");
 				
-				parameters.add(new TemplateParameters(id, type, defaultValue));
+				parameters.add(new TemplateParameters(id, name, type, defaultValue));
 			}
 			
 			return parameters;
