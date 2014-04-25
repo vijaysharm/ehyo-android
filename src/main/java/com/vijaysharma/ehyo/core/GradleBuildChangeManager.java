@@ -20,7 +20,6 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 	// TODO: Replace with ObjectFactory
 	static class GradleBuildChangeManagerFactory {
 		GradleBuildChangeManager create() {
-			
 			return new GradleBuildChangeManager(new PatchApplier<GradleBuild, GradleBuildDocument>(PRODUCER));
 		}	
 	}

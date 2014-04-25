@@ -1,20 +1,23 @@
 package com.vijaysharma.ehyo.core.models;
 
-import java.util.Set;
-
-import com.google.common.base.Optional;
 
 public class SourceSet {
-	private final Optional<AndroidManifest> manifests;
+	private final AndroidManifest manifests;
 	private final SourceSetType sourceSet;
+	private final String project;
 	
-	public SourceSet(SourceSetType sourceSet, Optional<AndroidManifest> optional) {
+	public SourceSet(String project, SourceSetType sourceSet, AndroidManifest manifest) {
 		this.sourceSet = sourceSet;
-		this.manifests = optional;
+		this.manifests = manifest;
+		this.project = project;
 	}
 	
-	public Set<AndroidManifest> getManifests() {
-		return manifests.asSet();
+	public String getProject() {
+		return project;
+	}
+	
+	public AndroidManifest getManifests() {
+		return manifests;
 	}
 	
 	public SourceSetType getSourceSet() {

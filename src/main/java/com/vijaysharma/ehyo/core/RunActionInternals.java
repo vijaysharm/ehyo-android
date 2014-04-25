@@ -13,6 +13,8 @@ import com.vijaysharma.ehyo.api.OptionSelectorFactory;
 import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.ProjectSourceSet;
+import com.vijaysharma.ehyo.api.Template;
+import com.vijaysharma.ehyo.api.TemplateFactory;
 import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
@@ -138,8 +140,10 @@ class RunActionInternals {
 			ImmutableSet.Builder<ProjectSourceSet> sourceSets = ImmutableSet.builder();
 
 			for ( SourceSet sourceSet : build.getSourceSets() ) {
-				for ( AndroidManifest manifest : sourceSet.getManifests() ) {
-					sourceSets.add(new DefaultProjectSourceSet(build, manifest, actions));
+				// TODO: I'm only doing this filter so that I filter out any
+				// source sets that don't have manifests
+				if ( sourceSet.getManifests() != null ) {
+					sourceSets.add(new DefaultProjectSourceSet(sourceSet, actions));
 				}
 			}
 			
@@ -151,8 +155,10 @@ class RunActionInternals {
 			ImmutableSet.Builder<ProjectManifest> manifests = ImmutableSet.builder();
 			
 			for ( SourceSet sourceSet : build.getSourceSets() ) {
-				for ( AndroidManifest manifest : sourceSet.getManifests() ) {
-					manifests.add(new DefaultProjectManifest(manifest, actions));
+				// TODO: I'm only doing this filter so that I filter out any
+				// source sets that don't have manifests
+				if ( sourceSet.getManifests() != null ) {
+					manifests.add(new DefaultProjectManifest(sourceSet.getManifests(), actions));
 				}
 			}
 				
@@ -165,24 +171,30 @@ class RunActionInternals {
 	}
 	
 	static class DefaultProjectSourceSet implements ProjectSourceSet {
-		private final GradleBuild build;
-		private final AndroidManifest manifest;
 		private final PluginActions actions;
+		private final SourceSet sourceSet;
 
-		public DefaultProjectSourceSet(GradleBuild build, AndroidManifest manifest, PluginActions actions) {
-			this.build = build;
-			this.manifest = manifest;
+		public DefaultProjectSourceSet(SourceSet sourceSet, PluginActions actions) {
+			this.sourceSet = sourceSet;
 			this.actions = actions;
 		}
-
+		
 		@Override
-		public void applyTemplate(String templatePath, List<TemplateParameters> parameters) {
-			actions.applyTemplate(templatePath, parameters);
+		public void applyTemplate(Template template, List<TemplateParameters> parameters) {
+			DefaultTemplate t = (DefaultTemplate) template;
+			actions.applyTemplate(t, sourceSet, parameters);
 		}
 		
 		@Override
 		public String toString() {
-			return Joiner.on(":").join(manifest.getProject(), manifest.getSourceSet().getType());
+			return Joiner.on(":").join(sourceSet.getProject(), sourceSet.getSourceSet().getType());
+		}
+	}
+	
+	static class DefaultTemplateFactory implements TemplateFactory {
+		@Override
+		public Template create(String path) {
+			return new DefaultTemplate(path);
 		}
 	}
 	

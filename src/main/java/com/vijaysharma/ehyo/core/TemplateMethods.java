@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.core.templates;
+package com.vijaysharma.ehyo.core;
 
 import java.io.File;
 import java.util.List;

@@ -6,7 +6,12 @@ public class TemplateParameters {
 	private final String type;
 	private final String name;
 
-	public TemplateParameters(String id, String name, String type, String defaultValue) {
+	public TemplateParameters(String id, 
+							  String name,
+							  String type,
+							  String defaultValue,
+							  String constraints,
+							  String help) {
 		this.id = id;
 		this.type = type;
 		this.defaultValue = defaultValue;

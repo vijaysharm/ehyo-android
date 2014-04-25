@@ -14,8 +14,8 @@ public class ProjectRegistry {
 		this.projects = projects;
 	}
 	
-	public Project geProject(GradleBuild build) {
-		return projects.get(build.getProject());
+	public Project getProject(String name) {
+		return projects.get(name);
 	}
 	
 	public List<GradleBuild> getAllGradleBuilds() {

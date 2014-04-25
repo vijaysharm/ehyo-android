@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -68,11 +67,21 @@ public class ProjectRegistryBuilder {
 			Map<SourceSetType, AndroidManifest> manifestMapping = Maps.newHashMap();
 			List<File> projectManifestFiles = manifests.removeAll(projectName);
 			for ( File file : projectManifestFiles ) {
+				// TODO: We should be reading the project build to 
 				AndroidManifestDocument document = AndroidManifestDocument.read(file); 
 				Set<String> permissions = document.getPermissions();
+				String packageName = document.getPackage();
 				SourceSetType sourceSet = new SourceSetType(file.getParentFile().getName());
-
-				manifestMapping.put(sourceSet, new AndroidManifest(file, projectName, sourceSet, permissions));
+				File sourceDirectory = new File( file.getParentFile(), "java");
+				File resourceDirectory = new File( file.getParentFile(), "res");
+				
+				manifestMapping.put(sourceSet, new AndroidManifest(file, 
+																   projectName, 
+																   packageName, 
+																   sourceSet,
+																   sourceDirectory,
+																   resourceDirectory,
+																   permissions));
 			}
 			
 			File buildFile = builds.remove(projectName);
@@ -90,7 +99,10 @@ public class ProjectRegistryBuilder {
 			ImmutableSet.Builder<SourceSet> sourceSets = ImmutableSet.builder();
 			for ( SourceSetType type : sourceSetTypes ) {
 				AndroidManifest manifest = manifestMapping.get(type);
-				sourceSets.add(new SourceSet(type, Optional.fromNullable(manifest)));
+				if ( manifests == null )
+					System.err.println("Manifest for source set: [" + projectName + ":" + type + "] is null!!!!");
+				
+				sourceSets.add(new SourceSet(projectName, type, manifest));
 			}
 			
 			GradleBuild build = new GradleBuild(projectName, buildFile, buildTypes, flavors, sourceSets.build(), dependencies);

@@ -10,6 +10,7 @@ import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultTemplateFactory;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
@@ -26,7 +27,7 @@ public class ServiceFactory {
 		
 		return new Service(plugins, 
 						   builds,
-						   new DefaultTemplateService(),
+						   new DefaultTemplateFactory(),
 						   new DefaultOptionSelectorFactory());
 	}
 }
