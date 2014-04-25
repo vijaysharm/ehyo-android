@@ -39,6 +39,11 @@ public class BuildType {
 	public String getType() {
 		return type;
 	}
+	
+	@Override
+	public String toString() {
+		return "BuildType [type=" + type + "]";
+	}
 
 	@Override
 	public int hashCode() {

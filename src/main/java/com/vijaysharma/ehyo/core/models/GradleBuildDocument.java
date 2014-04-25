@@ -28,6 +28,23 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return model.getLines();
 	}
 
+	public Set<SourceSetType> getSourceSetTypes() {
+		ImmutableSet.Builder<SourceSetType> sourceSets = ImmutableSet.builder();
+		sourceSets.add(SourceSetType.MAIN);
+		sourceSets.add(SourceSetType.DEBUG);
+		sourceSets.add(SourceSetType.RELEASE);
+		sourceSets.add(SourceSetType.ANDROID_TEST);
+		
+		String key = "root.android.sourceSets.";
+		Set<String> keys = model.getKeysStartingWith(key);
+		for ( String k : keys ) {
+			String source = k.substring(key.length());
+			sourceSets.add(new SourceSetType(source));
+		}
+		
+		return sourceSets.build();
+	}
+	
 	public Set<BuildType> getBuildTypes() {
 		ImmutableSet.Builder<BuildType> builtypes = ImmutableSet.builder();
 		builtypes.add(BuildType.ANDROID_TEST);

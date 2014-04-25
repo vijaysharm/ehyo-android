@@ -33,6 +33,8 @@ public class Main implements Runnable {
 //			"--plugins", "com.thirdparty.plugin", 
 			"--dry-run",
 			"--directory", "/Users/vsharma/programming/android/MyApplication"
+//			"--directory", "/Users/vsharma/programming/android/muzei"
+//			"--directory", "/Users/vsharma/programming/android/u2020"
 		};
 		
 		String[] plugin = {
@@ -40,10 +42,10 @@ public class Main implements Runnable {
 //			"--add", "access",
 //			"--remove", "internet"
 				
-//			"search-mvn-central",
-//			"--lib", "butterknife"
+			"search-mvn-central",
+			"--lib", "butterknife"
 				
-			"android-templates"
+//			"android-templates"
 		};
 		
 		String[] arguments = concat(main, plugin);

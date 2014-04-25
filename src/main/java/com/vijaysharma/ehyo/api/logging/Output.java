@@ -65,7 +65,7 @@ public class Output implements TextOutput {
             return (Flushable) appendable;
         }
 
-        return new Flushable() { public void flush() throws IOException {}};
+        return new Flushable() { @Override public void flush() throws IOException {}};
 	}
     
     private void append(CharSequence output) {

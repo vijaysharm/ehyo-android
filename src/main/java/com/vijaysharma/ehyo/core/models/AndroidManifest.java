@@ -4,30 +4,26 @@ import java.io.File;
 import java.util.Set;
 
 public class AndroidManifest implements HasDocument {
-	public static AndroidManifest read(File file) {
-		return new AndroidManifest(file);
-	}
-
 	private final File file;
 	private final String id;
-	private final AndroidManifestDocument document;
+	private final SourceSetType type;
+	private final Set<String> permissions;
+	private final String project;
 	
-	public AndroidManifest(File file) {
+	public AndroidManifest(File file, String projectName, SourceSetType sourceSet, Set<String> permissions) {
 		this.file = file;
+		this.project = projectName;
+		this.type = sourceSet;
+		this.permissions = permissions;
 		this.id = file.getAbsolutePath();
-		this.document = AndroidManifestDocument.read(file);
 	}
 
 	public String getProject() {
-		return file.getParentFile().getParentFile().getParentFile().getName();
+		return project;
 	}
 	
-	/**
-	 * Not really a variant, and not really a flavor, but I can't make that
-	 * assumption without reading the build file
-	 */
-	public String getSourceSet() {
-		return file.getParentFile().getName();
+	public SourceSetType getSourceSet() {
+		return type;
 	}
 	
 	public String getId() {
@@ -39,12 +35,12 @@ public class AndroidManifest implements HasDocument {
 		return file;
 	}
 
-	@Override
-	public AndroidManifestDocument asDocument() {
-		return document.copy();
-	}
-
 	public Set<String> getPermissions() {
-		return document.getPermissions();
+		return this.permissions;
+	}
+	
+	@Override
+	public String toString() {
+		return getProject() + ":" + getSourceSet().getType() + ":" + getFile().getName();
 	}
 }

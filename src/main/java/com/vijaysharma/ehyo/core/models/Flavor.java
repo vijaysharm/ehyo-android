@@ -11,6 +11,11 @@ public class Flavor {
 	}
 
 	@Override
+	public String toString() {
+		return "Flavor [flavor=" + flavor + "]";
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

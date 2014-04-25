@@ -5,8 +5,6 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.core.models.AndroidManifest;
-import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.GradleSettings;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
@@ -63,8 +61,8 @@ public class ProjectRegistryLoader {
 	static class FileObserverProjectBuilder implements FileSystemObserver {
 		private final File root;
 		private final List<GradleSettings> settings = Lists.newArrayList();
-		private final List<AndroidManifest> manifests = Lists.newArrayList();
-		private final List<GradleBuild> builds = Lists.newArrayList();
+		private final List<File> manifests = Lists.newArrayList();
+		private final List<File> builds = Lists.newArrayList();
 
 		private final FileConstructorFactory<ProjectRegistryBuilder> projectFactory;
 		
@@ -85,31 +83,27 @@ public class ProjectRegistryLoader {
 
 		@Override
 		public void onManifest(File manifest) {
-			this.manifests.add(AndroidManifest.read(manifest));
+			this.manifests.add(manifest);
 		}
 
 		@Override
 		public void onBuild(File build) {
-			this.builds.add(GradleBuild.read(build));
+			this.builds.add(build);
 		}
 
 		public ProjectRegistry build() {
 			ProjectRegistryBuilder registry = projectFactory.create(ProjectRegistryBuilder.class, root);
-			registry.addProject(root.getName());
 
-			if ( ! settings.isEmpty() ) {
-				// register a bunch of projects
-				for ( GradleSettings setting : this.settings )
-					registry.addProjects( setting.getProjects() );
-			} 
+			for ( GradleSettings setting : this.settings )
+				registry.addProjects( setting.getProjects() );
 
 			// iterate over the build files and build a view of the projects
-			for ( GradleBuild build : this.builds ) {
+			for ( File build : this.builds ) {
 				registry.addBuild(build);
 			}
 
 			// iterate over the manifest file and keep a view on each project
-			for ( AndroidManifest manifest : this.manifests ) {
+			for ( File manifest : this.manifests ) {
 				registry.adddManifest(manifest);
 			}
 

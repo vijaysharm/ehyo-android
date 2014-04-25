@@ -7,12 +7,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.ProjectBuild;
-import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultOptionSelectorFactory;
 import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectBuild;
-import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectManifest;
-import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
@@ -27,15 +24,7 @@ public class ServiceFactory {
 			}
 		});
 		
-		List<ProjectManifest> manifests = registry.getAllAndroidManifests(new Function<AndroidManifest, ProjectManifest>() {
-			@Override
-			public ProjectManifest apply(AndroidManifest manifest) {
-				return new DefaultProjectManifest(manifest, actions);
-			}
-		});
-		
 		return new Service(plugins, 
-						   manifests,
 						   builds,
 						   new DefaultOptionSelectorFactory());
 	}

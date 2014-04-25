@@ -5,22 +5,26 @@ import java.util.List;
 import java.util.Set;
 
 public class GradleBuild implements HasDocument {
-	public static GradleBuild read(File file) {
-		return new GradleBuild(file);
-	}
-	
 	private final File file;
 	private final String id;
-	private final GradleBuildDocument document;
+	private final Set<BuildType> buildTypes;
+	private final Set<Flavor> flavors;
+	private final Set<SourceSet> sourceSets;
+	private final List<Dependency> dependencies;
+	private final String project;
 	
-	public GradleBuild(File file) {
+	public GradleBuild(String projectName, File file, Set<BuildType> buildTypes, Set<Flavor> flavors, Set<SourceSet> sourceSets, List<Dependency> dependencies) {
+		this.project = projectName;
 		this.file = file;
+		this.buildTypes = buildTypes;
+		this.flavors = flavors;
+		this.sourceSets = sourceSets;
+		this.dependencies = dependencies;
 		this.id = file.getAbsolutePath();
-		this.document = GradleBuildDocument.read(this.file);
 	}
 
 	public String getProject() {
-		return file.getParentFile().getName();
+		return project;
 	}
 
 	@Override
@@ -33,31 +37,23 @@ public class GradleBuild implements HasDocument {
 	}
 	
 	public List<Dependency> getDependencies() {
-		return document.getDependencies();
+		return this.dependencies;
 	}
 	
-	/**
-	 * TODO: Should read the file and determine all build types (including ones
-	 * that are created with initWith)
-	 */
 	public Set<BuildType> getBuildTypes() {
-		return document.getBuildTypes();
+		return this.buildTypes;
 	}
 
-	/**
-	 * TODO: Should read the file and determine all build types (including ones
-	 * that are created with initWith)
-	 */
 	public Set<Flavor> getFlavors() {
-		return document.getFlavors();
+		return this.flavors;
+	}
+	
+	public Set<SourceSet> getSourceSets() {
+		return sourceSets;
 	}
 	
 	@Override
-	public GradleBuildDocument asDocument() {
-		return this.document.copy();
-	}
-
-	public Set<String> getDependencies(BuildType buildType, Flavor flavor) {
-		return document.getDependencies(buildType, flavor);
+	public String toString() {
+		return getProject() + ":" + getFile().getName();
 	}
 }

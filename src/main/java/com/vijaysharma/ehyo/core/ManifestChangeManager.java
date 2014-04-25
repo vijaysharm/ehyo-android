@@ -9,34 +9,37 @@ import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 
-public class ManifestChangeManager implements ChangeManager<PluginActions>{
-	private static final Function<AndroidManifest, String> MANIFEST_RENDERER = new Function<AndroidManifest, String>() {
+public class ManifestChangeManager implements ChangeManager<PluginActions> {
+	private static final Function<AndroidManifest, AndroidManifestDocument> FACTORY = new Function<AndroidManifest, AndroidManifestDocument>() {
 		@Override
-		public String apply(AndroidManifest manifest) {
-			return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
+		public AndroidManifestDocument apply(AndroidManifest input) {
+			return AndroidManifestDocument.read(input.getFile());
 		}
 	};
 	
 	// TODO: Replace with ObjectFactory
 	static class ManifestChangeManagerFactory {
 		public ManifestChangeManager create() {
-			return new ManifestChangeManager(new PatchApplier<AndroidManifest, AndroidManifestDocument>(MANIFEST_RENDERER));
+			return new ManifestChangeManager(new PatchApplier<AndroidManifest, AndroidManifestDocument>(FACTORY));
 		}
 	}
 	
 	private final PluginActionHandlerFactory factory;
 	private final PatchApplier<AndroidManifest, AndroidManifestDocument> patcher;
 	private final ImmutableMap.Builder<AndroidManifest, AndroidManifestDocument> changes;
+	private final Function<AndroidManifest, AndroidManifestDocument> producer;
 	
 	private ManifestChangeManager(PatchApplier<AndroidManifest, AndroidManifestDocument> patcher) {
-		this( patcher, new PluginActionHandlerFactory() );
+		this( patcher, new PluginActionHandlerFactory(), FACTORY );
 	}
 	
 	ManifestChangeManager(PatchApplier<AndroidManifest, AndroidManifestDocument> patcher,
-						  PluginActionHandlerFactory factory) {
+						  PluginActionHandlerFactory factory,
+						  Function<AndroidManifest, AndroidManifestDocument> producer) {
 		this.patcher = patcher;
 		this.factory = factory;
 		this.changes = ImmutableMap.builder();
+		this.producer = producer;
 	}
 	
 	@Override
@@ -45,7 +48,7 @@ public class ManifestChangeManager implements ChangeManager<PluginActions>{
 		Set<AndroidManifest> manifests = Sets.newHashSet(actions.getAddedPermissions().keySet());
 		manifests.addAll(actions.getRemovedPermissions().keySet());
 		for ( AndroidManifest manifest : manifests ) {
-			changes.put(manifest, manifest.asDocument());
+			changes.put(manifest, producer.apply(manifest));
 		}
 		
 		ManifestActionHandler handler = factory.createManifestActionHandler();

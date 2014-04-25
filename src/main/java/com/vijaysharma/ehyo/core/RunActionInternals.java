@@ -16,6 +16,7 @@ import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.BuildType;
 import com.vijaysharma.ehyo.core.models.Flavor;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
+import com.vijaysharma.ehyo.core.models.SourceSet;
 
 class RunActionInternals {
 
@@ -41,11 +42,6 @@ class RunActionInternals {
 		}
 		
 		@Override
-		public Set<String> getDependencies() {
-			return build.getDependencies(buildType, flavor);
-		}
-		
-		@Override
 		public void applyTemplate(String templatePath, List<TemplateParameters> parameters) {
 			throw new UnsupportedOperationException("applyTemplate!!");
 		}
@@ -65,7 +61,7 @@ class RunActionInternals {
 		@Override
 		public String toString() {
 			return Joiner.on(":").join(build.getProject(), 
-									   buildType.getCompileString(flavor));
+					   buildType.getCompileString(flavor));
 		}
 	}
 	
@@ -99,7 +95,7 @@ class RunActionInternals {
 		
 		@Override
 		public String toString() {
-			return manifest.getProject() + ":" + manifest.getSourceSet() + ":" + manifest.getFile().getName();
+			return manifest.toString();
 		}
 	}
 
@@ -147,6 +143,19 @@ class RunActionInternals {
 			}
 			
 			return buildtype.build();
+		}
+		
+		@Override
+		public Set<ProjectManifest> getManifests() {
+			ImmutableSet.Builder<ProjectManifest> manifests = ImmutableSet.builder();
+			
+			for ( SourceSet sourceSet : build.getSourceSets() ) {
+				for ( AndroidManifest manifest : sourceSet.getManifests() ) {
+					manifests.add(new DefaultProjectManifest(manifest, actions));
+				}
+			}
+				
+			return manifests.build();
 		}
 
 		private DefaultBuildConfiguration create(BuildType type, Flavor flavor) {

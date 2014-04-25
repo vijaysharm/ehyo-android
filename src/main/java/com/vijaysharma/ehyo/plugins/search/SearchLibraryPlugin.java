@@ -6,10 +6,8 @@ import java.util.List;
 
 import retrofit.RestAdapter;
 
-import com.google.common.collect.ImmutableList;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.Plugin;
-import com.vijaysharma.ehyo.api.ProjectBuild;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
@@ -48,7 +46,7 @@ public class SearchLibraryPlugin implements Plugin {
 	
 			Artifact first = artifacts[0];
 			
-			List<BuildConfiguration> buildConfigs = gather(service);
+			List<BuildConfiguration> buildConfigs = service.getBuildConfigurations();
 			OptionSelector<BuildConfiguration> configSelector = service.createSelector(BuildConfiguration.class);
 			List<BuildConfiguration> selectedBuildConfigs = configSelector.select(buildConfigs, false);
 
@@ -56,15 +54,6 @@ public class SearchLibraryPlugin implements Plugin {
 				config.addDependency(toProjectId(first));
 			}
 		}
-	}
-
-	private List<BuildConfiguration> gather(Service service) {
-		ImmutableList.Builder<BuildConfiguration> configs = ImmutableList.builder();
-		for( ProjectBuild build : service.getProjectBuilds() ) {
-			configs.addAll(build.getBuildConfigurations());
-		}
-
-		return configs.build();
 	}
 
 	private static String getLib(List<String> args) {

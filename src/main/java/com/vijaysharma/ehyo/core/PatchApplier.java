@@ -19,16 +19,16 @@ import difflib.InsertDelta;
 import difflib.Patch;
 
 public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
-	private final Function<T, String> renderer;
+	private final Function<T, K> factory;
 	private final FileWriter writer;
 	private final TextOutput out;
 	
-	public PatchApplier(Function<T, String> renderer) {
-		this(new FileWriter(), renderer, Output.out);
+	public PatchApplier(Function<T, K> factory) {
+		this(new FileWriter(), factory, Output.out);
 	}
 	
-	PatchApplier(FileWriter writer, Function<T, String> renderer, TextOutput out) {
-		this.renderer = renderer;
+	PatchApplier(FileWriter writer, Function<T, K> producer, TextOutput out) {
+		this.factory = producer;
 		this.writer = writer;
 		this.out = out;
 	}
@@ -36,7 +36,7 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	public void apply(Map<T, K> files, boolean dryrun) {
 		for ( Map.Entry<T, K> file : files.entrySet() ) {
 			try {
-				List<String> baseline = toListOfStrings(file.getKey().asDocument());
+				List<String> baseline = toListOfStrings(factory.apply(file.getKey()));
 				List<String> changed = toListOfStrings(file.getValue());
 				Patch diff = DiffUtils.diff(baseline, changed);
 				if ( diff.getDeltas().isEmpty() ) {
@@ -61,7 +61,7 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	
 	private void show(T item, List<String> baseline, Patch diff) throws IOException {
 		StringBuilder output = new StringBuilder();
-		output.append("Diff " + renderer.apply(item) + "\n");
+		output.append("Diff " + item.toString() + "\n");
 		for (Delta delta: diff.getDeltas()) {
 			printDelta(baseline, output, delta);
 		}
@@ -70,7 +70,7 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	}
 
 	private void save(T item, K modified) throws IOException {
-		out.print("Writing " + renderer.apply(item) + "... ");
+		out.print("Writing " + item.toString() + "... ");
 		List<String> changed = toListOfStrings(modified);
 		writer.write(item, changed);
 		out.println("done");
@@ -97,14 +97,14 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		int position = delta.getOriginal().getPosition();
 		
 		if (position > 0)
-			out.append( (position-1) + "  "  + baseline.get((position-1)) + "\n");
+			out.append((position-1) + "  "  + baseline.get((position-1)) + "\n");
 		
 		List<Object> revised = (List<Object>) delta.getOriginal().getLines();
 		for ( Object obj : revised )
-			out.append( (position++) + " -"  + obj + "\n");
+			out.append((position++) + " -"  + obj + "\n");
 		
 		if ( position < baseline.size() )
-			out.append( (position) + "  "  + baseline.get((position)) + "\n");		
+			out.append((position) + "  "  + baseline.get((position)) + "\n");		
 	}
 	
 	private static void printInsert(Delta delta, List<String> baseline, StringBuilder out) {
@@ -115,10 +115,10 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		
 		List<Object> revised = (List<Object>) delta.getRevised().getLines();
 		for ( Object obj : revised )
-			out.append( (position++) + " +"  + obj + "\n");
+			out.append((position++) + " +"  + obj + "\n");
 		
 		if ( position < baseline.size() )
-			out.append( (position) + "  "  + baseline.get((position)) + "\n");
+			out.append((position) + "  "  + baseline.get((position)) + "\n");
 	}
 
 	private static void printChange(Delta delta, List<String> baseline, StringBuilder out) {
@@ -129,15 +129,15 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 
 		List<Object> original = (List<Object>) delta.getOriginal().getLines();
 		for ( Object obj : original )
-			out.append( (position++) + " -"  + obj + "\n");
+			out.append((position++) + " -"  + obj + "\n");
 		
 		position = delta.getRevised().getPosition();
 		List<Object> revised = (List<Object>) delta.getRevised().getLines();
 		for ( Object obj : revised )
-			out.append( (position++) + " +"  + obj + "\n");
+			out.append((position++) + " +"  + obj + "\n");
 		
 		if ( position < baseline.size() )
-			out.append( (position) + "  "  + baseline.get((position)) + "\n");		
+			out.append((position) + "  "  + baseline.get((position)) + "\n");		
 	}
 	
 }

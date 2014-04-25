@@ -6,4 +6,5 @@ public interface ProjectBuild {
 	Set<String> getFlavors();
 	Set<String> getBuildTypes();
 	Set<BuildConfiguration> getBuildConfigurations();
+	Set<ProjectManifest> getManifests();
 }

@@ -22,4 +22,10 @@ public class Dependency {
 	public String getDependency() {
 		return dependency;
 	}
+
+	@Override
+	public String toString() {
+		return "Dependency [buildType=" + buildType + ", flavor=" + flavor
+				+ ", dependency=" + dependency + "]";
+	}
 }

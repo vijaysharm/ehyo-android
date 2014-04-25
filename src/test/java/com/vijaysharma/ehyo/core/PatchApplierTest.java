@@ -23,18 +23,18 @@ import com.vijaysharma.ehyo.core.models.AsListOfStrings;
 import com.vijaysharma.ehyo.core.models.HasDocument;
 
 public class PatchApplierTest {
-	private Function<HasDocument, String> renderer;
+	private Function<HasDocument, AsListOfStrings> factory;
 	private PatchApplier<HasDocument, AsListOfStrings> patcher;
 	private FileWriter writer;
 	private TextOutput out;
 	
 	@Before
 	public void before() {
-		renderer = mock(Function.class);
+		factory = mock(Function.class);
 		writer = mock(FileWriter.class);
 		out = mock(TextOutput.class);
 		
-		patcher = new PatchApplier<HasDocument, AsListOfStrings>(writer, renderer, out);
+		patcher = new PatchApplier<HasDocument, AsListOfStrings>(writer, factory, out);
 	}
 	
 	@Test
@@ -45,7 +45,7 @@ public class PatchApplierTest {
 		List<String> original = Lists.newArrayList();
 		List<String> modified = Lists.newArrayList();
 		
-		when(document.asDocument()).thenReturn(originalObject);
+		when(factory.apply(document)).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
 		
@@ -53,7 +53,7 @@ public class PatchApplierTest {
 		files.put(document, modifiedObject);
 		
 		patcher.apply(files, false);
-		verify(renderer, never()).apply(any(HasDocument.class));
+		verify(factory, times(1)).apply(any(HasDocument.class));
 		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
 		verify(out, never()).println(Mockito.anyString());
 	}
@@ -66,7 +66,7 @@ public class PatchApplierTest {
 		List<String> original = Lists.newArrayList();
 		List<String> modified = Lists.newArrayList();
 		
-		when(document.asDocument()).thenReturn(originalObject);
+		when(factory.apply(document)).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
 		
@@ -74,7 +74,7 @@ public class PatchApplierTest {
 		files.put(document, modifiedObject);
 		
 		patcher.apply(files, true);
-		verify(renderer, never()).apply(any(HasDocument.class));
+		verify(factory, times(1)).apply(any(HasDocument.class));
 		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
 		verify(out, never()).println(Mockito.anyString());
 	}
@@ -87,16 +87,16 @@ public class PatchApplierTest {
 		List<String> original = Lists.newArrayList();
 		List<String> modified = Lists.newArrayList("New Line");
 		
-		when(document.asDocument()).thenReturn(originalObject);
+		when(factory.apply(document)).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
-		when(renderer.apply(document)).thenReturn("test");
+		when(document.toString()).thenReturn("test");
 		
 		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
 		files.put(document, modifiedObject);
 		
 		patcher.apply(files, true);
-		verify(renderer, times(1)).apply(document);
+		verify(factory, times(1)).apply(document);
 		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
 		verify(out, times(1)).print(
 				"Diff test\n"+ 
@@ -111,16 +111,16 @@ public class PatchApplierTest {
 		List<String> original = Lists.newArrayList();
 		List<String> modified = Lists.newArrayList("New Line");
 		
-		when(document.asDocument()).thenReturn(originalObject);
+		when(factory.apply(document)).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
-		when(renderer.apply(document)).thenReturn("test");
+		when(document.toString()).thenReturn("test");
 		
 		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
 		files.put(document, modifiedObject);
 		
 		patcher.apply(files, false);
-		verify(renderer, times(1)).apply(document);
+		verify(factory, times(1)).apply(document);
 		verify(writer, times(1)).write(document, modified);
 		
 		verify(out, times(1)).print("Writing test... ");
