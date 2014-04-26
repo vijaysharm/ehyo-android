@@ -127,9 +127,10 @@ class DefaultTemplate implements Template {
 	}
 	
 	static interface RecipeDocumentCallback {
-		void onInstantiate(List<String> result, File to);
-		void onMerge(List<String> result, File to);
-		void onCopy(List<String> result, File to);
+		void onInstantiate(File from, List<String> result, File to);
+		void onMerge(File from, List<String> result, File to);
+		void onManifestMerge(File from, Document result, File to);
+		void onCopy(File from, List<String> result, File to);
 		void onDependency(String dependency);
 	}
 	
@@ -152,16 +153,23 @@ class DefaultTemplate implements Template {
 					String from = fromPath(child.getAttributeValue("from"));
 					String to = child.getAttributeValue("to");
 					freemarker.template.Template template = get(config, from);
-					List<String> result = asListOfStrings(template, properties);
+					File toFile = to == null ? null : new File( to );
+					File fromFile = new File( from );
 					
-					callback.onMerge( result, new File( to ) );
+					if ( from.contains("AndroidManifest.xml") ) {
+						Document result = asDocument(template, properties);
+						callback.onManifestMerge(fromFile, result, toFile);
+					} else {
+						List<String> result = asListOfStrings(template, properties);
+						callback.onMerge(fromFile, result, toFile);
+					}
 				} else if ( "instantiate".equals( child.getName() ) ) {
 					String from = fromPath(child.getAttributeValue("from"));
 					String to = child.getAttributeValue("to");
 					freemarker.template.Template template = get(config, from);
 					List<String> result = asListOfStrings(template, properties);
 					
-					callback.onInstantiate( result, new File( to ) );
+					callback.onInstantiate( new File(from), result, to == null ? null : new File( to ) );
 				} else if ( "dependency".equals( child.getName() ) ) {
 					String dependency = child.getAttributeValue("mavenUrl");
 					callback.onDependency(dependency);
@@ -170,16 +178,12 @@ class DefaultTemplate implements Template {
 					List<String> result = EFileUtil.readLines(new File(from));
 					String to = child.getAttributeValue("to");
 					
-					callback.onCopy( result, new File( to ) );
+					callback.onCopy( new File(from), result, to == null ? null : new File( to ) );
 				} 
 			}
 		}
 
 		private String fromPath(String path) {
-			// TODO: This isn't right
-			if ( path == null )
-				return null;
-
 			String separator = path.startsWith("/") ? "" : File.separator;
 			return Joiner.on(separator).join("root", path);
 		}
@@ -222,17 +226,6 @@ class DefaultTemplate implements Template {
 		
 		public DocumentHelper(Document document) {
 			this.document = document;
-		}
-		
-		public String getValue(String section, String key) {
-			Element root = document.getRootElement();
-			
-			for ( Element element : root.getChildren(section) ) {
-				if (key.equals(element.getAttributeValue("id")))
-					return element.getAttributeValue("value");
-			}
-			
-			return null;
 		}
 		
 		public String getAttribute(String section, String attribute) {

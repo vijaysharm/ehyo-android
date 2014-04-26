@@ -51,26 +51,5 @@ public class ManifestActionHandler implements PluginActionHandler<AndroidManifes
 		
 		if ( !toBeRemoved.isEmpty() )
 			doc.removePermission(toBeRemoved);
-		
-//		for ( String permission : remove ) {
-//			if ( all.contains(permission) ) {
-//				doc.removePermission(permission);
-//			} else {
-//				out.println( permission + " does not exist in manifest" );
-//			}
-//			
-//			add.remove(permission);
-//		}
-//		
-//		for ( String permission : all ) {
-//			if ( add.contains(permission) ) {
-//				out.println( permission + " already exists in manifest" );
-//				add.remove(permission);
-//			}
-//		}
-//		
-//		for (String permission : add) {
-//			doc.addPermission(permission);
-//		}
 	}
 }

@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jdom2.Document;
+
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildType;
@@ -17,6 +18,7 @@ import com.vijaysharma.ehyo.core.DefaultTemplate.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.Project;
@@ -31,7 +33,8 @@ public class PluginActions {
 	private final ImmutableMultimap.Builder<GradleBuild, Dependency> addedDependencies = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<GradleBuild, Dependency> removedDependencies = ImmutableMultimap.builder();
 	
-	private final ImmutableSet.Builder<TemplateAction> templates = ImmutableSet.builder();
+	private final ImmutableMultimap.Builder<File, List<String>> mergedFiles = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<File, List<String>> createdFiles = ImmutableMultimap.builder();
 	
 	public void addDependency(GradleBuild build, BuildType type, Flavor flavor, String projectId) {
 		Dependency dependency = new Dependency(type, flavor, projectId);
@@ -67,12 +70,27 @@ public class PluginActions {
 		return removedPermissions.build();
 	}
 	
+	public Multimap<File, List<String>> getCreatedFiles() {
+		return createdFiles.build();
+	}
+	
+	public Multimap<File, List<String>> getMergedFiles() {
+		return mergedFiles.build();
+	}
+	
 	public boolean hasBuildChanges() {
-		return  (! addedDependencies.build().isEmpty()) || (! removedDependencies.build().isEmpty() );
+		return  (! addedDependencies.build().isEmpty()) || 
+				(! removedDependencies.build().isEmpty());
 	}
 	
 	public boolean hasManifestChanges() {
-		return  (! addedPermissions.build().isEmpty()) || (! removedPermissions.build().isEmpty() );
+		return  (! addedPermissions.build().isEmpty()) || 
+				(! removedPermissions.build().isEmpty());
+	}
+
+	public boolean hasFileChanges() {
+		return  (! mergedFiles.build().isEmpty()) ||
+				(! createdFiles.build().isEmpty());
 	}
 
 	public BuildActions getBuildActions(final GradleBuild key) {
@@ -108,7 +126,7 @@ public class PluginActions {
 	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateParameters> parameters, ProjectRegistry registry) {
 		Project project = registry.getProject(sourceSet.getProject());
 		final GradleBuild build = project.getBuild();
-		AndroidManifest manifest = sourceSet.getManifests();
+		final AndroidManifest manifest = sourceSet.getManifests();
 		
 		final Map<String, Object> mapping = Maps.newHashMap();
 		for ( TemplateParameters param : parameters ) {
@@ -128,24 +146,40 @@ public class PluginActions {
 
 		template.apply(mapping, new RecipeDocumentCallback() {
 			@Override
-			public void onInstantiate(List<String> result, File to) {
-				System.out.println("instantiate");
-				System.out.println(result);
-				System.out.println("to: " + to + "\n");
+			public void onInstantiate(File from, List<String> result, File to) {
+//				System.out.println("instantiate from: " + from);
+//				System.out.println(result);
+//				System.out.println("to: " + to + "\n");
+				createdFiles.put(to, result);
 			}
 
 			@Override
-			public void onMerge(List<String> result, File to) {				
-				System.out.println("merge");
-				System.out.println(result);				
-				System.out.println("to: " + to + "\n");
+			public void onManifestMerge(File from, Document result, File to) {
+				if ( ! manifest.getFile().equals(to) )
+					throw new IllegalStateException("Expected " + to + " to be " + manifest.getFile());
+				AndroidManifestDocument manifestDocument = new AndroidManifestDocument(result);
+				
+				Set<String> permissions = manifestDocument.getPermissions();
+				for ( String permission : permissions )
+					addPermission(manifest, permission);
+				
+				
+			}
+			
+			@Override
+			public void onMerge(File from, List<String> result, File to) {
+//				System.out.println("merge from: " + from);
+//				System.out.println(result);				
+//				System.out.println("to: " + to + "\n");
+				mergedFiles.put(to, result);
 			}
 
 			@Override
-			public void onCopy(List<String> result, File to) {
-				System.out.println("copy");
-				System.out.println(result);
-				System.out.println("to: " + to + "\n");
+			public void onCopy(File from, List<String> result, File to) {
+//				System.out.println("copy from: " + from);
+//				System.out.println(result);
+//				System.out.println("to: " + to + "\n");
+				createdFiles.put(to, result);
 			}
 
 			@Override
@@ -155,13 +189,6 @@ public class PluginActions {
 				addDependency(build, BuildType.COMPILE, null, dependency);
 			}
 		});
-	}
-
-	public Set<TemplateAction> getTemplates() {
-		return templates.build();
-	}
-	public boolean hasTemplates() {
-		return ! templates.build().isEmpty();
 	}
 	
 	static class TemplateAction {

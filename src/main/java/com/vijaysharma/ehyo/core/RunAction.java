@@ -91,6 +91,12 @@ public class RunAction implements Action {
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}
+		
+		if ( actions.hasFileChanges() ) {
+			FileChangeManager changes = new FileChangeManager();
+			changes.apply(actions);
+			changes.commit(dryrun);
+		}
 	}
 	
 	private Plugin find(List<String> args) {

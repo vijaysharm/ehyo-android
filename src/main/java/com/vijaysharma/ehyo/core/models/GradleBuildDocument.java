@@ -14,14 +14,12 @@ import com.vijaysharma.ehyo.api.Flavor;
 
 public class GradleBuildDocument implements AsListOfStrings {
 	public static GradleBuildDocument read(File file) {
-		return new GradleBuildDocument(readLines(file), file);
+		return new GradleBuildDocument(readLines(file));
 	}
 	
 	private final GradleBuildDocumentModel model;
-	private final File file;
 	
-	private GradleBuildDocument(List<String> lines, File file) {
-		this.file = file;
+	private GradleBuildDocument(List<String> lines) {
 		this.model = new GradleBuildDocumentModel(lines);
 	}
 	
@@ -144,9 +142,5 @@ public class GradleBuildDocument implements AsListOfStrings {
 		dependency.append(compileString).append(" \'" + lib.getDependency() + "\'");
 
 		return dependency.toString();
-	}
-	
-	public GradleBuildDocument copy() {
-		return GradleBuildDocument.read(file);
 	}
 }

@@ -18,13 +18,18 @@ import org.jdom2.output.XMLOutputter;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Application;
+import com.vijaysharma.ehyo.core.models.ManifestTags.MetaData;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Receiver;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Service;
 import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 public class AndroidManifestDocument implements AsListOfStrings {
 	public static AndroidManifestDocument read(File file) {
 		try {
 			SAXBuilder builder = new SAXBuilder();
-			return new AndroidManifestDocument(builder.build(file), file);
+			return new AndroidManifestDocument(builder.build(file));
 		} catch (IOException ioe) {
 			throw new UncheckedIoException(ioe);
 		} catch (JDOMException jde) {
@@ -34,11 +39,9 @@ public class AndroidManifestDocument implements AsListOfStrings {
 
 	private static final Namespace ANDROID_NAMESPACE = Namespace.getNamespace("android", "http://schemas.android.com/apk/res/android");
 	private final Document document;
-	private final File file;
 	
-	public AndroidManifestDocument(Document document, File file) {
+	public AndroidManifestDocument(Document document) {
 		this.document = document;
-		this.file = file;
 	}
 
 	@Override
@@ -69,32 +72,71 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		return permissions.build();
 	}
 	
-	public List<String> getActivities() {
-		ImmutableList.Builder<String> activities = ImmutableList.builder();
+	public Application getApplication() {
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+
+		return Application.read(application, ANDROID_NAMESPACE);
+	}
+	
+	public Set<String> getLibraries() {
+		ImmutableSet.Builder<String> useslibrary = ImmutableSet.builder();
+		Element root = document.getRootElement();
+		for (Element target : root.getChildren("uses-library")) {
+			useslibrary.add(target.getAttributeValue("name", ANDROID_NAMESPACE));
+		}
+		
+		return useslibrary.build();
+	}
+	
+	public List<Receiver> getReceivers() {
+		ImmutableList.Builder<Receiver> receivers = ImmutableList.builder();
 		Element root = document.getRootElement();
 		Element application = root.getChild("application");
 		for (Element target : application.getChildren("activity")) {
-			activities.add(target.getAttributeValue("name", ANDROID_NAMESPACE));
+			receivers.add(Receiver.read(target, ANDROID_NAMESPACE));
+		}
+		
+		return receivers.build();
+	}
+	
+	public List<Activity> getActivities() {
+		ImmutableList.Builder<Activity> activities = ImmutableList.builder();
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+		for (Element target : application.getChildren("activity")) {
+			activities.add(Activity.read(target, ANDROID_NAMESPACE));
 		}
 		
 		return activities.build();
 	}
 	
-	public List<String> getServices() {
-		ImmutableList.Builder<String> activities = ImmutableList.builder();
+	public List<MetaData> getMetadata() {
+		ImmutableList.Builder<MetaData> metadata = ImmutableList.builder();
 		Element root = document.getRootElement();
 		Element application = root.getChild("application");
-		for (Element target : application.getChildren("service")) {
-			activities.add(target.getAttributeValue("name", ANDROID_NAMESPACE));
+		for (Element target : application.getChildren("activity")) {
+			metadata.add(MetaData.read(target, ANDROID_NAMESPACE));
 		}
 		
-		return activities.build();
+		return metadata.build();
+	}
+	
+	public List<Service> getServices() {
+		ImmutableList.Builder<Service> services = ImmutableList.builder();
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+		for (Element target : application.getChildren("activity")) {
+			services.add(Service.read(target, ANDROID_NAMESPACE));
+		}
+		
+		return services.build();
 	}
 	
 	public void addPermission(Set<String> permissions) {
 		for ( String permission : permissions ) {
 			Element usesPermission = new Element("uses-permission")
-			.setAttribute("name", permission, ANDROID_NAMESPACE);
+				.setAttribute("name", permission, ANDROID_NAMESPACE);
 
 			document.getRootElement().addContent(0, usesPermission);			
 		}
@@ -107,9 +149,5 @@ public class AndroidManifestDocument implements AsListOfStrings {
 				root.removeContent(target);
 			}
 		}	
-	}
-
-	public AndroidManifestDocument copy() {
-		return AndroidManifestDocument.read(this.file);
 	}
 }

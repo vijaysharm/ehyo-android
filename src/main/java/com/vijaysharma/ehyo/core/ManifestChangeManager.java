@@ -44,9 +44,9 @@ public class ManifestChangeManager implements ChangeManager<PluginActions> {
 	
 	@Override
 	public void apply(PluginActions actions) {
-		// TODO: You have to check manifest IDs from ALL points that can be modified
 		Set<AndroidManifest> manifests = Sets.newHashSet(actions.getAddedPermissions().keySet());
 		manifests.addAll(actions.getRemovedPermissions().keySet());
+		
 		for ( AndroidManifest manifest : manifests ) {
 			changes.put(manifest, producer.apply(manifest));
 		}
