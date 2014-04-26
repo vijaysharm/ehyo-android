@@ -15,19 +15,19 @@ import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class ServiceFactory {
-	public Service create(PluginLoader pluginLoader, ProjectRegistry registry, final PluginActions actions) {
+	public Service create(PluginLoader pluginLoader, final ProjectRegistry registry, final PluginActions actions) {
 		Collection<Plugin> plugins = pluginLoader.transform(Functions.<Plugin>identity());
 		
 		List<ProjectBuild> builds = registry.getAllGradleBuilds(new Function<GradleBuild, ProjectBuild>() {
 			@Override
 			public ProjectBuild apply(GradleBuild build) {
-				return new DefaultProjectBuild(build, actions);
+				return new DefaultProjectBuild(build, actions, registry);
 			}
 		});
 		
 		return new Service(plugins, 
 						   builds,
-						   new DefaultTemplateFactory(),
+						   new DefaultTemplateFactory(actions),
 						   new DefaultOptionSelectorFactory());
 	}
 }

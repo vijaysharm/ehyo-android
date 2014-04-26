@@ -19,6 +19,7 @@ import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 import com.vijaysharma.ehyo.core.models.SourceSet;
 
 class RunActionInternals {
@@ -100,10 +101,12 @@ class RunActionInternals {
 	static class DefaultProjectBuild implements ProjectBuild {
 		private final GradleBuild build;
 		private final PluginActions actions;
+		private final ProjectRegistry registry;
 		
-		public DefaultProjectBuild(GradleBuild build, PluginActions actions) {
+		public DefaultProjectBuild(GradleBuild build, PluginActions actions, ProjectRegistry registry) {
 			this.build = build;
 			this.actions = actions;
+			this.registry = registry;
 		}
 		
 		public GradleBuild getBuild() {
@@ -143,7 +146,7 @@ class RunActionInternals {
 				// TODO: I'm only doing this filter so that I filter out any
 				// source sets that don't have manifests
 				if ( sourceSet.getManifests() != null ) {
-					sourceSets.add(new DefaultProjectSourceSet(sourceSet, actions));
+					sourceSets.add(new DefaultProjectSourceSet(sourceSet, actions, registry));
 				}
 			}
 			
@@ -173,16 +176,18 @@ class RunActionInternals {
 	static class DefaultProjectSourceSet implements ProjectSourceSet {
 		private final PluginActions actions;
 		private final SourceSet sourceSet;
+		private final ProjectRegistry registry;
 
-		public DefaultProjectSourceSet(SourceSet sourceSet, PluginActions actions) {
+		public DefaultProjectSourceSet(SourceSet sourceSet, PluginActions actions, ProjectRegistry registry) {
 			this.sourceSet = sourceSet;
 			this.actions = actions;
+			this.registry = registry;
 		}
 		
 		@Override
 		public void applyTemplate(Template template, List<TemplateParameters> parameters) {
-			DefaultTemplate t = (DefaultTemplate) template;
-			actions.applyTemplate(t, sourceSet, parameters);
+			DefaultTemplate tmpl = (DefaultTemplate) template;
+			actions.applyTemplate(tmpl, sourceSet, parameters, registry);
 		}
 		
 		@Override
@@ -192,9 +197,15 @@ class RunActionInternals {
 	}
 	
 	static class DefaultTemplateFactory implements TemplateFactory {
+		private final PluginActions actions;
+		
+		public DefaultTemplateFactory(PluginActions actions) {
+			this.actions = actions;
+		}
+		
 		@Override
 		public Template create(String path) {
-			return new DefaultTemplate(path);
+			return new DefaultTemplate(path, actions);
 		}
 	}
 	

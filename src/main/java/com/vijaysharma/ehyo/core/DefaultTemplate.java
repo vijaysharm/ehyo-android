@@ -28,6 +28,7 @@ import com.vijaysharma.ehyo.core.TemplateMethods.EscapeXmlAttribute;
 import com.vijaysharma.ehyo.core.TemplateMethods.EscapeXmlString;
 import com.vijaysharma.ehyo.core.TemplateMethods.ExtractLetters;
 import com.vijaysharma.ehyo.core.TemplateMethods.SlashedPackageName;
+import com.vijaysharma.ehyo.core.utils.EFileUtil;
 import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 import freemarker.template.Configuration;
@@ -38,14 +39,16 @@ import freemarker.template.TemplateExceptionHandler;
 class DefaultTemplate implements Template {
 	private final String path;
 	private final Document templateDocument;
-
+	private final PluginActions actions;
+	
 	// TODO: This should probably be moved to a factory
-	public DefaultTemplate(String path) {
+	public DefaultTemplate(String path, PluginActions actions) {
 		this.path = path;
 		URL templateRoot = DefaultTemplate.class.getResource(path);
 		File templateFileRoot = new File(templateRoot.getFile());
 		File templateStartingPoint = new File(templateFileRoot, "template.xml");
 		this.templateDocument = load(templateStartingPoint);		
+		this.actions = actions;
 	}
 	
 	/**
@@ -57,7 +60,7 @@ class DefaultTemplate implements Template {
 		return getParameters(templateDocument);
 	}
 
-	public void getActions(Map<String, Object> properties) {
+	public void apply(Map<String, Object> properties, RecipeDocumentCallback callback) {
 		final ImmutableMap.Builder<String, Object> mapping = ImmutableMap.builder();
 		
 		mapping.putAll(properties); 
@@ -73,55 +76,17 @@ class DefaultTemplate implements Template {
 		final Configuration config = config( DefaultTemplate.class, path );
 		freemarker.template.Template globalTemplate = get(config, model.getAttribute("globals", "file"));
 		Document globalDocument = asDocument(globalTemplate, mapping.build());
-		DocumentHelper globalModel = new DocumentHelper(globalDocument);
 		
-//		globalModel.populate(mapping);
 		for ( Element element : globalDocument.getRootElement().getChildren("global") ) {
 			mapping.put(element.getAttributeValue("id"),
 						element.getAttributeValue("value"));
 		}
 		
-		// TODO: This variable isn't always defined in the global, 
-		//		 There needs to be a default value associated
-		if ( !mapping.build().containsKey("manifestOut") ) {
-			mapping.put("manifestOut", globalModel.getValue("global", "manifestOut"));
-		}
-		
 		freemarker.template.Template recipeTemplate = get(config, model.getAttribute("execute", "file"));
 		Document recipeDocument = asDocument(recipeTemplate, mapping.build());
-		RecipeDocumentModel recipeModel = new RecipeDocumentModel(recipeDocument);
+		RecipeDocumentModel recipeModel = new RecipeDocumentModel(recipeDocument, config, mapping.build());
 
-		recipeModel.read( new RecipeDocumentCallback() {
-			@Override
-			public void onInstantiate(String from, String to) {
-				freemarker.template.Template template = get(config, from);
-				List<String> result = asListOfStrings(template, mapping.build());
-				
-				System.out.println("instantiate");
-				System.out.println(result);
-				System.out.println("to: " + to + "\n");
-			}
-
-			@Override
-			public void onMerge(String from, String to) {
-				freemarker.template.Template template = get(config, from);
-				List<String> result = asListOfStrings(template, mapping.build());
-				
-				System.out.println("merge");
-				System.out.println(result);				
-				System.out.println("to: " + to + "\n");
-			}
-
-			@Override
-			public void onCopy(String from, String to) {
-				System.out.println("copy\n" + from + " to " + to + "\n");
-			}
-
-			@Override
-			public void onDependency(String dependency) {
-				System.out.println("dependency\n" + dependency + "\n");
-			}
-		});		
+		recipeModel.read( callback );
 	}
 
 	private static void dump(freemarker.template.Template template, Map<String, Object> mapping) {
@@ -161,40 +126,51 @@ class DefaultTemplate implements Template {
 		}
 	}
 	
-	private static interface RecipeDocumentCallback {
-		void onInstantiate(String from, String to);
-		void onMerge(String from, String to);
-		void onCopy(String from, String to);
+	static interface RecipeDocumentCallback {
+		void onInstantiate(List<String> result, File to);
+		void onMerge(List<String> result, File to);
+		void onCopy(List<String> result, File to);
 		void onDependency(String dependency);
 	}
 	
 	private static class RecipeDocumentModel {
 		private final Document document;
-
-		public RecipeDocumentModel(Document document) {
+		private final Configuration config;
+		private final Map<String, Object> properties;
+		
+		public RecipeDocumentModel(Document document, Configuration config, Map<String, Object> properties) {
 			this.document = document;
+			this.config = config;
+			this.properties = properties;
 		}
 		
 		public void read( RecipeDocumentCallback callback ) {
 			Element root = document.getRootElement();
 			
-			// TODO: Should add root as part of path
 			for ( Element child : root.getChildren() ) {
 				if ( "merge".equals( child.getName() ) ) {
 					String from = fromPath(child.getAttributeValue("from"));
 					String to = child.getAttributeValue("to");
-					callback.onMerge( from, to );
+					freemarker.template.Template template = get(config, from);
+					List<String> result = asListOfStrings(template, properties);
+					
+					callback.onMerge( result, new File( to ) );
 				} else if ( "instantiate".equals( child.getName() ) ) {
 					String from = fromPath(child.getAttributeValue("from"));
 					String to = child.getAttributeValue("to");
-					callback.onInstantiate( from, to );
+					freemarker.template.Template template = get(config, from);
+					List<String> result = asListOfStrings(template, properties);
+					
+					callback.onInstantiate( result, new File( to ) );
 				} else if ( "dependency".equals( child.getName() ) ) {
 					String dependency = child.getAttributeValue("mavenUrl");
 					callback.onDependency(dependency);
 				} else if ( "copy".equals( child.getName() ) ) {
 					String from = fromPath(child.getAttributeValue("from"));
+					List<String> result = EFileUtil.readLines(new File(from));
 					String to = child.getAttributeValue("to");
-					callback.onCopy( from, to );					
+					
+					callback.onCopy( result, new File( to ) );
 				} 
 			}
 		}

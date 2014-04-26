@@ -1,20 +1,26 @@
 package com.vijaysharma.ehyo.core;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.TemplateParameters;
+import com.vijaysharma.ehyo.core.DefaultTemplate.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
+import com.vijaysharma.ehyo.core.models.Project;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 import com.vijaysharma.ehyo.core.models.SourceSet;
 
 // TODO: Delegate component action changes to smaller classes
@@ -97,8 +103,58 @@ public class PluginActions {
 		};
 	}
 
-	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateParameters> parameters) {
-		templates.add(new TemplateAction(template, sourceSet, parameters));
+	// TODO: Can't say I'm a fan of this API... 4 arguments??
+	// TODO: Need to read in the buildApi and the minApiLevel from the build
+	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateParameters> parameters, ProjectRegistry registry) {
+		Project project = registry.getProject(sourceSet.getProject());
+		final GradleBuild build = project.getBuild();
+		AndroidManifest manifest = sourceSet.getManifests();
+		
+		final Map<String, Object> mapping = Maps.newHashMap();
+		for ( TemplateParameters param : parameters ) {
+			mapping.put(param.getId(), param.getDefaultValue());
+		}
+		
+		// TODO: This might be acceptable until ehyo supports creating new projects
+		mapping.put("isNewProject", false);
+		mapping.put("buildApi", 16);
+		mapping.put("minApiLevel", 16);
+		
+		mapping.put("manifestDir", manifest.getFile().getParentFile().getAbsolutePath());
+		mapping.put("manifestOut", manifest.getFile().getParentFile().getAbsolutePath());
+		mapping.put("srcDir", manifest.getSourceDirectory().getAbsolutePath());
+		mapping.put("resDir", manifest.getResourceDirectory().getAbsolutePath());
+		mapping.put("packageName", manifest.getPackageName());
+
+		template.apply(mapping, new RecipeDocumentCallback() {
+			@Override
+			public void onInstantiate(List<String> result, File to) {
+				System.out.println("instantiate");
+				System.out.println(result);
+				System.out.println("to: " + to + "\n");
+			}
+
+			@Override
+			public void onMerge(List<String> result, File to) {				
+				System.out.println("merge");
+				System.out.println(result);				
+				System.out.println("to: " + to + "\n");
+			}
+
+			@Override
+			public void onCopy(List<String> result, File to) {
+				System.out.println("copy");
+				System.out.println(result);
+				System.out.println("to: " + to + "\n");
+			}
+
+			@Override
+			public void onDependency(String dependency) {
+				// TODO: Need a way to determine which is the best build
+				// configuration from the source set.
+				addDependency(build, BuildType.COMPILE, null, dependency);
+			}
+		});
 	}
 
 	public Set<TemplateAction> getTemplates() {

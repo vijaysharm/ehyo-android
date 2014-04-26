@@ -23,7 +23,7 @@ public class AndroidTemplates implements Plugin {
 		OptionSelector<ProjectSourceSet> configSelector = service.createSelector(ProjectSourceSet.class);
 		List<ProjectSourceSet> selectedBuildConfigs = configSelector.select(sourceSets, false);
 
-		String templatePath = "/templates/other/Service";
+		String templatePath = "/templates/other/PlusOneFragment";
 		Template template = service.loadTemplate(templatePath);
 		List<TemplateParameters> parameters = template.loadTemplateParameters();
 		

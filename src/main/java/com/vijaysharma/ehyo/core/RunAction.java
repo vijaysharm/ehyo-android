@@ -91,12 +91,6 @@ public class RunAction implements Action {
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}
-		
-		if ( actions.hasTemplates() ) {
-			DefaultChangeManager changes = new DefaultChangeManager(registry);
-			changes.apply(actions);
-			changes.commit(dryrun);
-		}
 	}
 	
 	private Plugin find(List<String> args) {
