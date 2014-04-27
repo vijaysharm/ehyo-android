@@ -80,4 +80,5 @@ TODO
 ++ This was seen in the Muzei Gradle build
 ++ compile ('de.greenrobot:eventbus:2.2.0') { exclude group:'com.google.android', module: 'support-v4' // already included below }
 ++ Current model will think its a context
-
++ There's a bug with the diff: 
+++ the line below the added line is incorrect, it shows the line after that.

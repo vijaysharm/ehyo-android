@@ -93,17 +93,30 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		ImmutableList.Builder<Receiver> receivers = ImmutableList.builder();
 		Element root = document.getRootElement();
 		Element application = root.getChild("application");
-		for (Element target : application.getChildren("activity")) {
+		if ( application == null )
+			return receivers.build();
+
+		for (Element target : application.getChildren("receiver")) {
 			receivers.add(Receiver.read(target, ANDROID_NAMESPACE));
 		}
 		
 		return receivers.build();
 	}
 	
+	public void addReceiver(Receiver receiver) {
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+		Element element = Receiver.create(receiver, ANDROID_NAMESPACE);
+		application.addContent(element);
+	}
+	
 	public List<Activity> getActivities() {
 		ImmutableList.Builder<Activity> activities = ImmutableList.builder();
 		Element root = document.getRootElement();
 		Element application = root.getChild("application");
+		if ( application == null )
+			return activities.build();
+		
 		for (Element target : application.getChildren("activity")) {
 			activities.add(Activity.read(target, ANDROID_NAMESPACE));
 		}
@@ -111,10 +124,21 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		return activities.build();
 	}
 	
+	public void addActivity(Activity activity) {
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+		Element element = Activity.create(activity, ANDROID_NAMESPACE);
+		application.addContent(element);
+	}
+	
 	public List<MetaData> getMetadata() {
 		ImmutableList.Builder<MetaData> metadata = ImmutableList.builder();
 		Element root = document.getRootElement();
 		Element application = root.getChild("application");
+		
+		if ( application == null )
+			return metadata.build();
+
 		for (Element target : application.getChildren("activity")) {
 			metadata.add(MetaData.read(target, ANDROID_NAMESPACE));
 		}
@@ -126,13 +150,24 @@ public class AndroidManifestDocument implements AsListOfStrings {
 		ImmutableList.Builder<Service> services = ImmutableList.builder();
 		Element root = document.getRootElement();
 		Element application = root.getChild("application");
-		for (Element target : application.getChildren("activity")) {
+		
+		if ( application == null )
+			return services.build();
+
+		for (Element target : application.getChildren("service")) {
 			services.add(Service.read(target, ANDROID_NAMESPACE));
 		}
 		
 		return services.build();
 	}
 	
+	public void addService(Service service) {
+		Element root = document.getRootElement();
+		Element application = root.getChild("application");
+		Element element = Service.create(service, ANDROID_NAMESPACE);
+		application.addContent(element);
+	}
+
 	public void addPermission(Set<String> permissions) {
 		for ( String permission : permissions ) {
 			Element usesPermission = new Element("uses-permission")

@@ -11,6 +11,7 @@ import org.jdom2.Document;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.TemplateParameters;
@@ -21,6 +22,9 @@ import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Receiver;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Service;
 import com.vijaysharma.ehyo.core.models.Project;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 import com.vijaysharma.ehyo.core.models.SourceSet;
@@ -29,6 +33,9 @@ import com.vijaysharma.ehyo.core.models.SourceSet;
 public class PluginActions {
 	private final ImmutableMultimap.Builder<AndroidManifest, String> addedPermissions = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<AndroidManifest, String> removedPermissions = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<AndroidManifest, Activity> addedActivities = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<AndroidManifest, Service> addedServices = ImmutableMultimap.builder();
+	private final ImmutableMultimap.Builder<AndroidManifest, Receiver> addedReceivers = ImmutableMultimap.builder();
 	
 	private final ImmutableMultimap.Builder<GradleBuild, Dependency> addedDependencies = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<GradleBuild, Dependency> removedDependencies = ImmutableMultimap.builder();
@@ -70,6 +77,27 @@ public class PluginActions {
 		return removedPermissions.build();
 	}
 	
+	public void addActivity(AndroidManifest manifest, Activity activity) {
+		addedActivities.put(manifest, activity);
+	}
+	public Multimap<AndroidManifest, Activity> getAddedActivities() {
+		return addedActivities.build();
+	}
+	
+	public void addService(AndroidManifest manifest, Service service) {
+		addedServices.put(manifest, service);
+	}
+	public Multimap<AndroidManifest, Service> getAddedServices() {
+		return addedServices.build();
+	}
+	
+	public void addReceiver(AndroidManifest manifest, Receiver receiver) {
+		addedReceivers.put(manifest, receiver);
+	}
+	public Multimap<AndroidManifest, Receiver> getAddedReceivers() {
+		return addedReceivers.build();
+	}
+	
 	public Multimap<File, List<String>> getCreatedFiles() {
 		return createdFiles.build();
 	}
@@ -85,7 +113,20 @@ public class PluginActions {
 	
 	public boolean hasManifestChanges() {
 		return  (! addedPermissions.build().isEmpty()) || 
-				(! removedPermissions.build().isEmpty());
+				(! removedPermissions.build().isEmpty()) ||
+				(! addedActivities.build().isEmpty()) ||
+				(! addedServices.build().isEmpty()) ||
+				(! addedReceivers.build().isEmpty());
+	}
+	
+	public Set<AndroidManifest> getManifests() {
+		Set<AndroidManifest> manifests = Sets.newHashSet(getAddedPermissions().keySet());
+		manifests.addAll(getRemovedPermissions().keySet());
+		manifests.addAll(getAddedActivities().keySet());
+		manifests.addAll(getAddedServices().keySet());
+		manifests.addAll(getAddedReceivers().keySet());
+		
+		return manifests;
 	}
 
 	public boolean hasFileChanges() {
@@ -117,6 +158,21 @@ public class PluginActions {
 			@Override
 			public Collection<String> getRemovedPermissions() {
 				return removedPermissions.build().get(key);
+			}
+			
+			@Override
+			public Collection<Activity> getAddedActivities() {
+				return addedActivities.build().get(key);
+			}
+
+			@Override
+			public Collection<Service> getAddedServices() {
+				return addedServices.build().get(key);
+			}
+
+			@Override
+			public Collection<Receiver> getAddedReceivers() {
+				return addedReceivers.build().get(key);
 			}
 		};
 	}
@@ -163,7 +219,18 @@ public class PluginActions {
 				for ( String permission : permissions )
 					addPermission(manifest, permission);
 				
+				List<Activity> activities = manifestDocument.getActivities();
+				for ( Activity activity : activities )
+					addActivity(manifest, activity);
 				
+				List<Service> services = manifestDocument.getServices();
+				for ( Service service : services )
+					addService(manifest, service);
+				
+				List<Receiver> receivers = manifestDocument.getReceivers();
+				for ( Receiver receiver : receivers ) {
+					addReceiver(manifest, receiver);
+				}
 			}
 			
 			@Override

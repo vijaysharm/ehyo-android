@@ -2,6 +2,7 @@ package com.vijaysharma.ehyo.core.models;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -143,6 +144,23 @@ public class ManifestTags {
 			return new Service(attributes.build(), metadatas.build(), filters.build());
 		}
 		
+		public static Element create(Service service, Namespace namespace) {
+			Element element = new Element("service");
+			for ( Entry<String, String> entry : service.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			for ( MetaData data : service.metadatas ) {
+				element.addContent(MetaData.create(data, namespace));
+			}
+			
+			for ( IntentFilter filter : service.filters ) {
+				element.addContent(IntentFilter.create(filter, namespace));
+			}
+			
+			return element;
+		}
+		
 		private final List<MetaData> metadatas;
 		private final List<IntentFilter> filters;
 		private final Map<String, String> attributes;
@@ -186,6 +204,23 @@ public class ManifestTags {
 			}
 			
 			return new Receiver(attributes.build(), metadatas.build(), filters.build());
+		}
+		
+		public static Element create(Receiver receiver, Namespace namespace) {
+			Element element = new Element("receiver");
+			for ( Entry<String, String> entry : receiver.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			for ( MetaData data : receiver.metadatas ) {
+				element.addContent(MetaData.create(data, namespace));
+			}
+			
+			for ( IntentFilter filter : receiver.filters ) {
+				element.addContent(IntentFilter.create(filter, namespace));
+			}
+			
+			return element;
 		}
 		
 		private final List<MetaData> metadatas;
@@ -250,6 +285,23 @@ public class ManifestTags {
 			return new Activity(attributes.build(), metadatas.build(), filters.build());
 		}
 		
+		public static Element create(Activity activity, Namespace namespace) {
+			Element element = new Element("activity");
+			for ( Entry<String, String> entry : activity.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			for ( MetaData data : activity.metadatas ) {
+				element.addContent(MetaData.create(data, namespace));
+			}
+			
+			for ( IntentFilter filter : activity.filters ) {
+				element.addContent(IntentFilter.create(filter, namespace));
+			}
+			
+			return element;
+		}
+		
 		private final List<MetaData> metadatas;
 		private final List<IntentFilter> filters;
 		private final Map<String, String> attributes;
@@ -261,6 +313,7 @@ public class ManifestTags {
 			this.metadatas = metadatas;
 			this.filters = filters;
 		}
+
 	}
 	public static class MetaData {
 		public static MetaData read(Element element, Namespace namespace) {
@@ -275,6 +328,15 @@ public class ManifestTags {
 			return new MetaData(properties.build());
 		}
 		
+		public static Element create(MetaData data, Namespace namespace) {
+			Element element = new Element("meta-data");
+			for ( Entry<String, String> entry : data.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			return element;
+		}
+
 		private final Map<String, String> attributes;
 		private MetaData(Map<String, String> attributes) {
 			this.attributes = attributes;
@@ -303,13 +365,34 @@ public class ManifestTags {
 			}
 			
 			ImmutableList.Builder<IntentAction> action = ImmutableList.builder();
-			for ( Element filter : element.getChildren("data") ) {
+			for ( Element filter : element.getChildren("action") ) {
 				action.add(IntentAction.read(filter, namespace));
 			}
 			
 			return new IntentFilter(properties.build(), action.build(), category.build(), data.build());
 		}
 		
+		public static Element create(IntentFilter filter, Namespace namespace) {
+			Element element = new Element("meta-data");
+			for ( Entry<String, String> entry : filter.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			for ( IntentAction action : filter.actions ) {
+				element.addContent(IntentAction.create(action, namespace));
+			}
+			
+			for ( Category category : filter.categories ) {
+				element.addContent(Category.create(category, namespace));
+			}
+
+			for ( Data data : filter.data ) {
+				element.addContent(Data.create(data, namespace));
+			}
+			
+			return element;
+		}
+
 		private final Map<String, String> attributes;
 		private final List<IntentAction> actions;
 		private final List<Category> categories;
@@ -337,6 +420,15 @@ public class ManifestTags {
 			return new IntentAction(properties.build());
 		}
 		
+		public static Element create(IntentAction action, Namespace namespace) {
+			Element element = new Element("action");
+			for ( Entry<String, String> entry : action.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			return element;
+		}
+
 		private final Map<String, String> attributes;
 		private IntentAction(Map<String, String> attributes) {
 			this.attributes = attributes;
@@ -357,6 +449,15 @@ public class ManifestTags {
 			return new Category(properties.build());
 		}
 		
+		public static Element create(Category category, Namespace namespace) {
+			Element element = new Element("category");
+			for ( Entry<String, String> entry : category.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			return element;
+		}
+
 		private final Map<String, String> attributes;
 		private Category(Map<String, String> attributes) {
 			this.attributes = attributes;
@@ -385,6 +486,15 @@ public class ManifestTags {
 			return new Data(properties.build());
 		}
 		
+		public static Element create(Data data, Namespace namespace) {
+			 Element element = new Element("data");
+			for ( Entry<String, String> entry : data.attributes.entrySet() ) {
+				element.setAttribute(entry.getKey(), entry.getValue(), namespace);
+			}
+			
+			return element;
+		}
+
 		private final Map<String, String> attributes;
 		private Data(Map<String, String> attributes) {
 			this.attributes = attributes;

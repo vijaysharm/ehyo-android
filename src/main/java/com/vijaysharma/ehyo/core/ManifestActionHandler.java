@@ -8,6 +8,9 @@ import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Receiver;
+import com.vijaysharma.ehyo.core.models.ManifestTags.Service;
 
 public class ManifestActionHandler implements PluginActionHandler<AndroidManifestDocument, ManifestActions> {
 	
@@ -25,6 +28,24 @@ public class ManifestActionHandler implements PluginActionHandler<AndroidManifes
 	@Override
 	public void modify(AndroidManifestDocument doc, ManifestActions action) {
 		modifyPermissions(doc, action);
+		modifyApplication(doc, action);
+	}
+
+	private void modifyApplication(AndroidManifestDocument doc, ManifestActions action) {
+		Collection<Activity> activities = action.getAddedActivities();
+		for ( Activity activity : activities ) {
+			doc.addActivity( activity );
+		}
+		
+		Collection<Service> services = action.getAddedServices();
+		for ( Service service : services ) {
+			doc.addService( service );
+		}
+		
+		Collection<Receiver> receivers = action.getAddedReceivers();
+		for ( Receiver receiver : receivers ) {
+			doc.addReceiver( receiver );
+		}
 	}
 
 	// TODO: Need to output permissions that are not defined in the document
