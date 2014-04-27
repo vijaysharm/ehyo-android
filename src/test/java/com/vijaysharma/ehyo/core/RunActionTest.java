@@ -17,6 +17,7 @@ import com.google.common.base.Optional;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
+import com.vijaysharma.ehyo.core.FileChangeManager.FileChangeManagerFactory;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
@@ -26,6 +27,7 @@ public class RunActionTest {
 	private ProjectRegistry registry;
 	private ManifestChangeManagerFactory manifestChangeFactory;
 	private GradleBuildChangeManagerFactory buildChangeFactory;
+	private FileChangeManagerFactory fileChangeManagerFactory;
 	private ServiceFactory serviceFactory;
 	private ObjectFactory<PluginActions> actionsFactory;
 	private TextOutput out;
@@ -36,6 +38,7 @@ public class RunActionTest {
 		registry = mock(ProjectRegistry.class);
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
 		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
+		fileChangeManagerFactory = mock(FileChangeManagerFactory.class);
 		serviceFactory = mock(ServiceFactory.class);
 		actionsFactory = mock(ObjectFactory.class);
 		out = mock(TextOutput.class);
@@ -183,6 +186,7 @@ public class RunActionTest {
 							 registry, 
 							 manifestChangeFactory,
 							 buildChangeFactory,
+							 fileChangeManagerFactory,
 							 serviceFactory,
 							 actionsFactory,
 							 help, 

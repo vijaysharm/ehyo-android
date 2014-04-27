@@ -16,7 +16,6 @@ public class ManifestChangeManager implements ChangeManager<PluginActions> {
 		}
 	};
 	
-	// TODO: Replace with ObjectFactory
 	static class ManifestChangeManagerFactory {
 		public ManifestChangeManager create() {
 			return new ManifestChangeManager(new PatchApplier<AndroidManifest, AndroidManifestDocument>(FACTORY));

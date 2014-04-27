@@ -9,6 +9,7 @@ import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
+import com.vijaysharma.ehyo.core.FileChangeManager.FileChangeManagerFactory;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
@@ -19,6 +20,7 @@ public class RunAction implements Action {
 	private final PluginLoader pluginLoader;
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
+	private final FileChangeManagerFactory fileChangeFactory;
 	private final ServiceFactory serviceFactory;
 	private final ObjectFactory<PluginActions> actionFactory;
 	private final boolean dryrun;
@@ -35,6 +37,7 @@ public class RunAction implements Action {
 			 registry,
 			 new ManifestChangeManagerFactory(),
 			 new GradleBuildChangeManagerFactory(),
+			 new FileChangeManagerFactory(),
 			 new ServiceFactory(),
 			 new DefaultPluginActionFactory(),
 			 help,
@@ -47,6 +50,7 @@ public class RunAction implements Action {
 			  ProjectRegistry registry, 
 			  ManifestChangeManagerFactory manifestChangeFactory,
 			  GradleBuildChangeManagerFactory buildChangeFactory,
+			  FileChangeManagerFactory fileChangeFactory,
 			  ServiceFactory serviceFactory,
 			  ObjectFactory<PluginActions> actionFactory,
 			  boolean help,
@@ -59,6 +63,7 @@ public class RunAction implements Action {
 		this.pluginLoader = loader;
 		this.manifestChangeFactory = manifestChangeFactory; 
 		this.buildChangeFactory = buildChangeFactory;
+		this.fileChangeFactory = fileChangeFactory;
 		this.serviceFactory = serviceFactory;
 		this.actionFactory = actionFactory;
 		this.out = out;
@@ -93,7 +98,7 @@ public class RunAction implements Action {
 		}
 		
 		if ( actions.hasFileChanges() ) {
-			FileChangeManager changes = new FileChangeManager();
+			FileChangeManager changes = fileChangeFactory.create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}

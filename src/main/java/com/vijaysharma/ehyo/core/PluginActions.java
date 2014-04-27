@@ -17,6 +17,7 @@ import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.core.DefaultTemplate.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
+import com.vijaysharma.ehyo.core.InternalActions.FileActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
@@ -98,8 +99,13 @@ public class PluginActions {
 		return addedReceivers.build();
 	}
 	
-	public Multimap<File, List<String>> getCreatedFiles() {
-		return createdFiles.build();
+	public Set<File> getFiles() {
+		Set<File> files = Sets.newHashSet(createdFiles.build().keySet());
+		return files;
+	}
+	
+	public void createFile(File file, List<String> contents) {
+		createdFiles.put(file, contents);
 	}
 	
 	public Multimap<File, List<String>> getMergedFiles() {
@@ -173,6 +179,15 @@ public class PluginActions {
 			@Override
 			public Collection<Receiver> getAddedReceivers() {
 				return addedReceivers.build().get(key);
+			}
+		};
+	}
+	
+	public FileActions getFileActions(final File key) {
+		return new FileActions() {
+			@Override
+			public Collection<List<String>> getCreatedFiles() {
+				return createdFiles.build().get(key);
 			}
 		};
 	}
