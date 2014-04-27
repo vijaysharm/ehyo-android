@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 
@@ -17,7 +16,6 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 		}
 	};
 	
-	// TODO: Replace with ObjectFactory
 	static class GradleBuildChangeManagerFactory {
 		GradleBuildChangeManager create() {
 			return new GradleBuildChangeManager(new PatchApplier<GradleBuild, GradleBuildDocument>(PRODUCER));
@@ -31,7 +29,7 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 	
 	GradleBuildChangeManager(PatchApplier<GradleBuild, GradleBuildDocument> applier,
 							 PluginActionHandlerFactory factory,
-							 Function<GradleBuild, GradleBuildDocument> producer ) {
+							 Function<GradleBuild, GradleBuildDocument> producer) {
 		this.buildFiles = ImmutableMap.builder();
 		this.patcher = applier;
 		this.factory = factory;
@@ -44,9 +42,7 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 
 	@Override
 	public void apply(PluginActions actions) {
-		// TODO: Don't just look at the ADDED dependencies
-		Set<GradleBuild> builds = Sets.newHashSet(actions.getAddedDependencies().keySet());
-		builds.addAll(actions.getRemovedDependencies().keySet());
+		Set<GradleBuild> builds = actions.getBuilds();
 		for ( GradleBuild build : builds ) {
 			buildFiles.put(build, producer.apply(build));
 		}

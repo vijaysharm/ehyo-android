@@ -49,6 +49,13 @@ public class PluginActions {
 		addedDependencies.put(build, dependency);
 	}
 	
+	public Set<GradleBuild> getBuilds() {
+		Set<GradleBuild> builds = Sets.newHashSet(getAddedDependencies().keySet());
+		builds.addAll(getRemovedDependencies().keySet());
+		
+		return builds;
+	}
+	
 	public Multimap<GradleBuild, Dependency> getAddedDependencies() {
 		return addedDependencies.build();
 	}

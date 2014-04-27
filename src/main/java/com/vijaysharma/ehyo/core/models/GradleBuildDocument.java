@@ -139,7 +139,10 @@ public class GradleBuildDocument implements AsListOfStrings {
 		Flavor flavor = lib.getFlavor();
 
 		String compileString = buildType.getCompileString(flavor);
-		dependency.append(compileString).append(" \'" + lib.getDependency() + "\'");
+		dependency
+			.append("    ")
+			.append(compileString)
+			.append(" \'" + lib.getDependency() + "\'");
 
 		return dependency.toString();
 	}
