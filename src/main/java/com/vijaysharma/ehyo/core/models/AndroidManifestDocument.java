@@ -34,7 +34,7 @@ public class AndroidManifestDocument implements AsListOfStrings {
 			throw new UncheckedIoException(ioe);
 		} catch (JDOMException jde) {
 			throw new RuntimeException(jde);
-		}		
+		}
 	}
 
 	private static final Namespace ANDROID_NAMESPACE = Namespace.getNamespace("android", "http://schemas.android.com/apk/res/android");

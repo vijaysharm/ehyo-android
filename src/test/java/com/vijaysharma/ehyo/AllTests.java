@@ -9,6 +9,7 @@ import com.vijaysharma.ehyo.core.FileObserverProjectBuilderTest;
 import com.vijaysharma.ehyo.core.ManifestActionHandlerTest;
 import com.vijaysharma.ehyo.core.PatchApplierTest;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoaderTest;
+import com.vijaysharma.ehyo.core.RecipeDocumentModelTest;
 import com.vijaysharma.ehyo.core.RunActionTest;
 import com.vijaysharma.ehyo.core.commandline.ApplicationRunActionFactoryTest;
 import com.vijaysharma.ehyo.core.commandline.BuiltInActionsTest;
@@ -41,6 +42,7 @@ import com.vijaysharma.ehyo.core.models.GradleBuildDocumentTest;
 	PatchApplierTest.class,
 	PluginsCommandLineConverterTest.class,
 	ProjectRegistryLoaderTest.class,
+	RecipeDocumentModelTest.class,
 	RunActionTest.class,
 })
 public class AllTests {

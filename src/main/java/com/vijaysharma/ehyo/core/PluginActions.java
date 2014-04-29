@@ -15,10 +15,10 @@ import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.TemplateParameters;
-import com.vijaysharma.ehyo.core.DefaultTemplate.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.FileActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
+import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.Dependency;
@@ -108,15 +108,13 @@ public class PluginActions {
 	
 	public Set<File> getFiles() {
 		Set<File> files = Sets.newHashSet(createdFiles.build().keySet());
+		files.addAll(mergedFiles.build().keySet());
+
 		return files;
 	}
 	
 	public void createFile(File file, List<String> contents) {
 		createdFiles.put(file, contents);
-	}
-	
-	public Multimap<File, List<String>> getMergedFiles() {
-		return mergedFiles.build();
 	}
 	
 	public boolean hasBuildChanges() {
@@ -224,19 +222,17 @@ public class PluginActions {
 
 		template.apply(mapping, new RecipeDocumentCallback() {
 			@Override
-			public void onInstantiate(File from, List<String> result, File to) {
-//				System.out.println("instantiate from: " + from);
-//				System.out.println(result);
-//				System.out.println("to: " + to + "\n");
+			public void onInstantiate(List<String> result, File to) {
 				createdFiles.put(to, result);
 			}
 
 			@Override
-			public void onManifestMerge(File from, Document result, File to) {
+			public void onManifestMerge(Document result, File to) {
 				if ( ! manifest.getFile().equals(to) )
 					throw new IllegalStateException("Expected " + to + " to be " + manifest.getFile());
 				AndroidManifestDocument manifestDocument = new AndroidManifestDocument(result);
 				
+				// TODO: Need to copy everything you can from the template manifest.
 				Set<String> permissions = manifestDocument.getPermissions();
 				for ( String permission : permissions )
 					addPermission(manifest, permission);
@@ -250,25 +246,18 @@ public class PluginActions {
 					addService(manifest, service);
 				
 				List<Receiver> receivers = manifestDocument.getReceivers();
-				for ( Receiver receiver : receivers ) {
+				for ( Receiver receiver : receivers )
 					addReceiver(manifest, receiver);
-				}
 			}
 			
 			@Override
-			public void onMerge(File from, List<String> result, File to) {
-//				System.out.println("merge from: " + from);
-//				System.out.println(result);				
-//				System.out.println("to: " + to + "\n");
+			public void onResourceMerge(List<String> result, File to) {
 				mergedFiles.put(to, result);
 			}
 
 			@Override
-			public void onCopy(File from, List<String> result, File to) {
-//				System.out.println("copy from: " + from);
-//				System.out.println(result);
-//				System.out.println("to: " + to + "\n");
-				createdFiles.put(to, result);
+			public void onCopy(File from, File to) {
+				// TODO: Handle copies
 			}
 
 			@Override

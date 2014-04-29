@@ -197,15 +197,9 @@ class RunActionInternals {
 	}
 	
 	static class DefaultTemplateFactory implements TemplateFactory {
-		private final PluginActions actions;
-		
-		public DefaultTemplateFactory(PluginActions actions) {
-			this.actions = actions;
-		}
-		
 		@Override
 		public Template create(String path) {
-			return new DefaultTemplate(path, actions);
+			return new DefaultTemplate(path);
 		}
 	}
 	

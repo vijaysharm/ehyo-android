@@ -36,7 +36,7 @@ public class GradleBuildChangeManager implements ChangeManager<PluginActions> {
 		this.producer = producer;
 	}
 
-	public GradleBuildChangeManager(PatchApplier<GradleBuild, GradleBuildDocument> patcher) {
+	private GradleBuildChangeManager(PatchApplier<GradleBuild, GradleBuildDocument> patcher) {
 		this(patcher, new PluginActionHandlerFactory(), PRODUCER);
 	}
 

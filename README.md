@@ -91,7 +91,7 @@ TODO
 + Broke Usage
 ++ It is no longer shown
 
-+ FIX: ApplicationRunActionFactoryTest
++ FIX: ApplicationRunActionFactoryTest, AndroidManifestDocumentTest
 
 + GradleBuildDocumentModel doesn't support the following kind of dependency
 ++ This was seen in the Muzei Gradle build
