@@ -34,6 +34,9 @@ public class CommandLineParser {
 	}
 	
 	public ParsedSet parse(List<String> args, List<ArgumentOption<?>> ops) {
+		if ( args.isEmpty() )
+			throw new IllegalArgumentException("No args given");
+		
 		ImmutableMap.Builder<ArgumentOption<?>, Object> parsed = ImmutableMap.builder();
 		for ( Iterator<String> it = args.iterator(); it.hasNext(); ) {
 			String arg = it.next();

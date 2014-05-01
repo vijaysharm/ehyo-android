@@ -74,7 +74,9 @@ public class RunAction implements Action {
 	@Override
 	public void run() {
 		Plugin plugin = find(args);
-		out.println("Executing plugin: " + plugin.getClass().getCanonicalName() + " with args: " + Joiner.on(" ").join(args));
+		
+		if ( ! args.isEmpty() )
+			out.println("Executing plugin: " + plugin.getClass().getCanonicalName() + " with args: " + Joiner.on(" ").join(args));
 
 		if ( help ) {
 			out.println("TODO: Print usage for: " + plugin.name());

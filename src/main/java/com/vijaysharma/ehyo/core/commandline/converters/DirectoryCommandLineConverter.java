@@ -8,6 +8,7 @@ import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilde
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
+import com.vijaysharma.ehyo.core.utils.GentleMessageException;
 
 public class DirectoryCommandLineConverter implements CommandLineConverter<ProjectRegistry>{
 	private final ArgumentOption<File> directory;
@@ -37,7 +38,11 @@ public class DirectoryCommandLineConverter implements CommandLineConverter<Proje
 		File root = options.value(directory);
 		ProjectRegistryLoader loader = factory.create();
 
-		return loader.load(root);
+		ProjectRegistry registry = loader.load(root);
+		if ( registry.isEmpty() ) 
+			throw new GentleMessageException("No Android projects found in " + root.getAbsolutePath());
+		
+		return registry;
 	}
 	
 	static class ProjectRegistryLoaderFactory {

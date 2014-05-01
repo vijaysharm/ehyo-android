@@ -32,7 +32,7 @@ public class Main implements Runnable {
 //			"--version",
 //			"--plugins", "com.thirdparty.plugin", 
 			"--dry-run",
-			"--directory", "/Users/vsharma/programming/android/MyApplication"
+//			"--directory", "/Users/vsharma/programming/android/MyApplication"
 //			"--directory", "/Users/vsharma/programming/android/muzei"
 //			"--directory", "/Users/vsharma/programming/android/u2020"
 		};

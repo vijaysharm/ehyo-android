@@ -66,7 +66,7 @@ public class PluginsCommandLineConverterTest {
 		CommandLineParser parser = spy(new CommandLineParser());
 		converter.configure(parser);
 		
-		List<String> args = Lists.newArrayList();
+		List<String> args = Lists.newArrayList("--test");
 		ParsedSet options = spy(parser.parse(args));
 		Set<String> actualPlugins = converter.read(options);
 		

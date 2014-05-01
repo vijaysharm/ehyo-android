@@ -9,6 +9,7 @@ import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.core.utils.GentleMessageException;
 
 class ParseAndBuildAction implements Action {
 	private final List<String> args;
@@ -31,17 +32,22 @@ class ParseAndBuildAction implements Action {
 	 */
 	@Override
 	public void run() {
-		List<CommandLineAction> actions = factory.create();
-
-		CommandLineParser parser = new CommandLineParser();
-		for ( CommandLineAction action : actions ) {
-			action.configure(parser);
-		}
-		
 		try {
+			List<CommandLineAction> actions = factory.create();
+	
+			CommandLineParser parser = new CommandLineParser();
+			for ( CommandLineAction action : actions ) {
+				action.configure(parser);
+			}
+		
 			ParsedSet options = parser.parse(args);
 			Action action = findAction(options, actions);
 			action.run();
+		} catch ( GentleMessageException ex ) {
+			out.println(ex.getMessage());
+		} catch ( IllegalArgumentException ex ) {
+			// TODO: print usage
+			out.println("usage...");
 		} catch ( UnsupportedOperationException ex ) {
 			throw ex;
 		} catch ( Exception ex ) {

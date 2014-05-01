@@ -14,6 +14,10 @@ public class ProjectRegistry {
 		this.projects = projects;
 	}
 	
+	public boolean isEmpty() {
+		return projects.isEmpty();
+	}
+	
 	public Project getProject(String name) {
 		return projects.get(name);
 	}

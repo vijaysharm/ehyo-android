@@ -27,12 +27,12 @@ To apply a template to your project, run the templates plugin.
 
 Limitations
 -----------
-+ This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. 
-++ Modified source set paths are not supported
++ This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. It looks for settings.gradle files to determine the project structure.
+++ Overridden source set paths in builds are not supported
 
-+ Templates will always add dependencies to the compile configuration
++ Templates will always add dependencies to the 'compile' configuration
 
-+ Can't maintain the formatting of the AndroidManifest.xml
++ Ruins the formatting of the AndroidManifest.xml
 
 + There's no rollback during failures. If part of a template is applied, and an exception occurs, then there's no way to undo what failed. As a suggestion, run ehyo within a version controlled project with a fresh checkout. That will allow you to rollback your changes when ehyo craps out on you.
 
@@ -72,9 +72,7 @@ TODO
 ++ Should print the number of documents modified (look a the way git does commits)
 
 + Check if the project structure is valid
-++ Need to determine when to notify the user that the directory they are loading from is invalid.
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
-++ You also don't want to show an exception when all they want to do is run list
 
 + As part of the list plugin, we should be able to provide a filter option
 
@@ -125,3 +123,4 @@ TODO
 + Read templates from github
 + Provide a way to easily create templates from a diff
 + Provide a way to save templates (as a gist?)
++ Provide support for android projects not created with gradle

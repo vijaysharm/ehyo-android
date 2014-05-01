@@ -18,6 +18,8 @@ import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
+import com.vijaysharma.ehyo.core.models.ProjectRegistry;
+import com.vijaysharma.ehyo.core.utils.GentleMessageException;
 
 public class DirectoryCommandLineConverterTest {
 	private ArgumentOption<File> option;
@@ -45,12 +47,30 @@ public class DirectoryCommandLineConverterTest {
 	public void read_calls_create_on_ProjectRegistryLoaderFactory() {
 		ParsedSet optionSet = mock(ParsedSet.class);
 		File file = mock(File.class);
+		ProjectRegistry registry = mock(ProjectRegistry.class);
+		
 		when(optionSet.value(option)).thenReturn(file);
 		when(factory.create()).thenReturn(loader);
+		when(loader.load(file)).thenReturn(registry);
+		when(registry.isEmpty()).thenReturn(false);
 		
 		converter.read(optionSet);
 		verify(factory, times(1)).create();
 		verify(loader, times(1)).load(file);
+	}
+	
+	@Test(expected=GentleMessageException.class)
+	public void read_throws_GentleMessageException_when_registry_is_empty() {
+		ParsedSet optionSet = mock(ParsedSet.class);
+		File file = mock(File.class);
+		ProjectRegistry registry = mock(ProjectRegistry.class);
+		
+		when(optionSet.value(option)).thenReturn(file);
+		when(factory.create()).thenReturn(loader);
+		when(loader.load(file)).thenReturn(registry);
+		when(registry.isEmpty()).thenReturn(true);
+		
+		converter.read(optionSet);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
