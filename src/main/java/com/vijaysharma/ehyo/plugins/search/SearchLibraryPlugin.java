@@ -18,7 +18,7 @@ public class SearchLibraryPlugin implements Plugin {
 
 	@Override
 	public String name() {
-		return "search-mvn-central";
+		return "dependencies";
 	}
 
 	/**

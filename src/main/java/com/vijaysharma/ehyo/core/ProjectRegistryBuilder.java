@@ -23,11 +23,6 @@ import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 import com.vijaysharma.ehyo.core.models.SourceSet;
 import com.vijaysharma.ehyo.core.models.SourceSetType;
 
-/**
- * TODO: I wonder about the usefulness of this class, you can probably move a
- * lot of this logic into the {@link ProjectRegistryLoader}. But we'll keep it
- * here for now.
- */
 public class ProjectRegistryBuilder {
 	private final ImmutableList.Builder<String> projectList = ImmutableList.builder();
 	private final Map<String, File> builds = Maps.newHashMap();
@@ -99,7 +94,7 @@ public class ProjectRegistryBuilder {
 			ImmutableSet.Builder<SourceSet> sourceSets = ImmutableSet.builder();
 			for ( SourceSetType type : sourceSetTypes ) {
 				AndroidManifest manifest = manifestMapping.get(type);
-				if ( manifests == null )
+				if ( manifest == null )
 					System.err.println("Manifest for source set: [" + projectName + ":" + type + "] is null!!!!");
 				
 				sourceSets.add(new SourceSet(projectName, type, manifest));

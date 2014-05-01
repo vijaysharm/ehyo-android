@@ -38,14 +38,14 @@ public class Main implements Runnable {
 		};
 		
 		String[] plugin = {
-//			"manifest-permissions",
-//			"--add", "access",
+			"permissions",
+			"--add", "access",
 //			"--remove", "internet"
 				
-//			"search-mvn-central",
+//			"dependencies",
 //			"--lib", "butterknife"
 				
-			"android-templates"
+//			"templates"
 		};
 		
 		String[] arguments = concat(main, plugin);

@@ -22,7 +22,7 @@ public class Permissions implements Plugin {
 
 	@Override
 	public String name() {
-		return "manifest-permissions";
+		return "permissions";
 	}
 
 	@Override

@@ -2,17 +2,28 @@ Ehyo
 ====
 A command line tool for scaffolding Android Applications. Heavyily inspired by and loosely named after the yeoman web scaffolding tool. The goal of this project is to provide a command line tool for developers looking to perform worry free boiler-plate operations to their Android projects.
 
-TODO: The tool supports android templates and https://github.com/jgilfelt/android-adt-templates
-
-TODO: Plugin architecture
+The tool allows you to perform common tasks to your Android project
++ Search/Add/Remove permissions from your manifest
++ Search/Add/Remove maven repository dependecies to your build
++ Apply common Android templates to your project
++ Apply templates provided by jgilfelt with https://github.com/jgilfelt/android-adt-templates
 
 Usage
 -----
-./bin/ehyo list
-./bin/ehyo manage-permissions --add internet
-./bin/ehyo manage-permissions --remove internet
-./bin/ehyo search --lib butterknife
-./bin/ehyo --plugins <ns> --directory <dir> search --add flow
+To view the list of actions ehyo supports, run the list plugin
+`./bin/ehyo list`
+
+To add or remove a permission to a manifest, run the permissions plugin. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argume
+`./bin/ehyo permissions --add internet`
+`./bin/ehyo --directory <dir> permissions --remove internet`
+
+To add or remove dependencies from a build, run the dependencies plugin. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
+`./bin/ehyo dependencies --add butterknife`
+`./bin/ehyo dependencies --remove retrofit --dry-run`
+
+To apply a template to your project, run the templates plugin.
+`./bin/ehyo templates list`
+`./bin/ehyo templates [templatename]`
 
 Limitations
 -----------
@@ -23,24 +34,32 @@ Limitations
 
 + Can't maintain the formatting of the AndroidManifest.xml
 
-Developing using Eclipse
-------------------------
-`mvn clean package dependency:sources dependency:resolve -Dclassifier=javadoc eclipse:eclipse`
++ There's no rollback during failures. If part of a template is applied, and an exception occurs, then there's no way to undo what failed. As a suggestion, run ehyo within a version controlled project with a fresh checkout. That will allow you to rollback your changes when ehyo craps out on you.
 
 Building the jar
 ----------------
 `mvn package`
 
+Developing using Eclipse
+------------------------
+`mvn clean package dependency:sources dependency:resolve -Dclassifier=javadoc eclipse:eclipse`
+
 TODO
 ----
-##High Level Goals
-+ Provide a way to create a new Android application
-++ Might create a project with basic pieces
-+++ Dependency Injection
-+++ Unit testing Framework
-+++ etc...
-+ Create a template that add the 'big cookie model to your project'
-+ Provide a plugin that lets you rename your package namespace
+##Bugs
++ Broke Usage
+++ It is no longer shown
+
++ FIX: ApplicationRunActionFactoryTest, AndroidManifestDocumentTest
+
++ GradleBuildDocumentModel doesn't support the following kind of dependency
+++ This was seen in the Muzei Gradle build
+++ compile ('de.greenrobot:eventbus:2.2.0') { exclude group:'com.google.android', module: 'support-v4' // already included below }
++++ Current model will think its a context
+++ Fails for certain types (e.g. tasks)
+
++ There's a bug with the diff: 
+++ the line below the added line is incorrect, it shows the line after that.
 
 ##Tasks
 + Show user formatted error when the name given in plugin is not found
@@ -92,19 +111,17 @@ TODO
 ++ https://github.com/isaacs/read/blob/master/lib/read.js
 ++ https://github.com/yeoman/generators
 
-##Bugs
-+ Broke Usage
-++ It is no longer shown
++ Write integration tests for templates
 
-+ FIX: ApplicationRunActionFactoryTest, AndroidManifestDocumentTest
++ Unit test existing plugins
 
-+ GradleBuildDocumentModel doesn't support the following kind of dependency
-++ This was seen in the Muzei Gradle build
-++ compile ('de.greenrobot:eventbus:2.2.0') { exclude group:'com.google.android', module: 'support-v4' // already included below }
-+++ Current model will think its a context
-++ Fails for certain types (e.g. tasks)
-
-+ There's a bug with the diff: 
-++ the line below the added line is incorrect, it shows the line after that.
-
-+ manifestOut needs to be supplied only when not available.
+##Roadmap
++ Provide a way to create a new Android application
+++ Create a project with basic pieces
++++ Dependency Injection
++++ Unit testing Framework
++ Create a template that add the 'big cookie model to your project'
++ Provide a plugin that lets you rename your package namespace
++ Read templates from github
++ Provide a way to easily create templates from a diff
++ Provide a way to save templates (as a gist?)

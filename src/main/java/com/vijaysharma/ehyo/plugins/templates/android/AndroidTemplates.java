@@ -14,7 +14,7 @@ import com.vijaysharma.ehyo.api.utils.OptionSelector;
 public class AndroidTemplates implements Plugin {
 	@Override
 	public String name() {
-		return "android-templates";
+		return "templates";
 	}
 
 	String[] templates = {
