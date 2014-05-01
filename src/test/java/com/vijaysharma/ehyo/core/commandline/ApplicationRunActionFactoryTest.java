@@ -10,6 +10,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.RunAction;
 import com.vijaysharma.ehyo.core.RunActionBuilder;

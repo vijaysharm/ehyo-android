@@ -13,11 +13,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
 import com.vijaysharma.ehyo.api.GentleMessageException;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
-import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 

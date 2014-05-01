@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.core.commandline;
+package com.vijaysharma.ehyo.api;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -12,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 
 public class CommandLineParserTest {
 	private ArgumentOption<String> op1;

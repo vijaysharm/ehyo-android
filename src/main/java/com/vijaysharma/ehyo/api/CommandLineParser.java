@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.core.commandline;
+package com.vijaysharma.ehyo.api;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.vijaysharma.ehyo.api.UsageException;
 
 public class CommandLineParser {
 	private static final Object NULL = new Object();

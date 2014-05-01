@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.core.commandline;
+package com.vijaysharma.ehyo.api;
 
 import java.util.Set;
 

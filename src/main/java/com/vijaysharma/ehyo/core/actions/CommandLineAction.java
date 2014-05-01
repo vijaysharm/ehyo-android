@@ -1,8 +1,8 @@
 package com.vijaysharma.ehyo.core.actions;
 
+import com.vijaysharma.ehyo.api.CommandLineParser;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.Action;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 public interface CommandLineAction {
 	void configure(CommandLineParser parser);

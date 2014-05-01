@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.ParseAndBuildAction.CommandLineActionsFactory;
 
 public class ParseAndBuildActionTest {

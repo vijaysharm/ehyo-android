@@ -2,12 +2,12 @@ package com.vijaysharma.ehyo.core.commandline.converters;
 
 import java.io.File;
 
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
 import com.vijaysharma.ehyo.api.GentleMessageException;
+import com.vijaysharma.ehyo.api.ArgumentOption.ArgumentOptionBuilder;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
-import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
-import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class DirectoryCommandLineConverter implements CommandLineConverter<ProjectRegistry>{

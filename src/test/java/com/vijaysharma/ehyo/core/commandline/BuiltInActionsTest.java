@@ -15,9 +15,11 @@ import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.Action;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BuiltInActionsTest {

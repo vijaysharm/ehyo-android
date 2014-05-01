@@ -3,10 +3,10 @@ package com.vijaysharma.ehyo.core.commandline.converters;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
-import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
+import com.vijaysharma.ehyo.api.ArgumentOption.ArgumentOptionBuilder;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 
 public class PluginsCommandLineConverter implements CommandLineConverter<Set<String>> {
 	private final ArgumentOption<String> plugins;

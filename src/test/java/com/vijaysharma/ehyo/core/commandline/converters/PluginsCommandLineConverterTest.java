@@ -17,9 +17,9 @@ import org.mockito.Captor;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.api.ArgumentOption;
+import com.vijaysharma.ehyo.api.CommandLineParser;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PluginsCommandLineConverterTest {

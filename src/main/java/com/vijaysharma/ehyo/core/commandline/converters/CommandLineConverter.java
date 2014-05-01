@@ -1,7 +1,7 @@
 package com.vijaysharma.ehyo.core.commandline.converters;
 
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
-import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.api.CommandLineParser;
+import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 
 public interface CommandLineConverter <T> {
 	void configure(CommandLineParser parser);
