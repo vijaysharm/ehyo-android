@@ -10,18 +10,18 @@ The tool allows you to perform common tasks to your Android project
 
 Usage
 -----
-To view the list of actions ehyo supports, run the list plugin
+To view the list of actions ehyo supports, run the list command
 `./bin/ehyo list`
 
-To add or remove a permission to a manifest, run the permissions plugin. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argume
+To add or remove a permission to a manifest, run the permissions command. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argume
 `./bin/ehyo permissions --add internet`
 `./bin/ehyo --directory <dir> permissions --remove internet`
 
-To add or remove dependencies from a build, run the dependencies plugin. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
+To add or remove dependencies from a build, run the dependencies command. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
 `./bin/ehyo dependencies --add butterknife`
 `./bin/ehyo dependencies --remove retrofit --dry-run`
 
-To apply a template to your project, run the templates plugin.
+To apply a template to your project, run the templates command.
 `./bin/ehyo templates list`
 `./bin/ehyo templates [templatename]`
 
@@ -47,9 +47,6 @@ Developing using Eclipse
 TODO
 ----
 ##Bugs
-+ Broke Usage
-++ It is no longer shown
-
 + FIX: ApplicationRunActionFactoryTest, AndroidManifestDocumentTest
 
 + GradleBuildDocumentModel doesn't support the following kind of dependency
@@ -58,11 +55,13 @@ TODO
 +++ Current model will think its a context
 ++ Fails for certain types (e.g. tasks)
 
-+ There's a bug with the diff: 
++ There's a bug displaying the diff: 
 ++ the line below the added line is incorrect, it shows the line after that.
 
++ Displays the following when commands are run
+++ Manifest for source set: [app:SourceSetType [type=debug]] is null!!!!
+
 ##Tasks
-+ Show user formatted error when the name given in plugin is not found
 + Show better version information
 ++ Better option description for usage
 + Have the PatchApplier not modify the formatting of the XML file
@@ -74,7 +73,7 @@ TODO
 + Check if the project structure is valid
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
 
-+ As part of the list plugin, we should be able to provide a filter option
++ As part of the list command, we should be able to provide a filter option
 
 + Add support for a --debug for verbose printing
 
@@ -89,29 +88,24 @@ TODO
 + Make all core models package protected
 ++ Document public API
 
-+ Finish the maven search library plugin
++ Finish the maven search library command
 ++ Should it be renamed to dependency, providing a search, add, remove capability?
 ++ Clean up add / remove
 ++ Support adding libraries directly from command line (i.e. no searching, just raw text)
 
-+ Finish the manifest-permission plugin
++ Finish the manifest-permission command
 ++ It should support an optional remove argument, which should display the list of existing permissions to remove
 
-+ Finish Template Plugin
++ Finish Template command
 ++ Should support applying a template to a sourceset without a manifest
 +++ Need to support a non-existent manifest (as an empty file)
 ++ Prompt user to fill in fields (without resorting to default values)
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
 ++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
 
-+ Improve Command line
-++ http://nodejs.org/api/readline.html
-++ https://github.com/isaacs/read/blob/master/lib/read.js
-++ https://github.com/yeoman/generators
-
 + Write integration tests for templates
 
-+ Unit test existing plugins
++ Unit test existing commands
 
 ##Roadmap
 + Provide a way to create a new Android application
@@ -119,8 +113,10 @@ TODO
 +++ Dependency Injection
 +++ Unit testing Framework
 + Create a template that add the 'big cookie model to your project'
-+ Provide a plugin that lets you rename your package namespace
++ Provide a command that lets you rename your package namespace
 + Read templates from github
 + Provide a way to easily create templates from a diff
 + Provide a way to save templates (as a gist?)
 + Provide support for android projects not created with gradle
++ Improve Command line
+++ Inquire.js

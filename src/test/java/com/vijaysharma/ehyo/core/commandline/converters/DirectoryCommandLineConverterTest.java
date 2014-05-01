@@ -13,13 +13,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
-import com.vijaysharma.ehyo.core.utils.GentleMessageException;
 
 public class DirectoryCommandLineConverterTest {
 	private ArgumentOption<File> option;
@@ -53,6 +53,7 @@ public class DirectoryCommandLineConverterTest {
 		when(factory.create()).thenReturn(loader);
 		when(loader.load(file)).thenReturn(registry);
 		when(registry.isEmpty()).thenReturn(false);
+		when(file.exists()).thenReturn(true);
 		
 		converter.read(optionSet);
 		verify(factory, times(1)).create();
@@ -69,6 +70,21 @@ public class DirectoryCommandLineConverterTest {
 		when(factory.create()).thenReturn(loader);
 		when(loader.load(file)).thenReturn(registry);
 		when(registry.isEmpty()).thenReturn(true);
+		
+		converter.read(optionSet);
+	}
+	
+	@Test(expected=GentleMessageException.class)
+	public void read_throws_GentleMessageException_when_directory_path_does_not_exist() {
+		ParsedSet optionSet = mock(ParsedSet.class);
+		File file = mock(File.class);
+		ProjectRegistry registry = mock(ProjectRegistry.class);
+		
+		when(optionSet.value(option)).thenReturn(file);
+		when(factory.create()).thenReturn(loader);
+		when(loader.load(file)).thenReturn(registry);
+		when(registry.isEmpty()).thenReturn(false);
+		when(file.exists()).thenReturn(false);
 		
 		converter.read(optionSet);
 	}

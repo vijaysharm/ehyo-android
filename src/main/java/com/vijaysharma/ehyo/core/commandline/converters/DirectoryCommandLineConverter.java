@@ -2,13 +2,13 @@ package com.vijaysharma.ehyo.core.commandline.converters;
 
 import java.io.File;
 
+import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption;
 import com.vijaysharma.ehyo.core.commandline.ArgumentOption.ArgumentOptionBuilder;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
-import com.vijaysharma.ehyo.core.utils.GentleMessageException;
 
 public class DirectoryCommandLineConverter implements CommandLineConverter<ProjectRegistry>{
 	private final ArgumentOption<File> directory;
@@ -36,11 +36,15 @@ public class DirectoryCommandLineConverter implements CommandLineConverter<Proje
 	@Override
 	public ProjectRegistry read(ParsedSet options) {
 		File root = options.value(directory);
+		if ( ! root.exists() )
+			throw new GentleMessageException("Directory " + root.getAbsolutePath() + " doesn't seem to exist");
+		
 		ProjectRegistryLoader loader = factory.create();
 
 		ProjectRegistry registry = loader.load(root);
 		if ( registry.isEmpty() ) 
-			throw new GentleMessageException("No Android projects found in " + root.getAbsolutePath());
+			throw new GentleMessageException("No Android projects found in " + root.getAbsolutePath() + 
+											 "\nConsider passing --directory <dir> to an existing Android Gradle project");
 		
 		return registry;
 	}

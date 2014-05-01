@@ -1,25 +1,38 @@
 package com.vijaysharma.ehyo.core.commandline;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
+import com.vijaysharma.ehyo.api.UsageException;
 
 public class CommandLineParser {
-	private final ImmutableList.Builder<ArgumentOption<?>> options = ImmutableList.builder();
 	private static final Object NULL = new Object();
-	
-	public CommandLineParser(List<ArgumentOption<?>> options) {
-		this.options.addAll(options);
-	}
+
+	private final ImmutableList.Builder<ArgumentOption<?>> options;
+	private final String usage;
 	
 	public CommandLineParser() {
-		
+		this(new ArrayList<ArgumentOption<?>>(), "");
 	}
 	
+	public CommandLineParser(String usage) {
+		this(new ArrayList<ArgumentOption<?>>(), usage);
+	}
+	
+	CommandLineParser(List<ArgumentOption<?>> options) {
+		this(options, "");
+	}
+	
+	private CommandLineParser(List<ArgumentOption<?>> options, String usage) {
+		this.options = ImmutableList.builder();
+		this.options.addAll(options);
+		this.usage = usage;
+	}
+		
 	public void addOptions(ArgumentOption<?>...ops) {
 		if ( ops == null || ops.length == 0 )
 			return;
@@ -35,7 +48,7 @@ public class CommandLineParser {
 	
 	public ParsedSet parse(List<String> args, List<ArgumentOption<?>> ops) {
 		if ( args.isEmpty() )
-			throw new IllegalArgumentException("No args given");
+			throw new UsageException(usage);
 		
 		ImmutableMap.Builder<ArgumentOption<?>, Object> parsed = ImmutableMap.builder();
 		for ( Iterator<String> it = args.iterator(); it.hasNext(); ) {

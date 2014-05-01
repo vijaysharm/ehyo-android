@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
@@ -123,17 +124,19 @@ public class RunAction implements Action {
 	
 	private Plugin find(List<String> args) {
 		if ( args == null || args.isEmpty() ) {
-			throw new RuntimeException("No plugin defined");
+			throw new GentleMessageException("You haven't defined a command to run.\n" +
+											 "try running 'ehyo list' to see a list of available commands\n");
 		}
 		
 		String pluginName = args.remove(0);
 		if ( pluginName == null ) {
-			throw new RuntimeException("No plugin given");
+			throw new RuntimeException("No command found");
 		}
 		
 		Optional<Plugin> p = pluginLoader.findPlugin(pluginName);
 		if ( ! p.isPresent() ) {
-			throw new RuntimeException("Plugin [" + pluginName + "] was not found.");
+			throw new GentleMessageException("Command [" + pluginName + "] is not supported by ehyo.\n" +
+											 "try running 'ehyo list' to see a list of available commands\n");
 		}
 		
 		return p.get();
@@ -145,12 +148,4 @@ public class RunAction implements Action {
 			return new PluginActions();
 		}
 	}
-
-//	private void printUsage(OptionParser parser) {
-//		try {
-//			parser.printHelpOn(System.err);
-//		} catch (IOException e) {
-//			Outputter.debug.exception("Failed to log usage", e);
-//		}
-//	}
 }

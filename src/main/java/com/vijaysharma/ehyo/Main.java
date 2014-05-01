@@ -32,14 +32,14 @@ public class Main implements Runnable {
 //			"--version",
 //			"--plugins", "com.thirdparty.plugin", 
 			"--dry-run",
-//			"--directory", "/Users/vsharma/programming/android/MyApplication"
+			"--directory", "/Users/vsharma/programming/android/MyApplication"
 //			"--directory", "/Users/vsharma/programming/android/muzei"
 //			"--directory", "/Users/vsharma/programming/android/u2020"
 		};
 		
 		String[] plugin = {
 			"permissions",
-			"--add", "access",
+//			"--add", "access",
 //			"--remove", "internet"
 				
 //			"dependencies",
@@ -76,7 +76,9 @@ public class Main implements Runnable {
     			output.append(" " + arg);
     		}
     	}
-    	output.append("\n");
+
+    	if ( output.toString().length() > 0 )
+    		output.append("\n");
 
     	Output.out.print(output.toString());
     }

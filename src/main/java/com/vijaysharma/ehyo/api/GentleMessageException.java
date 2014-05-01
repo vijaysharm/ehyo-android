@@ -1,4 +1,4 @@
-package com.vijaysharma.ehyo.core.utils;
+package com.vijaysharma.ehyo.api;
 
 
 public class GentleMessageException extends RuntimeException {

@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.actions.CommandLineAction;
 import com.vijaysharma.ehyo.core.commandline.CommandLineParser.ParsedSet;
-import com.vijaysharma.ehyo.core.utils.GentleMessageException;
 
 class ParseAndBuildAction implements Action {
 	private final List<String> args;
@@ -32,38 +32,25 @@ class ParseAndBuildAction implements Action {
 	 */
 	@Override
 	public void run() {
-		try {
-			List<CommandLineAction> actions = factory.create();
-	
-			CommandLineParser parser = new CommandLineParser();
-			for ( CommandLineAction action : actions ) {
-				action.configure(parser);
-			}
+		List<CommandLineAction> actions = factory.create();
+
+		CommandLineParser parser = new CommandLineParser(getUsage());
+		for ( CommandLineAction action : actions ) {
+			action.configure(parser);
+		}
 		
+		try {
 			ParsedSet options = parser.parse(args);
 			Action action = findAction(options, actions);
 			action.run();
 		} catch ( GentleMessageException ex ) {
 			out.println(ex.getMessage());
-		} catch ( IllegalArgumentException ex ) {
-			// TODO: print usage
-			out.println("usage...");
 		} catch ( UnsupportedOperationException ex ) {
 			throw ex;
 		} catch ( Exception ex ) {
 			out.exception("Execution exception " + Joiner.on(" ").join(this.args), ex);
-//			printUsage(ex.getMessage(), parser);
 		}
 	}
-	
-//	private void printUsage(String message, OptionParser parser) {
-//		try {
-//			System.err.println(message);
-//			parser.printHelpOn(System.err);
-//		} catch (IOException e) {
-//			Outputter.debug.exception("Failed to print usage", e);
-//		}		
-//	}
 
 	private Action findAction(ParsedSet options, List<CommandLineAction> actions) {
 		for ( CommandLineAction command : actions ) {
@@ -75,6 +62,30 @@ class ParseAndBuildAction implements Action {
 		throw new UnsupportedOperationException("No action factory for specified command-line arguments.");
 	}
 	
+	private String getUsage() {
+		StringBuilder usage = new StringBuilder();
+		usage.append("usage: ehyo [-v | --version] [-n | --dry-run] [--directory <dir>]\n");
+		usage.append("            <command> [<args>]\n\n");
+		
+		usage.append("Options:\n");
+		usage.append("    -v, --version\n");
+		usage.append("        To see the program version\n");
+		usage.append("    -n, --dry-run\n");
+		usage.append("        To see the changes that can be applied by\n");
+		usage.append("        a command without it affecting your project\n");
+		usage.append("    --directory <dir>\n");
+		usage.append("        To set the path to the Android Gradle project.\n");
+		usage.append("        Uses the current directory as default.\n\n");
+
+		usage.append("The most commonly used ehyo commands are:\n");
+		usage.append("    list\n");
+		usage.append("    permissions\n");
+		usage.append("    dependencies\n");
+		usage.append("    templates\n");
+		
+		return usage.toString();
+	}
+
 	static class CommandLineActionsFactory {
 		public List<CommandLineAction> create() {
 			List<CommandLineAction> actions = Lists.newLinkedList();
