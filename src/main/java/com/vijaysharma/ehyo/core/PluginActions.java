@@ -129,6 +129,9 @@ public class PluginActions {
 		mergedResource.put(file, contents);
 	}
 	
+	public Map<File,File> getBinaryFiles() {
+		return copiedFiles.build();
+	}
 	public void copyFiles(File from, File to) {
 		copiedFiles.put(from, to);
 	}
@@ -144,6 +147,10 @@ public class PluginActions {
 				(! addedActivities.build().isEmpty()) ||
 				(! addedServices.build().isEmpty()) ||
 				(! addedReceivers.build().isEmpty());
+	}
+	
+	public boolean hasBinaryFileChanges() {
+		return ! getBinaryFiles().isEmpty();
 	}
 	
 	public Set<AndroidManifest> getManifests() {
@@ -311,7 +318,6 @@ public class PluginActions {
 		public void onCopy(File from, File to) {
 			File directory = manifest.getResourceDirectory();
 			File toDirectory = computeTo(to, directory);
-			System.out.println("Copy from: [" + from + "] to: [" + toDirectory + "]");
 			actions.copyFiles(from, toDirectory);
 		}
 
@@ -329,6 +335,8 @@ public class PluginActions {
 			actions.addDependency(build, BuildType.COMPILE, null, dependency);
 		}
 		
+		// TODO: This will not work when we start reading the path from the
+		// build file.
 		private File computeTo(File to, File directory) {
 			if (to.getAbsolutePath().startsWith(directory.getAbsolutePath()))
 				return to;
@@ -336,11 +344,17 @@ public class PluginActions {
 				return new File(directory, cleanPath(to));
 		}
 		
+		// TODO: This will not work when we start reading the path from the
+		// build file.
 		private String cleanPath(File to) {
 			String path = to.getPath();
-			if (path.startsWith("res/") || path.startsWith("java/")) {
+			if (path.startsWith("res/") || path.startsWith("src/")) {
 				return path.substring(4, path.length());
 			}
+			if (path.startsWith("java/")) {
+				return path.substring(5, path.length());
+			}
+			
 			return to.getPath();
 		}
 	}

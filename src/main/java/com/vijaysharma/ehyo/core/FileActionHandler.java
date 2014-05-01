@@ -10,6 +10,7 @@ public class FileActionHandler implements PluginActionHandler<FileDocument, File
 	@Override
 	public void modify(FileDocument item, FileActions actions) {
 		createNewFiles(item, actions);
+		
 	}
 
 	private void createNewFiles(FileDocument item, FileActions actions) {

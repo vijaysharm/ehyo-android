@@ -1,17 +1,13 @@
 package com.vijaysharma.ehyo.core;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 
 import com.google.common.base.Joiner;
-import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 import freemarker.template.Configuration;
 
@@ -97,7 +93,7 @@ class RecipeDocumentModel {
 	// which will merge with an empty resource file.
 	private void doCopyCallback(RecipeDocumentCallback callback, File to, File from) {
 		if (isResource(from.getPath())) {
-			callback.onCopyResource(toDocument(from), to);
+			callback.onCopyResource(converter.asDocument(from), to);
 		} else {
 			callback.onCopy(from, to);
 		}
@@ -163,16 +159,5 @@ class RecipeDocumentModel {
 	private String fromPath(String path) {
 		String separator = path.startsWith("/") ? "" : File.separator;
 		return Joiner.on(separator).join("root", path);
-	}
-	
-	private static Document toDocument( File file ) {
-		try {
-			SAXBuilder builder = new SAXBuilder();
-			return builder.build(file);
-		} catch (IOException ioe) {
-			throw new UncheckedIoException(ioe);
-		} catch (JDOMException jde) {
-			throw new RuntimeException(jde);
-		}
 	}
 }

@@ -9,6 +9,7 @@ import com.vijaysharma.ehyo.api.Plugin;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
+import com.vijaysharma.ehyo.core.BinaryFileChangeManager.BinaryFileChangeManagerFactory;
 import com.vijaysharma.ehyo.core.FileChangeManager.FileChangeManagerFactory;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
@@ -104,8 +105,15 @@ public class RunAction implements Action {
 			changes.commit(dryrun);
 		}
 		
+		// TODO: Move factories into constructor
 		if ( actions.hasResourceChanges() ) {
 			ResourceChangeManager changes = new ResourceChangeManagerFactory().create();
+			changes.apply(actions);
+			changes.commit(dryrun);
+		}
+		
+		if ( actions.hasBinaryFileChanges() ) {
+			BinaryFileChangeManager changes = new BinaryFileChangeManagerFactory().create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}

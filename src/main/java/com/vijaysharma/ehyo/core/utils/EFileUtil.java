@@ -41,4 +41,12 @@ public class EFileUtil {
 			throw new UncheckedIoException(e);
 		}
 	}
+	
+	public static void copyFile(File from, File to) {
+		try {
+			FileUtils.copyFile(from, to);
+		} catch (IOException e) {
+			throw new UncheckedIoException(e);
+		}
+	}
 }

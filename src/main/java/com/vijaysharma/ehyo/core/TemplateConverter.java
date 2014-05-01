@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo.core;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -61,5 +62,16 @@ class TemplateConverter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
+
+	public Document asDocument(File file) {
+		try {
+			SAXBuilder builder = new SAXBuilder();
+			return builder.build(file);
+		} catch (IOException ioe) {
+			throw new UncheckedIoException(ioe);
+		} catch (JDOMException jde) {
+			throw new RuntimeException(jde);
+		}
+	}
 }

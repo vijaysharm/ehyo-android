@@ -162,7 +162,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onCreateResource(new LinkedList<String>(), new File("/some/path/dummy/DummyContent.java"));
+		verify(callback).onCreateJava(new LinkedList<String>(), new File("/some/path/dummy/DummyContent.java"));
 	}
 	
 	@Test
@@ -179,8 +179,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		File dest = new File(root, "root/res/layout-v17/dream.xml");
-		verify(callback).onCopy(dest, new File("/some/path/layout-v17/dream.xml"));
+		verify(callback).onCopyResource(null, new File("/some/path/layout-v17/dream.xml"));
 	}
 
 	@Test
@@ -198,13 +197,13 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onCopy(
-			new File(root, "root/res/layout-v17/dream1.xml"), 
+		verify(callback).onCopyResource(
+			null, 
 			new File("res/layout-v17/dream1.xml")
 		);
 		
-		verify(callback).onCopy(
-			new File(root, "root/res/layout-v17/dream2.xml"), 
+		verify(callback).onCopyResource(
+			null, 
 			new File("res/layout-v17/dream2.xml")
 		);		
 	}
@@ -224,13 +223,13 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onCopy(
-			new File(root, "root/res/layout-v17/dream1.xml"), 
+		verify(callback).onCopyResource(
+			null,
 			new File("res/layout-v17/dream1.xml")
 		);
 		
-		verify(callback).onCopy(
-			new File(root, "root/res/layout-v17/dir/dream2.xml"), 
+		verify(callback).onCopyResource(
+			null, 
 			new File("res/layout-v17/dir/dream2.xml")
 		);		
 	}
@@ -250,13 +249,13 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onCopy(
-			new File(root, "root/res/layout-v17/dream1.xml"), 
+		verify(callback).onCopyResource(
+			null, 
 			new File("/some/path/res/drawable-xxhdpi/dream1.xml")
 		);
 		
-		verify(callback).onCopy(
-			new File(root, "root/res/layout-v17/dream2.xml"), 
+		verify(callback).onCopyResource(
+			null, 
 			new File("/some/path/res/drawable-xxhdpi/dream2.xml")
 		);		
 	}

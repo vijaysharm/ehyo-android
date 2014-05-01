@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import com.vijaysharma.ehyo.core.PluginActions.DefaultRecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
+import com.vijaysharma.ehyo.core.models.ResourceDocument;
 
 public class DefaultRecipeDocumentCallbackTest {
 	private DefaultRecipeDocumentCallback callback;
@@ -33,7 +34,7 @@ public class DefaultRecipeDocumentCallbackTest {
 		File dest = new File("/root/dir/res/layout/main.xml");
 		callback.onMergeResource(null, dest);
 		
-		verify(actions).mergeResource(dest, null);
+		verify(actions).mergeResource(Mockito.eq(dest), Mockito.any(ResourceDocument.class));
 	}
 	
 	@Test
@@ -41,6 +42,7 @@ public class DefaultRecipeDocumentCallbackTest {
 		when(manifest.getResourceDirectory()).thenReturn(new File("/root/dir/res"));
 		callback.onMergeResource(null, new File("res/layout/main.xml"));
 		
-		verify(actions).mergeResource(new File("/root/dir/res/layout/main.xml"), null);
+		File dest = new File("/root/dir/res/layout/main.xml");
+		verify(actions).mergeResource(Mockito.eq(dest), Mockito.any(ResourceDocument.class));
 	}
 }
