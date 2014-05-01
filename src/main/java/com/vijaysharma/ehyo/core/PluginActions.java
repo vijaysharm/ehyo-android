@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.jdom2.Document;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -18,6 +19,7 @@ import com.vijaysharma.ehyo.api.TemplateParameters;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.FileActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
+import com.vijaysharma.ehyo.core.InternalActions.ResourceActions;
 import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
@@ -28,6 +30,7 @@ import com.vijaysharma.ehyo.core.models.ManifestTags.Receiver;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Service;
 import com.vijaysharma.ehyo.core.models.Project;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
+import com.vijaysharma.ehyo.core.models.ResourceDocument;
 import com.vijaysharma.ehyo.core.models.SourceSet;
 
 // TODO: Delegate component action changes to smaller classes
@@ -41,7 +44,8 @@ public class PluginActions {
 	private final ImmutableMultimap.Builder<GradleBuild, Dependency> addedDependencies = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<GradleBuild, Dependency> removedDependencies = ImmutableMultimap.builder();
 	
-	private final ImmutableMultimap.Builder<File, List<String>> mergedFiles = ImmutableMultimap.builder();
+	private final ImmutableMap.Builder<File, File> copiedFiles = ImmutableMap.builder();
+	private final ImmutableMultimap.Builder<File, ResourceDocument> mergedResource = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<File, List<String>> createdFiles = ImmutableMultimap.builder();
 	
 	public void addDependency(GradleBuild build, BuildType type, Flavor flavor, String projectId) {
@@ -108,13 +112,25 @@ public class PluginActions {
 	
 	public Set<File> getFiles() {
 		Set<File> files = Sets.newHashSet(createdFiles.build().keySet());
-		files.addAll(mergedFiles.build().keySet());
+		
+		return files;
+	}
 
+	public Set<File> getResourceFiles() {
+		Set<File> files = Sets.newHashSet(mergedResource.build().keySet());
 		return files;
 	}
 	
 	public void createFile(File file, List<String> contents) {
 		createdFiles.put(file, contents);
+	}
+	
+	public void mergeResource(File file, ResourceDocument contents) {
+		mergedResource.put(file, contents);
+	}
+	
+	public void copyFiles(File from, File to) {
+		copiedFiles.put(from, to);
 	}
 	
 	public boolean hasBuildChanges() {
@@ -141,10 +157,13 @@ public class PluginActions {
 	}
 
 	public boolean hasFileChanges() {
-		return  (! mergedFiles.build().isEmpty()) ||
-				(! createdFiles.build().isEmpty());
+		return  (! createdFiles.build().isEmpty());
 	}
 
+	public boolean hasResourceChanges() {
+		return ! mergedResource.build().isEmpty();
+	}
+	
 	public BuildActions getBuildActions(final GradleBuild key) {
 		return new BuildActions() {
 			@Override
@@ -196,6 +215,15 @@ public class PluginActions {
 			}
 		};
 	}
+	
+	public ResourceActions getResourceActions(final File key) {
+		return new ResourceActions() {
+			@Override
+			public Collection<ResourceDocument> getMergedResources() {
+				return mergedResource.build().get(key);
+			}
+		};
+	}
 
 	// TODO: Can't say I'm a fan of this API... 4 arguments??
 	// TODO: Need to read in the buildApi and the minApiLevel from the build
@@ -220,53 +248,101 @@ public class PluginActions {
 		mapping.put("resDir", manifest.getResourceDirectory().getAbsolutePath());
 		mapping.put("packageName", manifest.getPackageName());
 
-		template.apply(mapping, new RecipeDocumentCallback() {
-			@Override
-			public void onInstantiate(List<String> result, File to) {
-				createdFiles.put(to, result);
-			}
+		template.apply(mapping, new DefaultRecipeDocumentCallback(this, build, manifest));
+	}
+	
+	static class DefaultRecipeDocumentCallback implements RecipeDocumentCallback {
+		private final PluginActions actions;
+		private final GradleBuild build;
+		private final AndroidManifest manifest;
 
-			@Override
-			public void onManifestMerge(Document result, File to) {
-				if ( ! manifest.getFile().equals(to) )
-					throw new IllegalStateException("Expected " + to + " to be " + manifest.getFile());
-				AndroidManifestDocument manifestDocument = new AndroidManifestDocument(result);
-				
-				// TODO: Need to copy everything you can from the template manifest.
-				Set<String> permissions = manifestDocument.getPermissions();
-				for ( String permission : permissions )
-					addPermission(manifest, permission);
-				
-				List<Activity> activities = manifestDocument.getActivities();
-				for ( Activity activity : activities )
-					addActivity(manifest, activity);
-				
-				List<Service> services = manifestDocument.getServices();
-				for ( Service service : services )
-					addService(manifest, service);
-				
-				List<Receiver> receivers = manifestDocument.getReceivers();
-				for ( Receiver receiver : receivers )
-					addReceiver(manifest, receiver);
-			}
+		public DefaultRecipeDocumentCallback(PluginActions actions, GradleBuild build, AndroidManifest manifest) {
+			this.actions = actions;
+			this.build = build;
+			this.manifest = manifest;
+		}
+		
+		@Override
+		public void onCreateJava(List<String> result, File to) {
+			File directory = manifest.getSourceDirectory();
+			File toDirectory = computeTo(to, directory);
+			actions.createFile(toDirectory, result);
+		}
+		
+		@Override
+		public void onCreateResource(List<String> result, File to) {
+			File directory = manifest.getResourceDirectory();
+			File toDirectory = computeTo(to, directory);
+			actions.createFile(toDirectory, result);
+		}
+
+		@Override
+		public void onMergeManifest(Document result, File to) {
+			// TODO: Assuming that the manifest that will be modified will be
+			// the one that's owned by this action
+			AndroidManifestDocument manifestDocument = new AndroidManifestDocument(result);
 			
-			@Override
-			public void onResourceMerge(List<String> result, File to) {
-				mergedFiles.put(to, result);
-			}
+			// TODO: Need to copy everything you can from the template manifest.
+			Set<String> permissions = manifestDocument.getPermissions();
+			for ( String permission : permissions )
+				actions.addPermission(manifest, permission);
+			
+			List<Activity> activities = manifestDocument.getActivities();
+			for ( Activity activity : activities )
+				actions.addActivity(manifest, activity);
+			
+			List<Service> services = manifestDocument.getServices();
+			for ( Service service : services )
+				actions.addService(manifest, service);
+			
+			List<Receiver> receivers = manifestDocument.getReceivers();
+			for ( Receiver receiver : receivers )
+				actions.addReceiver(manifest, receiver);
+		}
+		
+		@Override
+		public void onMergeResource(Document result, File to) {
+			File directory = manifest.getResourceDirectory();
+			File toDirectory = computeTo(to, directory);
+			actions.mergeResource(toDirectory, new ResourceDocument(result));
+		}
 
-			@Override
-			public void onCopy(File from, File to) {
-				// TODO: Handle copies
-			}
+		@Override
+		public void onCopy(File from, File to) {
+			File directory = manifest.getResourceDirectory();
+			File toDirectory = computeTo(to, directory);
+			System.out.println("Copy from: [" + from + "] to: [" + toDirectory + "]");
+			actions.copyFiles(from, toDirectory);
+		}
 
-			@Override
-			public void onDependency(String dependency) {
-				// TODO: Need a way to determine which is the best build
-				// configuration from the source set.
-				addDependency(build, BuildType.COMPILE, null, dependency);
+		@Override
+		public void onCopyResource(Document result, File to) {
+			File directory = manifest.getResourceDirectory();
+			File toDirectory = computeTo(to, directory);
+			actions.mergeResource(toDirectory, new ResourceDocument(result));
+		}
+		
+		@Override
+		public void onDependency(String dependency) {
+			// TODO: Need a way to determine which is the best build
+			// configuration from the source set.
+			actions.addDependency(build, BuildType.COMPILE, null, dependency);
+		}
+		
+		private File computeTo(File to, File directory) {
+			if (to.getAbsolutePath().startsWith(directory.getAbsolutePath()))
+				return to;
+			else
+				return new File(directory, cleanPath(to));
+		}
+		
+		private String cleanPath(File to) {
+			String path = to.getPath();
+			if (path.startsWith("res/") || path.startsWith("java/")) {
+				return path.substring(4, path.length());
 			}
-		});
+			return to.getPath();
+		}
 	}
 	
 	static class TemplateAction {

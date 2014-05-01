@@ -72,8 +72,8 @@ public class ProjectRegistryBuilder {
 				Set<String> permissions = document.getPermissions();
 				String packageName = document.getPackage();
 				SourceSetType sourceSet = new SourceSetType(file.getParentFile().getName());
-				File sourceDirectory = new File( file.getParentFile(), "java");
-				File resourceDirectory = new File( file.getParentFile(), "res");
+				File sourceDirectory = new File(file.getParentFile(), "java");
+				File resourceDirectory = new File(file.getParentFile(), "res");
 				
 				manifestMapping.put(sourceSet, new AndroidManifest(file, 
 																   projectName, 

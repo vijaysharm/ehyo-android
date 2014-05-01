@@ -5,6 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.vijaysharma.ehyo.api.utils.OptionSelectorTest;
+import com.vijaysharma.ehyo.core.DefaultRecipeDocumentCallbackTest;
 import com.vijaysharma.ehyo.core.FileObserverProjectBuilderTest;
 import com.vijaysharma.ehyo.core.ManifestActionHandlerTest;
 import com.vijaysharma.ehyo.core.PatchApplierTest;
@@ -31,6 +32,7 @@ import com.vijaysharma.ehyo.core.models.GradleBuildDocumentTest;
 	BuildTypeTest.class,
 	CommandLineFactoryTest.class,
 	CommandLineParserTest.class,
+	DefaultRecipeDocumentCallbackTest.class,
 	DirectoryCommandLineConverterTest.class,
 	FileObserverProjectBuilderTest.class,
 	GradleBuildDocumentTest.class,

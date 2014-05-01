@@ -1,22 +1,28 @@
 package com.vijaysharma.ehyo.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 import com.google.common.base.Joiner;
+import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 import freemarker.template.Configuration;
 
 class RecipeDocumentModel {
 	static interface RecipeDocumentCallback {
-		void onInstantiate(List<String> result, File to);
-		void onResourceMerge(List<String> result, File to);
-		void onManifestMerge(Document result, File to);
+		void onCreateJava(List<String> result, File to);
+		void onCreateResource(List<String> result, File to);
+		void onMergeResource(Document result, File to);
+		void onMergeManifest(Document result, File to);
 		void onCopy(File from, File to);
+		void onCopyResource(Document result, File to);
 		void onDependency(String dependency);
 	}
 	
@@ -90,7 +96,11 @@ class RecipeDocumentModel {
 	// TODO: Optimize for resource files. We can maybe just call onResourceMerge
 	// which will merge with an empty resource file.
 	private void doCopyCallback(RecipeDocumentCallback callback, File to, File from) {
-		callback.onCopy(from, to);
+		if (isResource(from.getPath())) {
+			callback.onCopyResource(toDocument(from), to);
+		} else {
+			callback.onCopy(from, to);
+		}
 	}
 	
 	private void handleInstantiate(RecipeDocumentCallback callback, String fromPath, String toPath) {
@@ -98,9 +108,12 @@ class RecipeDocumentModel {
 		String from = fromPath(fromPath);
 		freemarker.template.Template template = converter.get(config, from);
 
-		if ( isResource(from) || isJava(from) ) {
+		if (isJava(from)) {
 			List<String> result = converter.asListOfStrings(template, properties);
-			callback.onInstantiate(result, to);
+			callback.onCreateJava(result, to);
+		} else if (isResource(from)) { 
+			List<String> result = converter.asListOfStrings(template, properties);
+			callback.onCreateResource(result, to);
 		} else {
 			throw new UnsupportedOperationException("merging unknown type: " + fromPath);
 		}
@@ -113,10 +126,10 @@ class RecipeDocumentModel {
 		
 		if ( isManifest(from) ) {
 			Document result = converter.asDocument(template, properties);
-			callback.onManifestMerge(result, to);
+			callback.onMergeManifest(result, to);
 		} else if ( isResource(from) ) {
-			List<String> result = converter.asListOfStrings(template, properties);
-			callback.onResourceMerge(result, to);
+			Document result = converter.asDocument(template, properties);
+			callback.onMergeResource(result, to);
 		} else {
 //			List<String> result = converter.asListOfStrings(template, properties);
 //			callback.onMerge(result, toFile);
@@ -129,7 +142,7 @@ class RecipeDocumentModel {
 	}
 	
 	private boolean isResource(String from) {
-		return from.startsWith("root/res/");
+		return from.contains("res/") && from.contains(".xml");
 	}
 
 	private boolean isManifest(String from) {
@@ -150,5 +163,16 @@ class RecipeDocumentModel {
 	private String fromPath(String path) {
 		String separator = path.startsWith("/") ? "" : File.separator;
 		return Joiner.on(separator).join("root", path);
+	}
+	
+	private static Document toDocument( File file ) {
+		try {
+			SAXBuilder builder = new SAXBuilder();
+			return builder.build(file);
+		} catch (IOException ioe) {
+			throw new UncheckedIoException(ioe);
+		} catch (JDOMException jde) {
+			throw new RuntimeException(jde);
+		}
 	}
 }

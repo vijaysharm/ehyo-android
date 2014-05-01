@@ -12,6 +12,7 @@ import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.FileChangeManager.FileChangeManagerFactory;
 import com.vijaysharma.ehyo.core.GradleBuildChangeManager.GradleBuildChangeManagerFactory;
 import com.vijaysharma.ehyo.core.ManifestChangeManager.ManifestChangeManagerFactory;
+import com.vijaysharma.ehyo.core.ResourceChangeManager.ResourceChangeManagerFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
 public class RunAction implements Action {
@@ -99,6 +100,12 @@ public class RunAction implements Action {
 		
 		if ( actions.hasFileChanges() ) {
 			FileChangeManager changes = fileChangeFactory.create();
+			changes.apply(actions);
+			changes.commit(dryrun);
+		}
+		
+		if ( actions.hasResourceChanges() ) {
+			ResourceChangeManager changes = new ResourceChangeManagerFactory().create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}

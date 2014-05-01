@@ -87,6 +87,11 @@ TODO
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
 ++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
 
++ Improve Command line
+++ http://nodejs.org/api/readline.html
+++ https://github.com/isaacs/read/blob/master/lib/read.js
+++ https://github.com/yeoman/generators
+
 ##Bugs
 + Broke Usage
 ++ It is no longer shown

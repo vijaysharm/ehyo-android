@@ -72,8 +72,13 @@ class DefaultTemplate implements Template {
 		Document globalDocument = converter.asDocument(globalTemplate, mapping.build());
 		
 		for ( Element element : globalDocument.getRootElement().getChildren("global") ) {
-			mapping.put(element.getAttributeValue("id"),
-						element.getAttributeValue("value"));
+			String id = element.getAttributeValue("id");
+			String value = element.getAttributeValue("value");
+
+			if (mapping.build().containsKey(id))
+				continue;
+
+			mapping.put(id, value);
 		}
 		
 		freemarker.template.Template recipeTemplate = converter.get(config, model.getAttribute("execute", "file"));

@@ -57,7 +57,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onManifestMerge(null, new File("/somepath/AndroidManifest.xml"));
+		verify(callback).onMergeManifest(null, new File("/somepath/AndroidManifest.xml"));
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onManifestMerge(null, new File("AndroidManifest.xml"));
+		verify(callback).onMergeManifest(null, new File("AndroidManifest.xml"));
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onManifestMerge(null, new File("AndroidManifest.xml"));
+		verify(callback).onMergeManifest(null, new File("AndroidManifest.xml"));
 	}
 	
 	@Test
@@ -102,7 +102,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onResourceMerge(new LinkedList<String>(), new File("/path/to/values/refs.xml"));
+		verify(callback).onMergeResource(null, new File("/path/to/values/refs.xml"));
 	}
 	
 	@Test
@@ -117,7 +117,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onResourceMerge(new LinkedList<String>(), new File("res/values/strings.xml"));
+		verify(callback).onMergeResource(null, new File("res/values/strings.xml"));
 	}
 	
 	@Test
@@ -132,7 +132,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onResourceMerge(new LinkedList<String>(), new File("res/values/strings.xml"));
+		verify(callback).onMergeResource(null, new File("res/values/strings.xml"));
 	}
 	
 	@Test
@@ -147,7 +147,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onInstantiate(new LinkedList<String>(), new File("/some/path/res/layout/fragment_grid.xml"));
+		verify(callback).onCreateResource(new LinkedList<String>(), new File("/some/path/res/layout/fragment_grid.xml"));
 	}
 	
 	@Test
@@ -162,7 +162,7 @@ public class RecipeDocumentModelTest {
 		RecipeDocumentModel model = new RecipeDocumentModel(root, load(document), config, properties, converter);
 		model.read(callback);
 		
-		verify(callback).onInstantiate(new LinkedList<String>(), new File("/some/path/dummy/DummyContent.java"));
+		verify(callback).onCreateResource(new LinkedList<String>(), new File("/some/path/dummy/DummyContent.java"));
 	}
 	
 	@Test

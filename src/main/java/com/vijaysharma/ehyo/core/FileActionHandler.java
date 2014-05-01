@@ -9,6 +9,10 @@ import com.vijaysharma.ehyo.core.models.FileDocument;
 public class FileActionHandler implements PluginActionHandler<FileDocument, FileActions> {
 	@Override
 	public void modify(FileDocument item, FileActions actions) {
+		createNewFiles(item, actions);
+	}
+
+	private void createNewFiles(FileDocument item, FileActions actions) {
 		Collection<List<String>> files = actions.getCreatedFiles();
 		for ( List<String> lines : files ) {
 			item.addAll(lines);

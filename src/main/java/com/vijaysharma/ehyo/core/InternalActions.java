@@ -7,6 +7,7 @@ import com.vijaysharma.ehyo.core.models.Dependency;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Receiver;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Service;
+import com.vijaysharma.ehyo.core.models.ResourceDocument;
 
 class InternalActions {
 	static interface ManifestActions {
@@ -24,5 +25,9 @@ class InternalActions {
 	
 	static interface FileActions {
 		Collection<List<String>> getCreatedFiles();
+	}
+	
+	static interface ResourceActions {
+		Collection<ResourceDocument> getMergedResources();
 	}
 }

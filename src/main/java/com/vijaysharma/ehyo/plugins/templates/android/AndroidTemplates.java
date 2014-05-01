@@ -18,7 +18,7 @@ public class AndroidTemplates implements Plugin {
 	}
 
 	String[] templates = {
-//		"/templates/activities/MapFragmentMasterDetail",
+		"/templates/activities/MapFragmentMasterDetail",
 //		"/templates/activities/SherlockBlankActivity",
 //		"/templates/activities/SherlockMasterDetailFlow",
 //		"/templates/activities/SlidingPaneMasterDetailFlow",
@@ -30,7 +30,7 @@ public class AndroidTemplates implements Plugin {
 //		"/templates/activities/GoogleMapsActivity", // Does not work "projectOut"
 //		"/templates/activities/GooglePlayServicesActivity",
 //		"/templates/activities/LoginActivity",
-//		"/templates/activities/MasterDetailFlow", // Does not work "minApiLevel"
+//		"/templates/activities/MasterDetailFlow", // Does not work "appCompat" expected boolean, but is string.
 //		"/templates/activities/SettingsActivity",
 //
 //		"/templates/other/AppWidget",
@@ -42,11 +42,11 @@ public class AndroidTemplates implements Plugin {
 //		"/templates/other/IntentService",
 //		"/templates/other/ListFragment",
 //		"/templates/other/Notification",
-		"/templates/other/PlusOneFragment",
-		"/templates/other/Service",
+//		"/templates/other/PlusOneFragment",
+//		"/templates/other/Service",
 
-		"/templates/other/EfficientListAdapter",
-		"/templates/other/ParcelableType"
+//		"/templates/other/EfficientListAdapter",
+//		"/templates/other/ParcelableType"
 	};
 	
 	@Override
