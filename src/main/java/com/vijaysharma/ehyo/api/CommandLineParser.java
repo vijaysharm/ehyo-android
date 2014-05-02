@@ -57,7 +57,7 @@ public class CommandLineParser {
 					it.remove();
 					if (op.hasRequiredArg()) {
 						if (! it.hasNext() )
-							throw new IllegalArgumentException(arg + " has required argument");
+							throw new UsageException("\'" + arg + "\' has required argument\n" + usage);
 						parsed.put(op, it.next());
 						it.remove();
 					} else {

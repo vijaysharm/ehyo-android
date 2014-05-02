@@ -17,6 +17,11 @@ public class AndroidTemplates implements Plugin {
 		return "templates";
 	}
 
+	@Override
+	public String usage() {
+		return "usage: ehyo template";
+	}
+	
 	String[] templates = {
 		"/templates/activities/MapFragmentMasterDetail",
 //		"/templates/activities/SherlockBlankActivity",
@@ -52,7 +57,7 @@ public class AndroidTemplates implements Plugin {
 	@Override
 	public void execute(List<String> args, Service service) {
 		List<ProjectSourceSet> sourceSets = gather(service);
-		OptionSelector<ProjectSourceSet> configSelector = service.createSelector(ProjectSourceSet.class);
+		OptionSelector<ProjectSourceSet> configSelector = service.createSelector("Which source set would you like to apply this template to?", ProjectSourceSet.class);
 		List<ProjectSourceSet> selectedBuildConfigs = configSelector.select(sourceSets, false);
 
 		String templatePath = templates[0];

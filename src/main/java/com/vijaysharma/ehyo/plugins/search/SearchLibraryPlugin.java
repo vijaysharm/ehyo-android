@@ -21,6 +21,11 @@ public class SearchLibraryPlugin implements Plugin {
 		return "dependencies";
 	}
 
+	@Override
+	public String usage() {
+		return "usage: ehyo dependencies";
+	}
+	
 	/**
 	 * TODO: Should support searching by artifact (i.e. distinguish between
 	 * 'com.netflix.rxjava:rxjava-core:0.16.1' and
@@ -47,7 +52,7 @@ public class SearchLibraryPlugin implements Plugin {
 			Artifact first = artifacts[0];
 			
 			List<BuildConfiguration> buildConfigs = service.getBuildConfigurations();
-			OptionSelector<BuildConfiguration> configSelector = service.createSelector(BuildConfiguration.class);
+			OptionSelector<BuildConfiguration> configSelector = service.createSelector("Which build configuration would you like to modify?", BuildConfiguration.class);
 			List<BuildConfiguration> selectedBuildConfigs = configSelector.select(buildConfigs, false);
 
 			for ( BuildConfiguration config : selectedBuildConfigs ) {

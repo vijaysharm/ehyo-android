@@ -15,8 +15,9 @@ import org.junit.Test;
 
 import com.vijaysharma.ehyo.api.ArgumentOption;
 import com.vijaysharma.ehyo.api.CommandLineParser;
-import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
+import com.vijaysharma.ehyo.api.GentleMessageException;
+import com.vijaysharma.ehyo.api.UsageException;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
@@ -89,7 +90,7 @@ public class DirectoryCommandLineConverterTest {
 		converter.read(optionSet);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=UsageException.class)
 	public void read_throws_when_no_argument_given_for_directory() {
 		when(option.supports("--directory")).thenReturn(true);
 		when(option.hasRequiredArg()).thenReturn(true);

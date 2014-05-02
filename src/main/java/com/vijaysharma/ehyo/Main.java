@@ -39,8 +39,8 @@ public class Main implements Runnable {
 		
 		String[] plugin = {
 			"permissions",
-//			"--add", "access",
-//			"--remove", "internet"
+			"--add", "internet",
+//			"--remove", "write"
 				
 //			"dependencies",
 //			"--lib", "butterknife"

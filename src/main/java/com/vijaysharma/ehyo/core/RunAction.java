@@ -3,7 +3,6 @@ package com.vijaysharma.ehyo.core;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.api.Plugin;
@@ -75,12 +74,9 @@ public class RunAction implements Action {
 	@Override
 	public void run() {
 		Plugin plugin = find(args);
-		
-		if ( ! args.isEmpty() )
-			out.println("Executing plugin: " + plugin.getClass().getCanonicalName() + " with args: " + Joiner.on(" ").join(args));
 
 		if ( help ) {
-			out.println("TODO: Print usage for: " + plugin.name());
+			out.println(plugin.usage());
 		} else {
 			PluginActions actions = actionFactory.create();
 			Service service = serviceFactory.create(pluginLoader, registry, actions);
@@ -135,7 +131,7 @@ public class RunAction implements Action {
 		
 		Optional<Plugin> p = pluginLoader.findPlugin(pluginName);
 		if ( ! p.isPresent() ) {
-			throw new GentleMessageException("Command [" + pluginName + "] is not supported by ehyo.\n" +
+			throw new GentleMessageException("Command '" + pluginName + "' is not supported by ehyo.\n" +
 											 "try running 'ehyo list' to see a list of available commands\n");
 		}
 		

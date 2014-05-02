@@ -74,10 +74,20 @@ class RunActionInternals {
 		}
 		
 		@Override
+		public void addPermission(String permission) {
+			actions.addPermission(manifest, permission);
+		}
+		
+		@Override
 		public void addPermissions(Set<String> permissions) {
 			for ( String permission : permissions ) {
 				actions.addPermission(manifest, permission);
 			}
+		}
+		
+		@Override
+		public void removePermission(String permission) {
+			actions.removePermission(manifest, permission);
 		}
 		
 		@Override
@@ -205,8 +215,7 @@ class RunActionInternals {
 	
 	static class DefaultOptionSelectorFactory implements OptionSelectorFactory {
 		@Override
-		public <T> OptionSelector<T> create(Class<T> clazz) {
-			String header = "Select";
+		public <T> OptionSelector<T> create(String header, Class<T> clazz) {
 			return new OptionSelector<T>(header, new ToStringRenderer<T>());
 		}
 	}

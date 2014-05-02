@@ -1,8 +1,8 @@
 package com.vijaysharma.ehyo.api;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,8 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
-import com.vijaysharma.ehyo.api.ArgumentOption;
-import com.vijaysharma.ehyo.api.CommandLineParser;
 import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 
 public class CommandLineParserTest {
@@ -64,7 +62,7 @@ public class CommandLineParserTest {
 		assertEquals("--help", optionSet.getRemainingArgs().get(0));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=UsageException.class)
 	public void parse_throws_when_cannot_find_argument_for_ArgumentOption() {
 		when(op1.supports("--add")).thenReturn(true);
 		when(op1.hasRequiredArg()).thenReturn(true);

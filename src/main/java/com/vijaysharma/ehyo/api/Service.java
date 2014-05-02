@@ -30,8 +30,8 @@ public class Service {
 		return projectBuilds;
 	}
 	
-	public <T> OptionSelector<T> createSelector(Class<T> clazz) {
-		return selectorFactory.create(clazz);
+	public <T> OptionSelector<T> createSelector(String header, Class<T> clazz) {
+		return selectorFactory.create(header, clazz);
 	}
 
 	public List<ProjectManifest> getManifests() {

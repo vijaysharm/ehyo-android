@@ -88,22 +88,21 @@ TODO
 + Make all core models package protected
 ++ Document public API
 
-+ Finish the maven search library command
-++ Should it be renamed to dependency, providing a search, add, remove capability?
++ Finish the dependency command
+++ Providing a search, add, remove capability?
 ++ Clean up add / remove
 ++ Support adding libraries directly from command line (i.e. no searching, just raw text)
 
-+ Finish the manifest-permission command
-++ It should support an optional remove argument, which should display the list of existing permissions to remove
-
-+ Finish Template command
++ Finish template command
 ++ Should support applying a template to a sourceset without a manifest
 +++ Need to support a non-existent manifest (as an empty file)
 ++ Prompt user to fill in fields (without resorting to default values)
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
 ++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
 
-+ Write integration tests for templates
++ Write integration tests 
+++ for templates
+++ for entire application
 
 + Unit test existing commands
 
@@ -112,11 +111,18 @@ TODO
 ++ Create a project with basic pieces
 +++ Dependency Injection
 +++ Unit testing Framework
+
 + Create a template that add the 'big cookie model to your project'
+
 + Provide a command that lets you rename your package namespace
+
 + Read templates from github
+
 + Provide a way to easily create templates from a diff
+
 + Provide a way to save templates (as a gist?)
+
 + Provide support for android projects not created with gradle
+
 + Improve Command line
-++ Inquire.js
+++ Inquire.js for java?

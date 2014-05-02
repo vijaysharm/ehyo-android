@@ -7,6 +7,10 @@ import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.logging.Output;
 
 public class ListPlugins implements Plugin {
+	@Override
+	public String usage() {
+		return "usage: ehyo list";
+	}
 	
 	@Override
 	public String name() {
