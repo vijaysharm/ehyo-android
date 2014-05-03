@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
+import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
@@ -41,8 +42,32 @@ class RunActionInternals {
 		}
 		
 		@Override
-		public void addDependency(String projectId) {
-			actions.addDependency(build, buildType, flavor, projectId);
+		public void addArtifact(Artifact artifact) {
+			actions.addDependency(build, buildType, flavor, artifact);
+		}
+		
+		@Override
+		public void addArtifacts(Set<Artifact> artifacts) {
+			for ( Artifact artifact : artifacts ) {
+				addArtifact(artifact);
+			}
+		}
+		
+		@Override
+		public void removeArtifact(Artifact artifact) {
+			actions.removeDependency(build, buildType, flavor, artifact);
+		}
+		
+		@Override
+		public void removeArtifacts(Set<Artifact> artifacts) {
+			for ( Artifact artifact : artifacts ) {
+				removeArtifact(artifact);
+			}
+		}
+		
+		@Override
+		public Set<Artifact> getArtifacts() {
+			return build.getArtifacts(buildType, flavor);
 		}
 		
 		public BuildType getBuildType() {
@@ -59,8 +84,7 @@ class RunActionInternals {
 
 		@Override
 		public String toString() {
-			return Joiner.on(":").join(build.getProject(), 
-					   buildType.getCompileString(flavor));
+			return Joiner.on(" ").join(build, buildType.getCompileString(flavor));
 		}
 	}
 	

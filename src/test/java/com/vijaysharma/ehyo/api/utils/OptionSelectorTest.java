@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.Lists;
+import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 
 public class OptionSelectorTest {
@@ -22,24 +23,22 @@ public class OptionSelectorTest {
 		out = mock(TextOutput.class);
 	}
 	
-	@Test
-	public void select_returns_empty_list_with_invalid_string_selection() {
+	@Test(expected=GentleMessageException.class)
+	public void select_throws_with_invalid_string_selection() {
 		Function<String, String> renderer = Functions.identity();
 		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("string"), out);
 		
 		List<String> list = Lists.newArrayList("one", "two");
-		List<String> selection = selectors.select(list);
-		assertEquals(0, selection.size());
+		selectors.select(list);
 	}
 	
-	@Test
-	public void select_returns_empty_list_with_invalid_int_selection() {
+	@Test(expected=GentleMessageException.class)
+	public void select_when_with_invalid_int_selection() {
 		Function<String, String> renderer = Functions.identity();
 		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("99"), out);
 		
 		List<String> list = Lists.newArrayList("one", "two");
-		List<String> selection = selectors.select(list);
-		assertEquals(0, selection.size());
+		selectors.select(list);
 	}
 	
 	@Test
@@ -65,14 +64,13 @@ public class OptionSelectorTest {
 		assertEquals("two", selection.get(1));
 	}
 	
-	@Test
-	public void select_returns_empty_array_when_selection_is_the_last_one_but_multiselect_is_false() {
+	@Test(expected=GentleMessageException.class)
+	public void select_throws_when_selection_is_the_last_one_but_multiselect_is_false() {
 		Function<String, String> renderer = Functions.identity();
 		OptionSelector<String> selectors = new OptionSelector<String>("", renderer, string("3"), out);
 		
 		List<String> list = Lists.newArrayList("one", "two");
-		List<String> selection = selectors.select(list, false);
-		assertEquals(0, selection.size());
+		selectors.select(list, false);
 	}
 	
 	@Test

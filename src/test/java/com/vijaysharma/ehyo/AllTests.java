@@ -23,6 +23,7 @@ import com.vijaysharma.ehyo.core.models.AndroidManifestDocumentTest;
 import com.vijaysharma.ehyo.core.models.BuildTypeTest;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocumentModelTest;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocumentTest;
+import com.vijaysharma.ehyo.plugins.dependencies.DependenciesTest;
 import com.vijaysharma.ehyo.plugins.manifestpermissions.PermissionsTest;
 
 @RunWith(Suite.class)
@@ -34,6 +35,7 @@ import com.vijaysharma.ehyo.plugins.manifestpermissions.PermissionsTest;
 	CommandLineFactoryTest.class,
 	CommandLineParserTest.class,
 	DefaultRecipeDocumentCallbackTest.class,
+	DependenciesTest.class,
 	DirectoryCommandLineConverterTest.class,
 	FileObserverProjectBuilderTest.class,
 	GradleBuildDocumentTest.class,

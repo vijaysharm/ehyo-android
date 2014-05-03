@@ -17,8 +17,9 @@ To add or remove a permission to a manifest, run the permissions command. By def
 `./bin/ehyo permissions --add internet`
 `./bin/ehyo --directory <dir> permissions --remove internet`
 
-To add or remove dependencies from a build, run the dependencies command. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
-`./bin/ehyo dependencies --add butterknife`
+To search, add or remove dependencies from a build, run the dependencies command. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
+`./bin/ehyo dependencies -s butterknife --add`
+`./bin/ehyo dependencies -g com.jakewharton`
 `./bin/ehyo dependencies --remove retrofit --dry-run`
 
 To apply a template to your project, run the templates command.
@@ -61,6 +62,11 @@ TODO
 + Displays the following when commands are run
 ++ Manifest for source set: [app:SourceSetType [type=debug]] is null!!!!
 
++ Ugly exception when no internet connection with dependency command
+
++ Need to create/modify build.gradle if user wants to add a dependency to a build config that isn't explicitly defined.
+++ check GradleBuildDocument and ProjectRegistryBuilder
+
 ##Tasks
 + Show better version information
 ++ Better option description for usage
@@ -89,12 +95,10 @@ TODO
 ++ Document public API
 
 + Finish the dependency command
-++ Providing a search, add, remove capability?
-++ Clean up add / remove
-++ Support adding libraries directly from command line (i.e. no searching, just raw text)
+++ Finish search by group ID
 
 + Finish template command
-++ Should support applying a template to a sourceset without a manifest
+
 +++ Need to support a non-existent manifest (as an empty file)
 ++ Prompt user to fill in fields (without resorting to default values)
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
@@ -125,4 +129,5 @@ TODO
 + Provide support for android projects not created with gradle
 
 + Improve Command line
+++ Need to be able to multi-select
 ++ Inquire.js for java?

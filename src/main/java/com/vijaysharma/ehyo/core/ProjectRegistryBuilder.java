@@ -94,8 +94,10 @@ public class ProjectRegistryBuilder {
 			ImmutableSet.Builder<SourceSet> sourceSets = ImmutableSet.builder();
 			for ( SourceSetType type : sourceSetTypes ) {
 				AndroidManifest manifest = manifestMapping.get(type);
-				if ( manifest == null )
-					System.err.println("Manifest for source set: [" + projectName + ":" + type + "] is null!!!!");
+
+				//TODO: Should I support manifests that don't exist?
+//				if ( manifest == null )
+//					System.err.println("Manifest for source set: [" + projectName + ":" + type + "] is null!!!!");
 				
 				sourceSets.add(new SourceSet(projectName, type, manifest));
 			}

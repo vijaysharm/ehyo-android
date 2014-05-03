@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 
 public class GradleBuildDocumentTest {
@@ -29,7 +30,10 @@ public class GradleBuildDocumentTest {
     	Dependency dependency = dependencies.get(0);
     	assertEquals(BuildType.COMPILE, dependency.getBuildType());
     	assertEquals(null, dependency.getFlavor());
-    	assertEquals("com.android.support:appcompat-v7:+", dependency.getDependency());
+    	Artifact artifact = dependency.getArtifact();
+		assertEquals("com.android.support", artifact.getGroupId());
+    	assertEquals("appcompat-v7", artifact.getArtifactId());
+    	assertEquals("+", artifact.getLatestVersion());
     }
 	
 	private File fromFile(String filename) {

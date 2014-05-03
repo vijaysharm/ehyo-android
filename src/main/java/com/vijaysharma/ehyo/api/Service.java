@@ -3,6 +3,8 @@ package com.vijaysharma.ehyo.api;
 import java.util.Collection;
 import java.util.List;
 
+import retrofit.RestAdapter;
+
 import com.google.common.collect.ImmutableList;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 
@@ -54,5 +56,13 @@ public class Service {
 
 	public Template loadTemplate(String templatePath) {
 		return templateFactory.create(templatePath);
+	}
+
+	public MavenService getMavenService() {
+		RestAdapter restAdapter = new RestAdapter.Builder()
+	    	.setEndpoint("http://search.maven.org")
+	    	.build();
+	
+		return restAdapter.create(MavenService.class);
 	}
 }

@@ -137,8 +137,9 @@ public class Permissions implements Plugin {
 		
 		List<ProjectManifest> manifestsToModify = Lists.newArrayList();
 		for ( ProjectManifest manifest : service.getManifests() ) {
+			Set<String> all = manifest.getPermissions();
 			for ( String permission : selectedPermission ) {
-				if ( ! manifest.getPermissions().contains(permission) )
+				if ( ! all.contains(permission) )
 					manifestsToModify.add(manifest);
 			}
 		}

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 
@@ -28,6 +29,11 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return model.getLines();
 	}
 
+	/**
+	 * TODO: I should read the types from the build file. If the user wants to
+	 * modify a non-existent one, we should let the user know, and create the
+	 * appropriate section for it
+	 */
 	public Set<SourceSetType> getSourceSetTypes() {
 		ImmutableSet.Builder<SourceSetType> sourceSets = ImmutableSet.builder();
 		sourceSets.add(SourceSetType.MAIN);
@@ -45,6 +51,11 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return sourceSets.build();
 	}
 	
+	/**
+	 * TODO: I should read the types from the build file. If the user wants to
+	 * modify a non-existent one, we should let the user know, and create the
+	 * appropriate section for it
+	 */
 	public Set<BuildType> getBuildTypes() {
 		ImmutableSet.Builder<BuildType> builtypes = ImmutableSet.builder();
 		builtypes.add(BuildType.ANDROID_TEST);
@@ -75,13 +86,13 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return flavors.build();
 	}
 	
-	public Set<String> getDependencies(BuildType buildType, Flavor flavor) {
-		ImmutableSet.Builder<String> dependencies = ImmutableSet.builder();
+	public Set<Artifact> getDependencies(BuildType buildType, Flavor flavor) {
+		ImmutableSet.Builder<Artifact> dependencies = ImmutableSet.builder();
 		Collection<String> properties = model.getProperties("root.dependencies");
 
 		for ( String property : properties ) {
 			if (property.startsWith(buildType.getCompileString(flavor))) {
-				String library = parseLibrary(buildType, null, property);
+				Artifact library = parseLibrary(buildType, null, property);
 				dependencies.add(library);
 			}
 		}
@@ -99,13 +110,13 @@ public class GradleBuildDocument implements AsListOfStrings {
 		for ( String property : properties ) {
 			for ( BuildType buildType : buildTypes ) {
 				if (property.startsWith(buildType.getCompileString())) {
-					String library = parseLibrary(buildType, null, property);
+					Artifact library = parseLibrary(buildType, null, property);
 					dependencies.add(new Dependency(buildType, null, library));
 				}
 				
 				for ( Flavor flavor : flavors ) {
 					if (property.startsWith(buildType.getCompileString(flavor))) {
-						String library = parseLibrary(buildType, flavor, property);
+						Artifact library = parseLibrary(buildType, flavor, property);
 						dependencies.add(new Dependency(buildType, flavor, library));
 					}	
 				}
@@ -115,9 +126,11 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return dependencies.build();
 	}
 
-	private String parseLibrary(BuildType buildType, Flavor flavor, String property) {
+	private Artifact parseLibrary(BuildType buildType, Flavor flavor, String property) {
 		int indexof = buildType.getCompileString(flavor).length();
-		return property.substring(indexof + 2, property.length() -1);
+		String library = property.substring(indexof + 2, property.length() -1);
+		
+		return Artifact.read(library);
 	}
 
 	public void addDependencies(Set<Dependency> toBeAdded) {
@@ -142,7 +155,7 @@ public class GradleBuildDocument implements AsListOfStrings {
 		dependency
 			.append("    ")
 			.append(compileString)
-			.append(" \'" + lib.getDependency() + "\'");
+			.append(" \'" + lib.getArtifact() + "\'");
 
 		return dependency.toString();
 	}

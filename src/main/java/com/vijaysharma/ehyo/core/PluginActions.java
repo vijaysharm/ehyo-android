@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.TemplateParameters;
@@ -48,8 +49,8 @@ public class PluginActions {
 	private final ImmutableMultimap.Builder<File, ResourceDocument> mergedResource = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<File, List<String>> createdFiles = ImmutableMultimap.builder();
 	
-	public void addDependency(GradleBuild build, BuildType type, Flavor flavor, String projectId) {
-		Dependency dependency = new Dependency(type, flavor, projectId);
+	public void addDependency(GradleBuild build, BuildType type, Flavor flavor, Artifact artifact) {
+		Dependency dependency = new Dependency(type, flavor, artifact);
 		addedDependencies.put(build, dependency);
 	}
 	
@@ -64,7 +65,7 @@ public class PluginActions {
 		return addedDependencies.build();
 	}
 	
-	public void removeDependency(GradleBuild build, BuildType type, Flavor flavor, String projectId) {
+	public void removeDependency(GradleBuild build, BuildType type, Flavor flavor, Artifact projectId) {
 		Dependency dependency = new Dependency(type, flavor, projectId);
 		removedDependencies.put(build, dependency);
 	}
@@ -332,7 +333,8 @@ public class PluginActions {
 		public void onDependency(String dependency) {
 			// TODO: Need a way to determine which is the best build
 			// configuration from the source set.
-			actions.addDependency(build, BuildType.COMPILE, null, dependency);
+			Artifact artifact = Artifact.read(dependency);
+			actions.addDependency(build, BuildType.COMPILE, null, artifact);
 		}
 		
 		// TODO: This will not work when we start reading the path from the

@@ -71,7 +71,7 @@ public class GradleBuildDocumentModel {
 			} else if ( line.endsWith("}")) {
 				context.removeLast();
 			} else {
-				if ( line.equals(property) && path(context).equals(path)) {
+				if ( line.equals(property.trim()) && path(context).equals(path)) {
 					return index;
 				}
 			}

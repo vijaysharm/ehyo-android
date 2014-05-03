@@ -38,12 +38,15 @@ public class Main implements Runnable {
 		};
 		
 		String[] plugin = {
-			"permissions",
-			"--add", "internet",
+//			"permissions",
+//			"--add", "internet",
 //			"--remove", "write"
 				
-//			"dependencies",
-//			"--lib", "butterknife"
+			"dependencies",
+			"-s", "butterknife",
+//			"-g", "com.jakewharton"
+			"--add"
+//			"--remove", "butterknife"
 				
 //			"templates"
 		};
@@ -51,8 +54,10 @@ public class Main implements Runnable {
 		String[] arguments = concat(main, plugin);
 		printArgs(arguments);
 		new Main(arguments).run();
+		
+//		System.out.println(dothis("g:\"com.vijay\""));
 	}
-    
+
     private static String[] concat(String[]...strings) {
     	ArrayList<String> result = new ArrayList<String>();
     	for ( String[] s : strings ) {

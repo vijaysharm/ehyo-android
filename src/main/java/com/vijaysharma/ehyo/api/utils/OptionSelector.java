@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.vijaysharma.ehyo.api.GentleMessageException;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 
@@ -50,7 +50,7 @@ public class OptionSelector<T> {
 		int selection = read(1, max);
 
 		if ( selection < 1 || selection > max)
-			return Lists.newArrayList();
+			throw new GentleMessageException("Your selection is out of range!");
 
 		if ( multiselect && selection == max )
 			return items;

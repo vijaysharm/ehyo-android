@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 
@@ -37,6 +39,23 @@ public class GradleBuild implements HasDocument {
 	
 	public String getId() {
 		return id;
+	}
+	
+	public Set<Artifact> getArtifacts(BuildType type, Flavor flavor) {
+		ImmutableSet.Builder<Artifact> artifacts = ImmutableSet.builder(); 
+		for ( Dependency dependency : dependencies ) {
+			if ( dependency.getBuildType().equals(type) ) {
+				if ( dependency.getFlavor() == null && flavor == null ) {
+					artifacts.add(dependency.getArtifact());
+				} else if ( dependency.getFlavor() != null && dependency.getFlavor().equals(flavor)) {
+					artifacts.add(dependency.getArtifact());
+				} else if ( flavor != null && flavor.equals(dependency.getFlavor())) {
+					artifacts.add(dependency.getArtifact());
+				}
+			}
+		}
+		
+		return artifacts.build();
 	}
 	
 	public List<Dependency> getDependencies() {
