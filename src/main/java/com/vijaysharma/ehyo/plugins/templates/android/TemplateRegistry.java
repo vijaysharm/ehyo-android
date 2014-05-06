@@ -52,7 +52,7 @@ public class TemplateRegistry {
 			template.addAll(TEMPLATES);
 		} else {
 			for ( TemplateItem item : TEMPLATES ) {
-				if ( item.getName().toLowerCase().contains(name.toLowerCase()) ) {
+				if ( item.getName().toLowerCase().startsWith(name.toLowerCase()) ) {
 					template.add(item);
 				}
 			}

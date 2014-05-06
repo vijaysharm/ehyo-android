@@ -11,6 +11,7 @@ import com.vijaysharma.ehyo.api.ProjectSourceSet;
 import com.vijaysharma.ehyo.api.Service;
 import com.vijaysharma.ehyo.api.Template;
 import com.vijaysharma.ehyo.api.TemplateFileParameter;
+import com.vijaysharma.ehyo.api.TemplateInfo;
 import com.vijaysharma.ehyo.api.TemplateProperty;
 import com.vijaysharma.ehyo.api.UsageException;
 import com.vijaysharma.ehyo.api.logging.Output;
@@ -44,18 +45,22 @@ public class AndroidTemplates implements Plugin {
 	public String usage() {
 		StringBuilder usage = new StringBuilder();
 		usage.append("usage: ehyo template [-l | --list]\n");
+		usage.append("                     [-i | --info <template name>]\n");
 		usage.append("                     [-a | --apply <template name>]\n\n");
 		
 		usage.append("Examples:\n");
 		usage.append("    ehyo dependencies --list\n");
 		usage.append("    ehyo dependencies -l\n");
 		usage.append("    ehyo dependencies -a EmptyActivity\n");
+		usage.append("    ehyo dependencies --info Service\n");
 
 		usage.append("Options:\n");
 		usage.append("    -l, --list\n");
 		usage.append("        List all supported templates.\n");
-		usage.append("    -t <template name>\n");
+		usage.append("    -a, --apply <template name>\n");
 		usage.append("        Apply the given template to the project.\n");
+		usage.append("    -i, --info <template name>\n");
+		usage.append("        Display information regarding the givne tempmate.\n");		
 		
 		return usage.toString();
 	}
@@ -67,16 +72,50 @@ public class AndroidTemplates implements Plugin {
 		
 		boolean containsList = args.contains("-l") || args.contains("--list");
 		boolean containsApply = args.contains("-a") || args.contains("--apply");
+		boolean containsInfo = args.contains("-i") || args.contains("--info");
 		
-		if ( ! containsList && ! containsApply )
+		if ( ! containsList && ! containsApply && ! containsInfo)
 			throw new UsageException(usage());
 		
 		if( containsList ) {
 			handleList();
+		} else if ( containsInfo ) {
+			handleInfo(args, service);
 		} else if ( containsApply ) {
 			handleApply(args, service);
 		}
 	}
+
+	private void handleInfo(List<String> args, Service service) {
+		String templateName = getArgValue("-i", args);
+		if ( Strings.isNullOrEmpty(templateName) ) {
+			templateName = getArgValue("--info", args);
+			
+			if ( Strings.isNullOrEmpty(templateName) ) {
+				throw new UsageException("'-i, --info' have a required argument\n" + 
+										 "Consider running with -l or --list to get a list of known templates.\n" + 
+										 usage());
+			}
+		}
+		
+		List<TemplateItem> items = registry.find(templateName);
+		if ( items.isEmpty() )
+			throw new GentleMessageException("No tempalates found matching '" + templateName + "'");
+		
+		TemplateItem item = service.createSelector("Multiple templates with '" + templateName + "' were found.\nWhich one would you like to know about", TemplateItem.class)
+				.selectOne(items);
+		
+		Template template = service.loadTemplate(item.getFullPath());
+		TemplateInfo info = template.loadTemplateInformation();
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append(info.getName() + "\n");
+		builder.append(createUnderline(info.getName()) + "\n");
+		builder.append(info.getDescription() + "\n");
+		
+		out.println(builder.toString());
+	}
+
 
 	private void handleApply(List<String> args, Service service) {
 		String templateName = getArgValue("-a", args);
@@ -84,7 +123,9 @@ public class AndroidTemplates implements Plugin {
 			templateName = getArgValue("--apply", args);
 			
 			if ( Strings.isNullOrEmpty(templateName) ) {
-				throw new UsageException("'-a, --apply' have a required argument\n" + usage());
+				throw new UsageException("'-a, --apply' have a required argument\n" + 
+						 				 "Consider running with -l or --list to get a list of known templates.\n" + 
+						 				 usage());
 			}
 		}
 		

@@ -49,7 +49,8 @@ public class Main implements Runnable {
 //			"--remove", "butterknife"
 				
 			"templates",
-			"-a", "Service"
+//			"-a", "Service"
+			"-i", "Service"
 		};
 		
 		String[] arguments = concat(main, plugin);

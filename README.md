@@ -11,22 +11,25 @@ The tool allows you to perform common tasks to your Android project
 Usage
 -----
 To view the list of actions ehyo supports, run the list command
-`./bin/ehyo list`
+`ehyo list`
 
-To add or remove a permission to a manifest, run the permissions command. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argume
-`./bin/ehyo permissions --add internet`
-`./bin/ehyo --directory <dir> permissions --remove internet`
+To add or remove a permission to a manifest, run the permissions command. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argument.
+
+`ehyo permissions --add internet`
+`ehyo --directory <dir> permissions --remove internet`
 
 To search, add or remove dependencies from a build, run the dependencies command. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
-`./bin/ehyo dependencies -s butterknife --add`
-`./bin/ehyo dependencies -g com.jakewharton`
-`./bin/ehyo dependencies --remove retrofit --dry-run`
+`ehyo dependencies -s butterknife --add`
+`ehyo dependencies -g com.jakewharton`
+`ehyo dependencies --remove retrofit --dry-run`
 
 To apply a template to your project, run the templates command.
-`./bin/ehyo templates --list`
-`./bin/ehyo templates -l`
-`./bin/ehyo templates -a [templatename]`
-`./bin/ehyo templates --apply [templatename]`
+`ehyo templates --list`
+`ehyo templates -l`
+`ehyo templates -a [templatename]`
+`ehyo templates --apply [templatename]`
+
+After downloading ehyo, a script to use ehyo is provided in ./bin/ehyo ... Add this to your path or give the full path to the script in bin and enjoy.
 
 Limitations
 -----------
@@ -39,13 +42,11 @@ Limitations
 
 + There's no rollback during failures. If part of a template is applied, and an exception occurs, then there's no way to undo what failed. As a suggestion, run ehyo within a version controlled project with a fresh checkout. That will allow you to rollback your changes when ehyo craps out on you.
 
++ Developed on and only tested on OSX. There isn't any OS specific stuff in the code, per-se, but consider this warning if things don't work ask you expect.
+
 Building the jar
 ----------------
 `mvn package`
-
-Developing using Eclipse
-------------------------
-`mvn clean package dependency:sources dependency:resolve -Dclassifier=javadoc eclipse:eclipse`
 
 TODO
 ----
@@ -66,10 +67,11 @@ TODO
 
 + Ugly exception when no internet connection with dependency command
 
++ PatchApplier modifies the formatting of XML (doesn't respect the desired Android formatting)
+
 ##Tasks
 + Show better version information
 ++ Better option description for usage
-+ Have the PatchApplier not modify the formatting of the XML file
 
 + Improve dry-run diff
 ++ Remove line numbers
@@ -97,17 +99,17 @@ TODO
 +++ Need to support a non-existent manifest (as an empty file)
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
 ++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
-++ Support displaying the description for a template with --about
 ++ Support optional in the template parameter file
 +++ See blank activity template
 ++ Support --<parameter> where the argument is the same parameter in the template
 ++ Read the min- supported properties on the template object and filter out non-applicable ones during execution
++ Support the 'revision' attribute on dependencies from template (see Login Activity)
 
 + Write integration tests 
 ++ for templates
 ++ for entire application
 
-+ Unit test existing commands
++ Move all TODOs to Issues list.
 
 ##Roadmap
 + Provide a way to create a new Android application
@@ -130,3 +132,5 @@ TODO
 + Improve Command line
 ++ Need to be able to multi-select
 ++ Inquire.js for java?
+
++ Provide ehyo through Brew

@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Template;
 import com.vijaysharma.ehyo.api.TemplateFileParameter;
+import com.vijaysharma.ehyo.api.TemplateInfo;
 import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.TemplateMethods.ActivityToLayout;
 import com.vijaysharma.ehyo.core.TemplateMethods.CamelCaseToUnderscore;
@@ -43,6 +44,12 @@ class DefaultTemplate implements Template {
 		File templateStartingPoint = new File(templateFileRoot, "template.xml");
 		this.templateDocument = load(templateStartingPoint);
 		this.converter = new TemplateConverter();
+	}
+	
+	@Override
+	public DefaultTemplateInfo loadTemplateInformation() {
+		final Element root = templateDocument.getRootElement();
+		return new DefaultTemplateInfo(root);
 	}
 	
 	/**
@@ -142,6 +149,23 @@ class DefaultTemplate implements Template {
 		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.DEBUG_HANDLER);
 		
 		return cfg;
+	}
+	
+	private static class DefaultTemplateInfo implements TemplateInfo {
+		private final Element root;
+		public DefaultTemplateInfo(Element root) {
+			this.root = root;
+		}
+		
+		@Override
+		public String getName() {
+			return root.getAttributeValue("name");
+		}
+		
+		@Override
+		public String getDescription() {
+			return root.getAttributeValue("description");
+		}
 	}
 	
 	private static class DefaultTemplateFileParameter implements TemplateFileParameter {

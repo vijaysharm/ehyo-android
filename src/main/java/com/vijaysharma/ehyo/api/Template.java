@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface Template {
 	List<TemplateFileParameter> loadTemplateParameters();
+	TemplateInfo loadTemplateInformation();
 }

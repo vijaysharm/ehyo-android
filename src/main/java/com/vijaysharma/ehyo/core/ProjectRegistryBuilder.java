@@ -62,7 +62,7 @@ public class ProjectRegistryBuilder {
 			Map<SourceSetType, AndroidManifest> manifestMapping = Maps.newHashMap();
 			List<File> projectManifestFiles = manifests.removeAll(projectName);
 			for ( File file : projectManifestFiles ) {
-				// TODO: We should be reading the project build to 
+				// TODO: We should be reading the project build to get some manifest information
 				AndroidManifestDocument document = AndroidManifestDocument.read(file); 
 				Set<String> permissions = document.getPermissions();
 				String packageName = document.getPackage();
