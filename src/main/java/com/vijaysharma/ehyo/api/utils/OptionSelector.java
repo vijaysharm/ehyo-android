@@ -28,6 +28,14 @@ public class OptionSelector<T> {
 		this.out = out;
 	}
 	
+	public T selectOne(List<T> items) {
+		List<T> selection = select(items, false);
+		if ( selection.size() != 1 )
+			throw new IllegalStateException("Expected only a single result");
+		
+		return selection.get(0);
+	}
+	
 	public List<T> select(List<T> items, boolean multiselect) {
 		if ( items.size() == 1 ) 
 			return items;

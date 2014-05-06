@@ -93,18 +93,14 @@ public class Dependencies implements Plugin {
 				addArtifacts(artifacts, service);
 			else
 				listArtifacts(artifacts, service);
-		}
-		
-		if ( searchByGroupId ) {
+		} else if ( searchByGroupId ) {
 			String groupId = getArgValue("-g", args);
 			List<Artifact> artifacts = searchArtifactsByGroupId(groupId, service);
 			if ( containsAdd )
 				addArtifacts(artifacts, service);
 			else
 				listArtifacts(artifacts, service);
-		}		
-		
-		if ( containsRemove ) {
+		} else if ( containsRemove ) {
 			String toRemove = getArgValue("--remove", args);
 			remove(toRemove, service);
 		}

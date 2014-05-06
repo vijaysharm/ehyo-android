@@ -16,7 +16,8 @@ import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
-import com.vijaysharma.ehyo.api.TemplateParameters;
+import com.vijaysharma.ehyo.api.TemplateFileParameter;
+import com.vijaysharma.ehyo.api.TemplateProperty;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.InternalActions.FileActions;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
@@ -235,14 +236,14 @@ public class PluginActions {
 
 	// TODO: Can't say I'm a fan of this API... 4 arguments??
 	// TODO: Need to read in the buildApi and the minApiLevel from the build
-	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateParameters> parameters, ProjectRegistry registry) {
+	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateProperty> parameters, ProjectRegistry registry) {
 		Project project = registry.getProject(sourceSet.getProject());
 		final GradleBuild build = project.getBuild();
 		final AndroidManifest manifest = sourceSet.getManifests();
 		
 		final Map<String, Object> mapping = Maps.newHashMap();
-		for ( TemplateParameters param : parameters ) {
-			mapping.put(param.getId(), param.getDefaultValue());
+		for ( TemplateProperty param : parameters ) {
+			mapping.put(param.getId(), param.getValue());
 		}
 		
 		// TODO: This might be acceptable until ehyo supports creating new projects
@@ -362,11 +363,11 @@ public class PluginActions {
 	}
 	
 	static class TemplateAction {
-		private List<TemplateParameters> parameters;
+		private List<TemplateFileParameter> parameters;
 		private DefaultTemplate template;
 		private final SourceSet sourceSet;
 		
-		public TemplateAction(DefaultTemplate template, SourceSet sourceSet, List<TemplateParameters> parameters) {
+		public TemplateAction(DefaultTemplate template, SourceSet sourceSet, List<TemplateFileParameter> parameters) {
 			this.template = template;
 			this.parameters = parameters;
 			this.sourceSet = sourceSet;
@@ -376,7 +377,7 @@ public class PluginActions {
 			return sourceSet;
 		}
 		
-		public List<TemplateParameters> getParameters() {
+		public List<TemplateFileParameter> getParameters() {
 			return parameters;
 		}
 		

@@ -42,13 +42,14 @@ public class Main implements Runnable {
 //			"--add", "internet",
 //			"--remove", "write"
 				
-			"dependencies",
-			"-s", "butterknife",
+//			"dependencies",
+//			"-s", "butterknife",
 //			"-g", "com.jakewharton"
-			"--add"
+//			"--add"
 //			"--remove", "butterknife"
 				
-//			"templates"
+			"templates",
+			"-a", "Service"
 		};
 		
 		String[] arguments = concat(main, plugin);

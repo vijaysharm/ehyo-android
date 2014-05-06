@@ -23,8 +23,10 @@ To search, add or remove dependencies from a build, run the dependencies command
 `./bin/ehyo dependencies --remove retrofit --dry-run`
 
 To apply a template to your project, run the templates command.
-`./bin/ehyo templates list`
-`./bin/ehyo templates [templatename]`
+`./bin/ehyo templates --list`
+`./bin/ehyo templates -l`
+`./bin/ehyo templates -a [templatename]`
+`./bin/ehyo templates --apply [templatename]`
 
 Limitations
 -----------
@@ -64,9 +66,6 @@ TODO
 
 + Ugly exception when no internet connection with dependency command
 
-+ Need to create/modify build.gradle if user wants to add a dependency to a build config that isn't explicitly defined.
-++ check GradleBuildDocument and ProjectRegistryBuilder
-
 ##Tasks
 + Show better version information
 ++ Better option description for usage
@@ -79,30 +78,30 @@ TODO
 + Check if the project structure is valid
 ++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
 
-+ As part of the list command, we should be able to provide a filter option
-
 + Add support for a --debug for verbose printing
-
-+ Add support for an "interactive" mode. Allows for users to step and select what is applied.
 
 + Should all actions have names so that output is more legible?
 ++ Might be useful with --debug (Track when an action is added, whether its executed or not, etc...)
 
-+ Move maven search into the Service
-++ Support searching by name, artifact id, etc..
-
 + Make all core models package protected
 ++ Document public API
 
-+ Finish the dependency command
-++ Finish search by group ID
++ Need to create/modify build.gradle if user wants to add a dependency to a build config that isn't explicitly defined.
+++ check GradleBuildDocument and ProjectRegistryBuilder
+
++ All commands
+++ Support --project id or --manifest id or --sourceset id where the ID is something you can use to distinctly select the right item to apply a command to (avoiding prompts)
 
 + Finish template command
-
+++ Add support for an "interactive" mode. Allows for users to step and select what is applied.
 +++ Need to support a non-existent manifest (as an empty file)
-++ Prompt user to fill in fields (without resorting to default values)
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
 ++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
+++ Support displaying the description for a template with --about
+++ Support optional in the template parameter file
++++ See blank activity template
+++ Support --<parameter> where the argument is the same parameter in the template
+++ Read the min- supported properties on the template object and filter out non-applicable ones during execution
 
 + Write integration tests 
 ++ for templates

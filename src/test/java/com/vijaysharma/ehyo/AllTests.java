@@ -25,10 +25,12 @@ import com.vijaysharma.ehyo.core.models.GradleBuildDocumentModelTest;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocumentTest;
 import com.vijaysharma.ehyo.plugins.dependencies.DependenciesTest;
 import com.vijaysharma.ehyo.plugins.manifestpermissions.PermissionsTest;
+import com.vijaysharma.ehyo.plugins.templates.android.AndroidTemplatesTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
 	AndroidManifestDocumentTest.class,
+	AndroidTemplatesTest.class,
 	ApplicationRunActionFactoryTest.class,
 	BuiltInActionsTest.class,
 	BuildTypeTest.class,

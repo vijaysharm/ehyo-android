@@ -14,7 +14,7 @@ import org.jdom2.input.SAXBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.Template;
-import com.vijaysharma.ehyo.api.TemplateParameters;
+import com.vijaysharma.ehyo.api.TemplateFileParameter;
 import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.TemplateMethods.ActivityToLayout;
 import com.vijaysharma.ehyo.core.TemplateMethods.CamelCaseToUnderscore;
@@ -50,7 +50,7 @@ class DefaultTemplate implements Template {
 	 * suggestion values).
 	 */
 	@Override
-	public List<TemplateParameters> loadTemplateParameters() {
+	public List<TemplateFileParameter> loadTemplateParameters() {
 		return getParameters(templateDocument);
 	}
 
@@ -100,8 +100,8 @@ class DefaultTemplate implements Template {
 		}		
 	}
 	
-	public static List<TemplateParameters> getParameters(Document document) {
-		List<TemplateParameters> parameters = Lists.newArrayList();
+	public static List<TemplateFileParameter> getParameters(Document document) {
+		List<TemplateFileParameter> parameters = Lists.newArrayList();
 		Element root = document.getRootElement();
 		for ( Element element : root.getChildren("parameter") ) {
 			String id = element.getAttributeValue("id");
@@ -114,7 +114,7 @@ class DefaultTemplate implements Template {
 			// TODO: Suggest may need to be interpolated (its a template value);
 //			String suggest = element.getAttributeValue("suggest");
 			
-			parameters.add(new TemplateParameters(id, name, type, defaultValue, constraints, help));
+			parameters.add(new DefaultTemplateFileParameter(id, name, type, defaultValue, constraints, help));
 		}
 		
 		return parameters;
@@ -142,5 +142,51 @@ class DefaultTemplate implements Template {
 		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.DEBUG_HANDLER);
 		
 		return cfg;
+	}
+	
+	private static class DefaultTemplateFileParameter implements TemplateFileParameter {
+		private final String id;
+		private final String defaultValue;
+		private final String type;
+		private final String name;
+		private final String help;
+
+		public DefaultTemplateFileParameter(String id, 
+								  String name,
+								  String type,
+								  String defaultValue,
+								  String constraints,
+								  String help) {
+			this.id = id;
+			this.type = type;
+			this.defaultValue = defaultValue;
+			this.name = name;
+			this.help = help;
+		}
+		
+		@Override
+		public String getId() {
+			return id;
+		}
+		
+		@Override
+		public String getName() {
+			return name;
+		}
+		
+		@Override
+		public String getType() {
+			return type;
+		}
+		
+		@Override
+		public String getDefaultValue() {
+			return defaultValue;
+		}
+		
+		@Override
+		public String getHelp() {
+			return help;
+		}
 	}
 }

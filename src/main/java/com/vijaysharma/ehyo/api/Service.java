@@ -7,6 +7,9 @@ import retrofit.RestAdapter;
 
 import com.google.common.collect.ImmutableList;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.api.utils.Questioner;
+import com.vijaysharma.ehyo.api.utils.Questioner.AnswerFactory;
+import com.vijaysharma.ehyo.api.utils.Questioner.Question;
 
 public class Service {
 	private final Collection<Plugin> plugins;
@@ -53,6 +56,15 @@ public class Service {
 
 		return configs.build();
 	}
+	
+	public List<ProjectSourceSet> getSourceSets() {
+		ImmutableList.Builder<ProjectSourceSet> configs = ImmutableList.builder();
+		for( ProjectBuild build : getProjectBuilds() ) {
+			configs.addAll(build.getSourceSets());
+		}
+
+		return configs.build();
+	}
 
 	public Template loadTemplate(String templatePath) {
 		return templateFactory.create(templatePath);
@@ -64,5 +76,9 @@ public class Service {
 	    	.build();
 	
 		return restAdapter.create(MavenService.class);
+	}
+
+	public <T extends Question> Questioner<T, TemplateProperty> createPrompt(AnswerFactory<T, TemplateProperty> factory) {
+		return new Questioner<T, TemplateProperty>(factory);
 	}
 }

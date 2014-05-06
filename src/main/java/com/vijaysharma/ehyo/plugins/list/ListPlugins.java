@@ -19,11 +19,6 @@ public class ListPlugins implements Plugin {
 	
 	@Override
 	public void execute(List<String> args, Service service) {
-		if ( args.contains("--about") ) {
-			Output.out.println("TODO: Print about information");
-			return;
-		}
-		
 		Output.out.println( "Installed plugins" );
 		Output.out.println( "-----------------" );
 		for ( Plugin plugin : service.getPlugins() ) {

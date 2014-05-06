@@ -16,7 +16,7 @@ import com.vijaysharma.ehyo.api.ProjectManifest;
 import com.vijaysharma.ehyo.api.ProjectSourceSet;
 import com.vijaysharma.ehyo.api.Template;
 import com.vijaysharma.ehyo.api.TemplateFactory;
-import com.vijaysharma.ehyo.api.TemplateParameters;
+import com.vijaysharma.ehyo.api.TemplateProperty;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
@@ -219,7 +219,7 @@ class RunActionInternals {
 		}
 		
 		@Override
-		public void applyTemplate(Template template, List<TemplateParameters> parameters) {
+		public void applyTemplate(Template template, List<TemplateProperty> parameters) {
 			DefaultTemplate tmpl = (DefaultTemplate) template;
 			actions.applyTemplate(tmpl, sourceSet, parameters, registry);
 		}
