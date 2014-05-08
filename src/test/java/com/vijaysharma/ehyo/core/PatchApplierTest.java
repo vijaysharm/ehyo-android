@@ -22,6 +22,7 @@ import com.vijaysharma.ehyo.core.PatchApplier.FileWriter;
 import com.vijaysharma.ehyo.core.models.AsListOfStrings;
 import com.vijaysharma.ehyo.core.models.HasDocument;
 
+@SuppressWarnings("unchecked")
 public class PatchApplierTest {
 	private Function<HasDocument, AsListOfStrings> factory;
 	private PatchApplier<HasDocument, AsListOfStrings> patcher;

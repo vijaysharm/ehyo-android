@@ -29,7 +29,7 @@ public class RunActionTest {
 	private GradleBuildChangeManagerFactory buildChangeFactory;
 	private FileChangeManagerFactory fileChangeManagerFactory;
 	private ServiceFactory serviceFactory;
-	private ObjectFactory<PluginActions> actionsFactory;
+	private ObjectFactory pbjectFactory;
 	private TextOutput out;
 	
 	@Before
@@ -40,7 +40,7 @@ public class RunActionTest {
 		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
 		fileChangeManagerFactory = mock(FileChangeManagerFactory.class);
 		serviceFactory = mock(ServiceFactory.class);
-		actionsFactory = mock(ObjectFactory.class);
+		pbjectFactory = mock(ObjectFactory.class);
 		out = mock(TextOutput.class);
 	}
 	
@@ -77,12 +77,12 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(actionsFactory.create()).thenReturn(actions);
+		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
 		
 		RunAction action = create(args);
 		action.run();
 		
-		verify(actionsFactory, times(1)).create();
+		verify(pbjectFactory, times(1)).create(PluginActions.class);
 	}
 	
 	@Test
@@ -94,7 +94,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(actionsFactory.create()).thenReturn(actions);
+		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
 		
 		RunAction action = create(args);
 		action.run();
@@ -103,6 +103,7 @@ public class RunActionTest {
 	}
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void run_calls_execute_on_plugin() {
 		Plugin plugin = mock(Plugin.class);
 		PluginActions actions = mock(PluginActions.class);
@@ -112,7 +113,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(actionsFactory.create()).thenReturn(actions);
+		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
 		when(serviceFactory.create(pluginLoader, registry, actions)).thenReturn(service);
 		
 		RunAction action = create(args);
@@ -144,7 +145,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(actionsFactory.create()).thenReturn(actions);
+		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
 		when(actions.hasManifestChanges()).thenReturn(true);
 		when(manifestChangeFactory.create()).thenReturn(changes);
 		
@@ -165,7 +166,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(actionsFactory.create()).thenReturn(actions);
+		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
 		when(actions.hasBuildChanges()).thenReturn(true);
 		when(buildChangeFactory.create()).thenReturn(changes);
 		
@@ -188,7 +189,7 @@ public class RunActionTest {
 							 buildChangeFactory,
 							 fileChangeManagerFactory,
 							 serviceFactory,
-							 actionsFactory,
+							 pbjectFactory,
 							 help, 
 							 dryrun,
 							 out);

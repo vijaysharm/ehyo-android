@@ -24,7 +24,7 @@ public class RunAction implements Action {
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
 	private final FileChangeManagerFactory fileChangeFactory;
 	private final ServiceFactory serviceFactory;
-	private final ObjectFactory<PluginActions> actionFactory;
+	private final ObjectFactory objectFactory;
 	private final boolean dryrun;
 	private final boolean help;	
 	private final TextOutput out;
@@ -41,7 +41,7 @@ public class RunAction implements Action {
 			 new GradleBuildChangeManagerFactory(),
 			 new FileChangeManagerFactory(),
 			 new ServiceFactory(),
-			 new DefaultPluginActionFactory(),
+			 new ObjectFactory(),
 			 help,
 			 dryrun,
 			 Output.out);
@@ -54,7 +54,7 @@ public class RunAction implements Action {
 			  GradleBuildChangeManagerFactory buildChangeFactory,
 			  FileChangeManagerFactory fileChangeFactory,
 			  ServiceFactory serviceFactory,
-			  ObjectFactory<PluginActions> actionFactory,
+			  ObjectFactory actionFactory,
 			  boolean help,
 			  boolean dryrun,
 			  TextOutput out) {
@@ -67,7 +67,7 @@ public class RunAction implements Action {
 		this.buildChangeFactory = buildChangeFactory;
 		this.fileChangeFactory = fileChangeFactory;
 		this.serviceFactory = serviceFactory;
-		this.actionFactory = actionFactory;
+		this.objectFactory = actionFactory;
 		this.out = out;
 	}
 
@@ -78,7 +78,7 @@ public class RunAction implements Action {
 		if ( help ) {
 			out.println(plugin.usage());
 		} else {
-			PluginActions actions = actionFactory.create();
+			PluginActions actions = objectFactory.create(PluginActions.class);
 			Service service = serviceFactory.create(pluginLoader, registry, actions);
 			plugin.execute(args, service);
 			execute(actions, registry);
@@ -136,12 +136,5 @@ public class RunAction implements Action {
 		}
 		
 		return p.get();
-	}
-
-	private static class DefaultPluginActionFactory implements ObjectFactory<PluginActions> {
-		@Override
-		public PluginActions create() {
-			return new PluginActions();
-		}
 	}
 }

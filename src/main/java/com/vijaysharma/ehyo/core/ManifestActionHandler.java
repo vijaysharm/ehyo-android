@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import com.vijaysharma.ehyo.api.logging.Output;
-import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
@@ -14,16 +12,6 @@ import com.vijaysharma.ehyo.core.models.ManifestTags.Service;
 
 public class ManifestActionHandler implements PluginActionHandler<AndroidManifestDocument, ManifestActions> {
 	
-	private final TextOutput out;
-	
-	public ManifestActionHandler() {
-		this( Output.out );
-	}
-	
-	ManifestActionHandler(TextOutput out) {
-		this.out = out;
-	}
-
 	//VTD-XML
 	@Override
 	public void modify(AndroidManifestDocument doc, ManifestActions action) {

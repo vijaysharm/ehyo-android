@@ -22,6 +22,7 @@ import com.vijaysharma.ehyo.core.ProjectRegistryLoader;
 import com.vijaysharma.ehyo.core.commandline.converters.DirectoryCommandLineConverter.ProjectRegistryLoaderFactory;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 
+@SuppressWarnings("unchecked")
 public class DirectoryCommandLineConverterTest {
 	private ArgumentOption<File> option;
 	private DirectoryCommandLineConverter converter;

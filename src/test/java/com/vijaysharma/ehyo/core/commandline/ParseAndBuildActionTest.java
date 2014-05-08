@@ -24,7 +24,6 @@ import com.vijaysharma.ehyo.core.commandline.ParseAndBuildAction.CommandLineActi
 public class ParseAndBuildActionTest {
 	private CommandLineActionsFactory factory;
 	private TextOutput out;
-	private ParseAndBuildAction action;
 	
 	@Before
 	public void before() {

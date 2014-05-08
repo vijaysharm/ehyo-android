@@ -1,36 +1,25 @@
 package com.vijaysharma.ehyo.core.models;
 
-import com.vijaysharma.ehyo.api.Artifact;
-import com.vijaysharma.ehyo.api.BuildType;
-import com.vijaysharma.ehyo.api.Flavor;
-
 public class Dependency {
-	private final BuildType buildType;
-	private final Flavor flavor;
-	private final Artifact artifact;
+	private final DependencyType type;
+	private final String library;
 	
-	public Dependency(BuildType buildType, Flavor flavor, Artifact dependency) {
-		this.buildType = buildType;
-		this.flavor = flavor;
-		this.artifact = dependency;
+	public Dependency(DependencyType type, String library) {
+		this.type = type;
+		this.library = library;
 	}
 
-	public BuildType getBuildType() {
-		return buildType;
+	public DependencyType getType() {
+		return type;
 	}
 
-	public Flavor getFlavor() {
-		return flavor;
-	}
-
-	public Artifact getArtifact() {
-		return artifact;
+	public String getLibrary() {
+		return library;
 	}
 
 	@Override
 	public String toString() {
-		return "Dependency [buildType=" + buildType + ", flavor=" + flavor
-				+ ", dependency=" + artifact + "]";
+		return "Dependency [type=" + type + ", library=" + library + "]";
 	}
 
 	@Override
@@ -38,10 +27,8 @@ public class Dependency {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((buildType == null) ? 0 : buildType.hashCode());
-		result = prime * result
-				+ ((artifact == null) ? 0 : artifact.hashCode());
-		result = prime * result + ((flavor == null) ? 0 : flavor.hashCode());
+				+ ((library == null) ? 0 : library.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -54,20 +41,15 @@ public class Dependency {
 		if (getClass() != obj.getClass())
 			return false;
 		Dependency other = (Dependency) obj;
-		if (buildType == null) {
-			if (other.buildType != null)
+		if (library == null) {
+			if (other.library != null)
 				return false;
-		} else if (!buildType.equals(other.buildType))
+		} else if (!library.equals(other.library))
 			return false;
-		if (artifact == null) {
-			if (other.artifact != null)
+		if (type == null) {
+			if (other.type != null)
 				return false;
-		} else if (!artifact.equals(other.artifact))
-			return false;
-		if (flavor == null) {
-			if (other.flavor != null)
-				return false;
-		} else if (!flavor.equals(other.flavor))
+		} else if (!type.equals(other.type))
 			return false;
 		return true;
 	}

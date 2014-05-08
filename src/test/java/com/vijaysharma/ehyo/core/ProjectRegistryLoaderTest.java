@@ -18,27 +18,26 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 
-import com.vijaysharma.ehyo.core.ProjectRegistryLoader.FileConstructorFactory;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader.FileObserverProjectBuilder;
 
 public class ProjectRegistryLoaderTest {
 	@Rule public TemporaryFolder folder = new TemporaryFolder();
 	
 	private FileObserverProjectBuilder builder;
-	private FileConstructorFactory<FileObserverProjectBuilder> factory;
+	private ObjectFactory factory;
 	private ProjectRegistryLoader loader;
 	
 	@Before
 	public void before() {
 		builder = mock(FileObserverProjectBuilder.class);
-		factory = mock(FileConstructorFactory.class);
+		factory = mock(ObjectFactory.class);
 		loader = new ProjectRegistryLoader(factory);
 	}
 	
 	@Test
 	public void load_doesnt_call_observe_with_non_directory_root() {
 		File file = newFile("AndroidManifest.xml");
-		when(factory.create(FileObserverProjectBuilder.class, file)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		
 		loader.load(file);
 		
@@ -51,7 +50,7 @@ public class ProjectRegistryLoaderTest {
 	@Test
 	public void load_doesnt_call_observe_with_empty_directory_root() {
 		File folder = newFolder("root");
-		when(factory.create(FileObserverProjectBuilder.class, folder)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		
 		loader.load(folder);
 		
@@ -67,7 +66,7 @@ public class ProjectRegistryLoaderTest {
 		File manifest = newFile("root/AndroidManifest.xml");
 		ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
 		
-		when(factory.create(FileObserverProjectBuilder.class, root)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		loader.load(root);
 		
 		verify(builder, never()).onBuild(any(File.class));
@@ -85,7 +84,7 @@ public class ProjectRegistryLoaderTest {
 		File settings = newFile("root/settings.gradle");
 		ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
 		
-		when(factory.create(FileObserverProjectBuilder.class, root)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		loader.load(root);
 		
 		verify(builder, never()).onBuild(any(File.class));
@@ -103,7 +102,7 @@ public class ProjectRegistryLoaderTest {
 		File build = newFile("root/build.gradle");
 		ArgumentCaptor<File> captor = ArgumentCaptor.forClass(File.class);
 		
-		when(factory.create(FileObserverProjectBuilder.class, root)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		loader.load(root);
 		
 		verify(builder, times(1)).onBuild(captor.capture());
@@ -123,7 +122,7 @@ public class ProjectRegistryLoaderTest {
 		newFile("root/build/settings.gradle");
 		newFile("root/build/AndroidManifest.xml");
 		
-		when(factory.create(FileObserverProjectBuilder.class, root)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		loader.load(root);
 		
 		verify(builder, never()).onBuild(any(File.class));
@@ -140,7 +139,7 @@ public class ProjectRegistryLoaderTest {
 		File settings = newFile("root/src/settings.gradle");
 		File manifest = newFile("root/src/AndroidManifest.xml");
 		
-		when(factory.create(FileObserverProjectBuilder.class, root)).thenReturn(builder);
+		when(factory.create(FileObserverProjectBuilder.class)).thenReturn(builder);
 		loader.load(root);
 		
 		verify(builder, times(1)).onBuild(eq(build));

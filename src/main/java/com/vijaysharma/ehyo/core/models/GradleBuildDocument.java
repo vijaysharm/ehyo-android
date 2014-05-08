@@ -1,17 +1,19 @@
 package com.vijaysharma.ehyo.core.models;
 
 import static com.vijaysharma.ehyo.core.utils.EFileUtil.readLines;
+import static com.vijaysharma.ehyo.core.utils.EStringUtil.makeFirstLetterUpperCase;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableList;
+import joptsimple.internal.Strings;
+
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.vijaysharma.ehyo.api.Artifact;
-import com.vijaysharma.ehyo.api.BuildType;
-import com.vijaysharma.ehyo.api.Flavor;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 public class GradleBuildDocument implements AsListOfStrings {
 	public static GradleBuildDocument read(File file) {
@@ -20,7 +22,7 @@ public class GradleBuildDocument implements AsListOfStrings {
 	
 	private final GradleBuildDocumentModel model;
 	
-	private GradleBuildDocument(List<String> lines) {
+	GradleBuildDocument(List<String> lines) {
 		this.model = new GradleBuildDocumentModel(lines);
 	}
 	
@@ -29,108 +31,142 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return model.getLines();
 	}
 
-	/**
-	 * TODO: I should read the types from the build file. If the user wants to
-	 * modify a non-existent one, we should let the user know, and create the
-	 * appropriate section for it
-	 */
-	public Set<SourceSetType> getSourceSetTypes() {
-		ImmutableSet.Builder<SourceSetType> sourceSets = ImmutableSet.builder();
-		sourceSets.add(SourceSetType.MAIN);
-		sourceSets.add(SourceSetType.DEBUG);
-		sourceSets.add(SourceSetType.RELEASE);
-		sourceSets.add(SourceSetType.ANDROID_TEST);
-		
-		String key = "root.android.sourceSets.";
+	public Set<FlavorDocument> flavors() {
+		ImmutableSet.Builder<FlavorDocument> flavors = ImmutableSet.builder();
+		String key = "root.android.productFlavors.";
 		Set<String> keys = model.getKeysStartingWith(key);
+		
 		for ( String k : keys ) {
-			String source = k.substring(key.length());
-			sourceSets.add(new SourceSetType(source));
+			String flavorName = k.substring(key.length());
+			Collection<String> properties = model.getProperties(k);
+			flavors.add(FlavorDocument.read(flavorName, properties));
+		}
+		
+//		Collection<String> properties = model.getProperties("root.android.defaultConfig");
+//		flavors.add(FlavorDocument.read("defaultConfig", properties));
+		
+		return flavors.build();		
+	}
+	
+	public Set<BuildTypeDocument> buildTypes() {
+		ImmutableSet.Builder<BuildTypeDocument> buildTypes = ImmutableSet.builder();
+		String key = "root.android.buildTypes.";
+		Set<String> keys = model.getKeysStartingWith(key);
+		
+		for ( String k : keys ) {
+			String buildName = k.substring(key.length());
+			Collection<String> properties = model.getProperties(k);
+			buildTypes.add(BuildTypeDocument.read(buildName, properties));
+		}
+		
+		return buildTypes.build();
+	}
+	
+	public Multimap<String, SourceSetDocument> sourceSets() {
+		ImmutableMultimap.Builder<String, SourceSetDocument> sourceSets = ImmutableMultimap.builder();
+		String key = "root.android.sourceSets";
+		Set<String> keys = model.getKeysStartingWith(key);
+		
+		for ( String k : keys ) {
+			String buildName = k.substring(key.length());
+			if ( Strings.isNullOrEmpty(buildName) ) {
+				Collection<String> properties = model.getProperties(k);
+				for ( String property : properties ) {
+					int indexOf = property.indexOf(".");
+					String name = property.substring(0, indexOf);
+					String prop = property.substring(indexOf + 1, property.length());
+					sourceSets.put(name, SourceSetDocument.read(name, Lists.newArrayList(prop)));
+				}
+			} else if (buildName.startsWith(".")) {
+				String cleaned = buildName.substring(1);
+				int indexOf = cleaned.indexOf(".");
+				if ( indexOf == -1 ) {
+					Collection<String> properties = model.getProperties(k);
+					sourceSets.put(cleaned, SourceSetDocument.read(cleaned, properties));
+				} else {
+					String name = cleaned.substring(0, indexOf);
+					Collection<String> properties = model.getProperties(k);
+					sourceSets.put(name, SourceSetDocument.read(name, properties));
+				}
+			}
+		}
+		
+		Collection<String> properties = model.getProperties("root.android");
+		for ( String property : properties ) {
+			if ( ! property.startsWith("sourceSets") )
+				continue;
+			
+			String p = property.substring("sourceSets.".length());
+			
+			int indexOf = p.indexOf(".");
+			String name = p.substring(0, indexOf);
+			String prop = p.substring(indexOf + 1, p.length());
+			sourceSets.put(name, SourceSetDocument.read(name, Lists.newArrayList(prop)));
 		}
 		
 		return sourceSets.build();
 	}
 	
-	/**
-	 * TODO: I should read the types from the build file. If the user wants to
-	 * modify a non-existent one, we should let the user know, and create the
-	 * appropriate section for it
-	 */
-	public Set<BuildType> getBuildTypes() {
-		ImmutableSet.Builder<BuildType> builtypes = ImmutableSet.builder();
-		builtypes.add(BuildType.ANDROID_TEST);
-		builtypes.add(BuildType.COMPILE);
-		builtypes.add(BuildType.DEBUG);
-		builtypes.add(BuildType.RELEASE);
+	public Multimap<DependencyType, Dependency> dependencies() {
+		Set<BuildTypeDocument> buildTypes = buildTypes();
+		Set<FlavorDocument> flavors = flavors();
+		Set<String> dependencies = readDependencies();
 		
-		String key = "root.android.buildTypes.";
-		Set<String> keys = model.getKeysStartingWith(key);
-		for ( String k : keys ) {
-			String build = k.substring(key.length());
-			builtypes.add(new BuildType(build));
-		}
-		
-		return builtypes.build();
-	}
-	
-	public Set<Flavor> getFlavors() {
-		ImmutableSet.Builder<Flavor> flavors = ImmutableSet.builder();
-		String key = "root.android.productFlavors.";
-		Set<String> keys = model.getKeysStartingWith(key);
-		
-		for ( String k : keys ) {
-			String flavor = k.substring(key.length());
-			flavors.add(new Flavor(flavor));
-		}
-		
-		return flavors.build();
-	}
-	
-	public Set<Artifact> getDependencies(BuildType buildType, Flavor flavor) {
-		ImmutableSet.Builder<Artifact> dependencies = ImmutableSet.builder();
-		Collection<String> properties = model.getProperties("root.dependencies");
-
-		for ( String property : properties ) {
-			if (property.startsWith(buildType.getCompileString(flavor))) {
-				Artifact library = parseLibrary(buildType, null, property);
-				dependencies.add(library);
-			}
-		}
-		
-		return dependencies.build();
-	}
-	
-	public List<Dependency> getDependencies() {
-		ImmutableList.Builder<Dependency> dependencies = ImmutableList.builder();
-		Collection<String> properties = model.getProperties("root.dependencies");
-	
-		Set<Flavor> flavors = getFlavors();
-		Set<BuildType> buildTypes = getBuildTypes();
-		
-		for ( String property : properties ) {
-			for ( BuildType buildType : buildTypes ) {
-				if (property.startsWith(buildType.getCompileString())) {
-					Artifact library = parseLibrary(buildType, null, property);
-					dependencies.add(new Dependency(buildType, null, library));
-				}
+		ImmutableMultimap.Builder<DependencyType, Dependency> d = ImmutableMultimap.builder();
+		for ( String deps : dependencies ) {
+			addDependency(deps, "compile", d);
+			addDependency(deps, "androidTestCompile", d);
+			
+			for ( BuildTypeDocument type : buildTypes ) {
+				String name = type.getName() + "Compile";
+				String test = "androidTest" + makeFirstLetterUpperCase(name);
 				
-				for ( Flavor flavor : flavors ) {
-					if (property.startsWith(buildType.getCompileString(flavor))) {
-						Artifact library = parseLibrary(buildType, flavor, property);
-						dependencies.add(new Dependency(buildType, flavor, library));
-					}	
+				addDependency(deps, name, d);
+				addDependency(deps, test, d);
+			}
+			
+			for ( FlavorDocument flavor : flavors ) {
+				String name = flavor.getName() + "Compile";
+				String test = "androidTest" + makeFirstLetterUpperCase(name);
+				
+				addDependency(deps, name, d);
+				addDependency(deps, test, d);
+			}
+			
+			for ( FlavorDocument flavor : flavors ) {
+				for ( BuildTypeDocument type : buildTypes ) {
+					String name = flavor.getName() + makeFirstLetterUpperCase(type.getName()) + "Compile";
+					String test = "androidTest" + makeFirstLetterUpperCase(name);
+					
+					addDependency(deps, name, d);
+					addDependency(deps, test, d);
 				}
 			}
 		}
 		
-		return dependencies.build();
+		return d.build();
 	}
 
-	private Artifact parseLibrary(BuildType buildType, Flavor flavor, String property) {
-		int indexof = buildType.getCompileString(flavor).length();
-		String library = property.substring(indexof + 2, property.length() -1);
+	private void addDependency(String dependency, String id, ImmutableMultimap.Builder<DependencyType, Dependency> dependencies) {
+		String clean = dependency.trim();
+		if (clean.startsWith(id + " ")) {
+			DependencyType type = new DependencyType(id);
+			String library = clean.substring(clean.indexOf(" ") + 1, clean.length()).trim();
+			library = library.replace("'", "");
+			
+			dependencies.put(type, new Dependency(type, library));
+		}
+	}
+
+	private Set<String> readDependencies() {
+		ImmutableSet.Builder<String> dependencies = ImmutableSet.builder();
+		Collection<String> properties = model.getProperties("root.dependencies");
+
+		for ( String property : properties ) {
+			dependencies.add(property);
+		}
 		
-		return Artifact.read(library);
+		return dependencies.build();
 	}
 
 	public void addDependencies(Set<Dependency> toBeAdded) {
@@ -138,25 +174,14 @@ public class GradleBuildDocument implements AsListOfStrings {
 			model.addTo("root.dependencies", formatDependency(dependency));
 		}
 	}
-	
+
 	public void removeDependencies(Set<Dependency> toBeRemoved) {
 		for ( Dependency dependency : toBeRemoved ) {
 			model.removeFrom("root.dependencies", formatDependency(dependency));
 		}
 	}
-
-	private String formatDependency(Dependency lib) {
-		StringBuilder dependency = new StringBuilder();
-
-		BuildType buildType = lib.getBuildType();
-		Flavor flavor = lib.getFlavor();
-
-		String compileString = buildType.getCompileString(flavor);
-		dependency
-			.append("    ")
-			.append(compileString)
-			.append(" \'" + lib.getArtifact() + "\'");
-
-		return dependency.toString();
+	
+	private String formatDependency(Dependency dependency) {
+		return dependency.getType() + " '" + dependency.getLibrary() + "'";
 	}
 }

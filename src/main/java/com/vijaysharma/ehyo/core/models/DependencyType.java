@@ -1,21 +1,19 @@
-package com.vijaysharma.ehyo.api;
+package com.vijaysharma.ehyo.core.models;
 
-
-
-public class BuildType {
+public class DependencyType {
 	private final String type;
-
-	public BuildType(String type) {
+	
+	public DependencyType(String type) {
 		this.type = type;
 	}
 	
 	public String getType() {
 		return type;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "BuildType [type=" + type + "]";
+		return "DependencyType [type=" + type + "]";
 	}
 
 	@Override
@@ -34,7 +32,7 @@ public class BuildType {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BuildType other = (BuildType) obj;
+		DependencyType other = (DependencyType) obj;
 		if (type == null) {
 			if (other.type != null)
 				return false;

@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,26 +14,27 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
-import com.vijaysharma.ehyo.core.ProjectRegistryLoader.FileConstructorFactory;
 import com.vijaysharma.ehyo.core.ProjectRegistryLoader.FileObserverProjectBuilder;
 
 public class FileObserverProjectBuilderTest {
 	@Rule public TemporaryFolder folder = new TemporaryFolder();
 
-	private FileConstructorFactory<ProjectRegistryBuilder> factory;
+	private ObjectFactory factory;
 	private ProjectRegistryBuilder registry;
+	private FileObserverProjectBuilder builder;
 	
 	@Before
 	public void before() {
-		factory = mock(FileConstructorFactory.class);
+		factory = mock(ObjectFactory.class);
 		registry = mock(ProjectRegistryBuilder.class);
+		builder = new FileObserverProjectBuilder(factory);
 	}
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void build_does_not_add_root_to_registry() {
 		File root = newFolder("root");
-		when(factory.create(ProjectRegistryBuilder.class, root)).thenReturn(registry);
-		FileObserverProjectBuilder builder = create(root);
+		when(factory.create(ProjectRegistryBuilder.class)).thenReturn(registry);
 
 		builder.build();
 		
@@ -43,18 +43,6 @@ public class FileObserverProjectBuilderTest {
 		verify(registry, times(0)).addBuild(any(File.class));
 		verify(registry, times(0)).adddManifest(any(File.class));
 		verify(registry, times(1)).build();
-	}
-	
-	private FileObserverProjectBuilder create( File root ) {
-		return new FileObserverProjectBuilder(root, factory);
-	}
-
-	private File newFile(String name) {
-		try {
-			return folder.newFile(name);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	private File newFolder(String name) {

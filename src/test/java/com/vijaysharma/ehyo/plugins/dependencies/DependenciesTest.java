@@ -31,6 +31,7 @@ import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("unchecked")
 public class DependenciesTest {
 	private Dependencies dependencies;
 	private Service service;

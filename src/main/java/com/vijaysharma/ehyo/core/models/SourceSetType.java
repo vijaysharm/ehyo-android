@@ -1,11 +1,6 @@
 package com.vijaysharma.ehyo.core.models;
 
 public class SourceSetType {
-	public final static SourceSetType MAIN = new SourceSetType("main");
-	public final static SourceSetType DEBUG = new SourceSetType("debug");
-	public final static SourceSetType RELEASE = new SourceSetType("release");
-	public final static SourceSetType ANDROID_TEST = new SourceSetType("androidTest");
-	
 	private final String type;
 	
 	public SourceSetType(String type) {

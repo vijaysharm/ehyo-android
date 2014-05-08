@@ -10,13 +10,13 @@ import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 
 public class BuildActionHandler implements PluginActionHandler<GradleBuildDocument, BuildActions>{
 	
-	// TODO: Need to output permissions that are not defined in the document
-	// during removal, and need to output when adding an existing permission 
+	// TODO: Need to output dependencies that are not defined in the document
+	// during removal, and need to output when adding an existing dependency 
 	@Override
 	public void modify(GradleBuildDocument document, BuildActions action) {
 		Collection<Dependency> add = action.getAddedDependencies();
 		Collection<Dependency> remove = action.getRemovedDependencies();
-		Collection<Dependency> all = document.getDependencies();
+		Collection<Dependency> all = document.dependencies().values();
 		
 		Set<Dependency> toBeAdded = Sets.newHashSet(add);
 		Set<Dependency> toBeRemoved = Sets.newHashSet(remove);

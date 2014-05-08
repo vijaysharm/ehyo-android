@@ -25,6 +25,7 @@ import com.vijaysharma.ehyo.api.UsageException;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("unchecked")
 public class PermissionsTest {
 	private PermissionRegistry registry;
 	private Permissions command;

@@ -313,8 +313,8 @@ public class ManifestTags {
 			this.metadatas = metadatas;
 			this.filters = filters;
 		}
-
 	}
+
 	public static class MetaData {
 		public static MetaData read(Element element, Namespace namespace) {
 			ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();

@@ -21,6 +21,7 @@ import com.vijaysharma.ehyo.core.Action;
 import com.vijaysharma.ehyo.core.commandline.CommandLineFactory;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("unchecked")
 public class MainTest
 {
 	private CommandLineFactory factory;

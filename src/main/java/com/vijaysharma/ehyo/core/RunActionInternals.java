@@ -19,6 +19,7 @@ import com.vijaysharma.ehyo.api.TemplateFactory;
 import com.vijaysharma.ehyo.api.TemplateProperty;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
+import com.vijaysharma.ehyo.core.models.DependencyType;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ProjectRegistry;
 import com.vijaysharma.ehyo.core.models.SourceSet;
@@ -27,23 +28,20 @@ class RunActionInternals {
 
 	static class DefaultBuildConfiguration implements BuildConfiguration {
 		private final GradleBuild build;
-		private final BuildType buildType;
-		private final Flavor flavor;
+		private final DependencyType type;
 		private final PluginActions actions;
 		
-		public DefaultBuildConfiguration(BuildType buildType,
-										 Flavor flavor,
+		public DefaultBuildConfiguration(DependencyType type,
 										 GradleBuild build, 
 										 PluginActions actions) {
-			this.flavor = flavor;
 			this.build = build;
-			this.buildType = buildType;
+			this.type = type;
 			this.actions = actions;
 		}
 		
 		@Override
 		public void addArtifact(Artifact artifact) {
-			actions.addDependency(build, buildType, flavor, artifact);
+			actions.addDependency(build, type, artifact);
 		}
 		
 		@Override
@@ -55,7 +53,7 @@ class RunActionInternals {
 		
 		@Override
 		public void removeArtifact(Artifact artifact) {
-			actions.removeDependency(build, buildType, flavor, artifact);
+			actions.removeDependency(build, type, artifact);
 		}
 		
 		@Override
@@ -67,68 +65,61 @@ class RunActionInternals {
 		
 		@Override
 		public Set<Artifact> getArtifacts() {
-			return build.getArtifacts(buildType, flavor);
-		}
-		
-		public BuildType getBuildType() {
-			return buildType;
+			return build.getArtifacts(type);
 		}
 		
 		public GradleBuild getBuild() {
 			return build;
 		}
-		
-		public Flavor getFlavor() {
-			return flavor;
-		}
 
 		@Override
 		public String toString() {
-			return Joiner.on(" ").join(build, buildType.getCompileString(flavor));
+			return Joiner.on(" ").join(build, type.getType());
 		}
 	}
 	
 	static class DefaultProjectManifest implements ProjectManifest {
-		private final AndroidManifest manifest;
+		private final SourceSet sourceSet;
 		private final PluginActions actions;
 		
-		public DefaultProjectManifest(AndroidManifest manifest, PluginActions actions) {
-			this.manifest = manifest;
+		public DefaultProjectManifest(SourceSet sourceSet, PluginActions actions) {
+			this.sourceSet = sourceSet;
 			this.actions = actions;
 		}
 		
 		@Override
 		public void addPermission(String permission) {
-			actions.addPermission(manifest, permission);
+			actions.addPermission(sourceSet.getManifest(), permission);
 		}
 		
 		@Override
 		public void addPermissions(Set<String> permissions) {
 			for ( String permission : permissions ) {
-				actions.addPermission(manifest, permission);
+				actions.addPermission(sourceSet.getManifest(), permission);
 			}
 		}
 		
 		@Override
 		public void removePermission(String permission) {
-			actions.removePermission(manifest, permission);
+			actions.removePermission(sourceSet.getManifest(), permission);
 		}
 		
 		@Override
 		public void removePermissions(Set<String> permissions) {
 			for ( String permission : permissions ) {
-				actions.removePermission(manifest, permission);
+				actions.removePermission(sourceSet.getManifest(), permission);
 			}
 		}
 		
 		@Override
 		public Set<String> getPermissions() {
+			AndroidManifest manifest = sourceSet.getManifest();
 			return manifest.getPermissions();
 		}
 		
 		@Override
 		public String toString() {
-			return manifest.toString();
+			return sourceSet.getProject() + ":" + sourceSet.getSourceSet().getType() + ":" + "AndroidManifest.xml";
 		}
 	}
 
@@ -161,12 +152,8 @@ class RunActionInternals {
 		public Set<BuildConfiguration> getBuildConfigurations() {
 			ImmutableSet.Builder<BuildConfiguration> buildtype = ImmutableSet.builder();
 			
-			for ( BuildType type : build.getBuildTypes() ) {
-				buildtype.add(create(type, null));
-
-				for ( Flavor flavor : build.getFlavors() ) {
-					buildtype.add(create(type, flavor));
-				}
+			for ( DependencyType type : build.getDependencies().keySet() ) {
+				buildtype.add(create(type));
 			}
 			
 			return buildtype.build();
@@ -176,10 +163,10 @@ class RunActionInternals {
 		public Set<ProjectSourceSet> getSourceSets() {
 			ImmutableSet.Builder<ProjectSourceSet> sourceSets = ImmutableSet.builder();
 
-			for ( SourceSet sourceSet : build.getSourceSets() ) {
+			for ( SourceSet sourceSet : build.getSourceSets().values() ) {
 				// TODO: I'm only doing this filter so that I filter out any
 				// source sets that don't have manifests
-				if ( sourceSet.getManifests() != null ) {
+				if ( sourceSet.getManifest() != null ) {
 					sourceSets.add(new DefaultProjectSourceSet(sourceSet, actions, registry));
 				}
 			}
@@ -191,19 +178,19 @@ class RunActionInternals {
 		public Set<ProjectManifest> getManifests() {
 			ImmutableSet.Builder<ProjectManifest> manifests = ImmutableSet.builder();
 			
-			for ( SourceSet sourceSet : build.getSourceSets() ) {
+			for ( SourceSet sourceSet : build.getSourceSets().values() ) {
 				// TODO: I'm only doing this filter so that I filter out any
 				// source sets that don't have manifests
-				if ( sourceSet.getManifests() != null ) {
-					manifests.add(new DefaultProjectManifest(sourceSet.getManifests(), actions));
+				if ( sourceSet.getManifest() != null ) {
+					manifests.add(new DefaultProjectManifest(sourceSet, actions));
 				}
 			}
 				
 			return manifests.build();
 		}
 
-		private DefaultBuildConfiguration create(BuildType type, Flavor flavor) {
-			return new DefaultBuildConfiguration(type, flavor, build, actions);
+		private DefaultBuildConfiguration create(DependencyType type) {
+			return new DefaultBuildConfiguration(type, build, actions);
 		}
 	}
 	

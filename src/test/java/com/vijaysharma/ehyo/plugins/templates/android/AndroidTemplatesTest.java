@@ -24,6 +24,7 @@ import com.vijaysharma.ehyo.api.utils.Questioner.AnswerFactory;
 import com.vijaysharma.ehyo.plugins.templates.android.AndroidTemplates.DefaultQuestion;
 import com.vijaysharma.ehyo.plugins.templates.android.TemplateRegistry.TemplateItem;
 
+@SuppressWarnings("unchecked")
 public class AndroidTemplatesTest {
 	private TextOutput out;
 	private TemplateRegistry registry;

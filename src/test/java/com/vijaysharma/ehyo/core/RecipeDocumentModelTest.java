@@ -26,6 +26,7 @@ import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 import freemarker.template.Configuration;
 
+@SuppressWarnings("unchecked")
 public class RecipeDocumentModelTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();

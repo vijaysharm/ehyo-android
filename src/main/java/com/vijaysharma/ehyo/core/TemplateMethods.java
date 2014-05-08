@@ -17,6 +17,7 @@ public class TemplateMethods {
 	 */
 	static class ActivityToLayout implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: activityToLayout " + arguments.get(0) + "]";
 			SimpleScalar scalar = (SimpleScalar) arguments.get(0);
@@ -29,6 +30,7 @@ public class TemplateMethods {
 	
 	static class ExtractLetters implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: extractLetters " + arguments.get(0) + "]";
 			SimpleScalar line = (SimpleScalar) arguments.get(0);
@@ -39,6 +41,7 @@ public class TemplateMethods {
 	
 	static class EscapeXmlString implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: escapeXmlString " + arguments.get(0) + "]";
 			SimpleScalar line = (SimpleScalar) arguments.get(0);
@@ -48,6 +51,7 @@ public class TemplateMethods {
 	
 	static class CamelCaseToUnderscore implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: camelCaseToUnderscore " + arguments.get(0) + "]";
 			SimpleScalar scalar = (SimpleScalar) arguments.get(0);
@@ -61,6 +65,7 @@ public class TemplateMethods {
 	 */
 	static class ClassToResource implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: classToResource " + arguments.get(0) + "]";
 			SimpleScalar scalar = (SimpleScalar) arguments.get(0);
@@ -73,6 +78,7 @@ public class TemplateMethods {
 	
 	static class SlashedPackageName implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: slashed " + arguments.get(0) + "]";
 			SimpleScalar line = (SimpleScalar) arguments.get(0);
@@ -82,6 +88,7 @@ public class TemplateMethods {
 	
 	static class EscapeXmlAttribute implements TemplateMethodModelEx {
 		@Override
+		@SuppressWarnings("rawtypes")
 		public Object exec(List arguments) throws TemplateModelException {
 //			return "[TODO: escape " + arguments.get(0) + "]";
 			SimpleScalar line = (SimpleScalar) arguments.get(0);

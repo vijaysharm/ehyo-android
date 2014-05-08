@@ -17,13 +17,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.core.InternalActions.ManifestActions;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ManifestActionHandlerTest {
-	private TextOutput out;
 	private ManifestActionHandler handler;
 	private AndroidManifestDocument document;
 	private ManifestActions action;
@@ -33,10 +31,9 @@ public class ManifestActionHandlerTest {
 	
 	@Before
 	public void before() {
-		out = mock(TextOutput.class);
 		document = mock(AndroidManifestDocument.class);
 		action = mock(ManifestActions.class);
-		handler = new ManifestActionHandler(out);
+		handler = new ManifestActionHandler();
 	}
 	
 	@Test

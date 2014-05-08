@@ -69,6 +69,8 @@ TODO
 
 + PatchApplier modifies the formatting of XML (doesn't respect the desired Android formatting)
 
++ Doesn't cope well with dependencies defined as "project(':libraries:lib1')" or "files('libs/foo.jar')"
+
 ##Tasks
 + Show better version information
 ++ Better option description for usage
@@ -93,6 +95,9 @@ TODO
 
 + All commands
 ++ Support --project id or --manifest id or --sourceset id where the ID is something you can use to distinctly select the right item to apply a command to (avoiding prompts)
+
++ Dependencies command
+++ Support upgrading dependencies
 
 + Finish template command
 ++ Add support for an "interactive" mode. Allows for users to step and select what is applied.

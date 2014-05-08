@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.CommandLineParser.ParsedSet;
 
+@SuppressWarnings("unchecked")
 public class CommandLineParserTest {
 	private ArgumentOption<String> op1;
 	

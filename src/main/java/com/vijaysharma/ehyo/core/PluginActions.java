@@ -14,8 +14,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.Artifact;
-import com.vijaysharma.ehyo.api.BuildType;
-import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.api.TemplateFileParameter;
 import com.vijaysharma.ehyo.api.TemplateProperty;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
@@ -26,6 +24,7 @@ import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.AndroidManifestDocument;
 import com.vijaysharma.ehyo.core.models.Dependency;
+import com.vijaysharma.ehyo.core.models.DependencyType;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Receiver;
@@ -50,8 +49,8 @@ public class PluginActions {
 	private final ImmutableMultimap.Builder<File, ResourceDocument> mergedResource = ImmutableMultimap.builder();
 	private final ImmutableMultimap.Builder<File, List<String>> createdFiles = ImmutableMultimap.builder();
 	
-	public void addDependency(GradleBuild build, BuildType type, Flavor flavor, Artifact artifact) {
-		Dependency dependency = new Dependency(type, flavor, artifact);
+	public void addDependency(GradleBuild build, DependencyType type, Artifact artifact) {
+		Dependency dependency = new Dependency(type, artifact.toBuildString());
 		addedDependencies.put(build, dependency);
 	}
 	
@@ -66,8 +65,8 @@ public class PluginActions {
 		return addedDependencies.build();
 	}
 	
-	public void removeDependency(GradleBuild build, BuildType type, Flavor flavor, Artifact projectId) {
-		Dependency dependency = new Dependency(type, flavor, projectId);
+	public void removeDependency(GradleBuild build, DependencyType type, Artifact artifact) {
+		Dependency dependency = new Dependency(type, artifact.toBuildString());
 		removedDependencies.put(build, dependency);
 	}
 	
@@ -239,7 +238,7 @@ public class PluginActions {
 	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateProperty> parameters, ProjectRegistry registry) {
 		Project project = registry.getProject(sourceSet.getProject());
 		final GradleBuild build = project.getBuild();
-		final AndroidManifest manifest = sourceSet.getManifests();
+		final AndroidManifest manifest = sourceSet.getManifest();
 		
 		final Map<String, Object> mapping = Maps.newHashMap();
 		for ( TemplateProperty param : parameters ) {
@@ -253,34 +252,34 @@ public class PluginActions {
 		
 		mapping.put("manifestDir", manifest.getFile().getParentFile().getAbsolutePath());
 		mapping.put("manifestOut", manifest.getFile().getParentFile().getAbsolutePath());
-		mapping.put("srcDir", manifest.getSourceDirectory().getAbsolutePath());
-		mapping.put("resDir", manifest.getResourceDirectory().getAbsolutePath());
+		mapping.put("srcDir", sourceSet.getSourceDirectory().getAbsolutePath());
+		mapping.put("resDir", sourceSet.getResourceDirectory().getAbsolutePath());
 		mapping.put("packageName", manifest.getPackageName());
 
-		template.apply(mapping, new DefaultRecipeDocumentCallback(this, build, manifest));
+		template.apply(mapping, new DefaultRecipeDocumentCallback(this, build, sourceSet));
 	}
 	
 	static class DefaultRecipeDocumentCallback implements RecipeDocumentCallback {
 		private final PluginActions actions;
 		private final GradleBuild build;
-		private final AndroidManifest manifest;
+		private final SourceSet sourceSet;
 
-		public DefaultRecipeDocumentCallback(PluginActions actions, GradleBuild build, AndroidManifest manifest) {
+		public DefaultRecipeDocumentCallback(PluginActions actions, GradleBuild build, SourceSet sourceSet) {
 			this.actions = actions;
 			this.build = build;
-			this.manifest = manifest;
+			this.sourceSet = sourceSet;
 		}
 		
 		@Override
 		public void onCreateJava(List<String> result, File to) {
-			File directory = manifest.getSourceDirectory();
+			File directory = sourceSet.getSourceDirectory();
 			File toDirectory = computeTo(to, directory);
 			actions.createFile(toDirectory, result);
 		}
 		
 		@Override
 		public void onCreateResource(List<String> result, File to) {
-			File directory = manifest.getResourceDirectory();
+			File directory = sourceSet.getResourceDirectory();
 			File toDirectory = computeTo(to, directory);
 			actions.createFile(toDirectory, result);
 		}
@@ -290,6 +289,7 @@ public class PluginActions {
 			// TODO: Assuming that the manifest that will be modified will be
 			// the one that's owned by this action
 			AndroidManifestDocument manifestDocument = new AndroidManifestDocument(result);
+			AndroidManifest manifest = sourceSet.getManifest();
 			
 			// TODO: Need to copy everything you can from the template manifest.
 			Set<String> permissions = manifestDocument.getPermissions();
@@ -311,21 +311,21 @@ public class PluginActions {
 		
 		@Override
 		public void onMergeResource(Document result, File to) {
-			File directory = manifest.getResourceDirectory();
+			File directory = sourceSet.getResourceDirectory();
 			File toDirectory = computeTo(to, directory);
 			actions.mergeResource(toDirectory, new ResourceDocument(result));
 		}
 
 		@Override
 		public void onCopy(File from, File to) {
-			File directory = manifest.getResourceDirectory();
+			File directory = sourceSet.getResourceDirectory();
 			File toDirectory = computeTo(to, directory);
 			actions.copyFiles(from, toDirectory);
 		}
 
 		@Override
 		public void onCopyResource(Document result, File to) {
-			File directory = manifest.getResourceDirectory();
+			File directory = sourceSet.getResourceDirectory();
 			File toDirectory = computeTo(to, directory);
 			actions.mergeResource(toDirectory, new ResourceDocument(result));
 		}
@@ -335,7 +335,7 @@ public class PluginActions {
 			// TODO: Need a way to determine which is the best build
 			// configuration from the source set.
 			Artifact artifact = Artifact.read(dependency);
-			actions.addDependency(build, BuildType.COMPILE, null, artifact);
+			actions.addDependency(build, new DependencyType("compile"), artifact);
 		}
 		
 		// TODO: This will not work when we start reading the path from the
