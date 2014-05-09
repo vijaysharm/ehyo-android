@@ -179,7 +179,7 @@ public class Dependencies implements Plugin {
 					
 					if (artifact.getGroupId().equals(a.getGroupId()) && artifact.getArtifactId().equals(a.getArtifactId())) {
 						StringBuilder message = new StringBuilder();
-						message.append("A version of " + artifact.getArtifactId() + " was found in " + config + ".\n");
+						message.append("A version of " + artifact.getArtifactId() + " was found in '" + config + "'.\n");
 						message.append("Would you like to modify the dependency from ");
 						message.append(a.getLatestVersion() + " to " + artifact.getLatestVersion());
 						List<String> select = service.createSelector( message.toString(), String.class).select(yesno, false);

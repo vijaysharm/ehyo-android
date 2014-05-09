@@ -5,11 +5,14 @@ import static com.vijaysharma.ehyo.core.utils.EStringUtil.makeFirstLetterUpperCa
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import joptsimple.internal.Strings;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -41,9 +44,6 @@ public class GradleBuildDocument implements AsListOfStrings {
 			Collection<String> properties = model.getProperties(k);
 			flavors.add(FlavorDocument.read(flavorName, properties));
 		}
-		
-//		Collection<String> properties = model.getProperties("root.android.defaultConfig");
-//		flavors.add(FlavorDocument.read("defaultConfig", properties));
 		
 		return flavors.build();		
 	}
@@ -107,12 +107,12 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return sourceSets.build();
 	}
 	
-	public Multimap<DependencyType, Dependency> dependencies() {
+	public Map<DependencyType, Set<Dependency>> dependencies() {
 		Set<BuildTypeDocument> buildTypes = buildTypes();
 		Set<FlavorDocument> flavors = flavors();
 		Set<String> dependencies = readDependencies();
 		
-		ImmutableMultimap.Builder<DependencyType, Dependency> d = ImmutableMultimap.builder();
+		ImmutableMap.Builder<DependencyType, Set<Dependency>> d  = ImmutableMap.builder();
 		for ( String deps : dependencies ) {
 			addDependency(deps, "compile", d);
 			addDependency(deps, "androidTestCompile", d);
@@ -147,14 +147,18 @@ public class GradleBuildDocument implements AsListOfStrings {
 		return d.build();
 	}
 
-	private void addDependency(String dependency, String id, ImmutableMultimap.Builder<DependencyType, Dependency> dependencies) {
+	private void addDependency(String dependency, String id, ImmutableMap.Builder<DependencyType, Set<Dependency>> dependencies) {
 		String clean = dependency.trim();
+		
+		DependencyType type = new DependencyType(id);
+		if (!dependencies.build().containsKey(type))
+			dependencies.put(type, new HashSet<Dependency>());
+		
 		if (clean.startsWith(id + " ")) {
-			DependencyType type = new DependencyType(id);
 			String library = clean.substring(clean.indexOf(" ") + 1, clean.length()).trim();
 			library = library.replace("'", "");
 			
-			dependencies.put(type, new Dependency(type, library));
+			dependencies.build().get(type).add(new Dependency(type, library));
 		}
 	}
 
@@ -182,6 +186,6 @@ public class GradleBuildDocument implements AsListOfStrings {
 	}
 	
 	private String formatDependency(Dependency dependency) {
-		return dependency.getType() + " '" + dependency.getLibrary() + "'";
+		return "    " + dependency.getType().getType() + " '" + dependency.getLibrary() + "'";
 	}
 }

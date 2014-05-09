@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
@@ -17,7 +16,7 @@ public class GradleBuild implements HasDocument {
 	private final Set<BuildType> buildTypes;
 	private final Set<Flavor> flavors;
 	private final Map<SourceSetType, SourceSet> sourceSets;
-	private final Multimap<DependencyType, Dependency> dependencies;
+	private final Map<DependencyType, Set<Dependency>> dependencies;
 	private final String project;
 	
 	public GradleBuild(String projectName, 
@@ -25,7 +24,7 @@ public class GradleBuild implements HasDocument {
 					   Set<BuildType> buildTypes, 
 					   Set<Flavor> flavors, 
 					   Map<SourceSetType, SourceSet> sourceSets, 
-					   Multimap<DependencyType, Dependency> dependencies) {
+					   Map<DependencyType, Set<Dependency>> dependencies) {
 		this.project = projectName;
 		this.file = file;
 		this.buildTypes = buildTypes;
@@ -61,7 +60,7 @@ public class GradleBuild implements HasDocument {
 		return artifacts.build();
 	}
 	
-	public Multimap<DependencyType, Dependency> getDependencies() {
+	public Map<DependencyType, Set<Dependency>> getDependencies() {
 		return this.dependencies;
 	}
 	

@@ -61,7 +61,7 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	
 	private void show(T item, List<String> baseline, Patch diff) throws IOException {
 		StringBuilder output = new StringBuilder();
-		output.append("Diff " + item.toString() + "\n");
+		output.append("Diff " + item.getFile() + "\n");
 		for (Delta delta: diff.getDeltas()) {
 			printDelta(baseline, output, delta);
 		}
@@ -70,7 +70,7 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 	}
 
 	private void save(T item, K modified) throws IOException {
-		out.print("Writing " + item.toString() + "... ");
+		out.print("Writing " + item.getFile() + "... ");
 		List<String> changed = toListOfStrings(modified);
 		writer.write(item, changed);
 		out.println("done");

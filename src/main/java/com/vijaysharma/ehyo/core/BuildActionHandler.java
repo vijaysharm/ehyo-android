@@ -1,11 +1,13 @@
 package com.vijaysharma.ehyo.core;
 
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.core.InternalActions.BuildActions;
 import com.vijaysharma.ehyo.core.models.Dependency;
+import com.vijaysharma.ehyo.core.models.DependencyType;
 import com.vijaysharma.ehyo.core.models.GradleBuildDocument;
 
 public class BuildActionHandler implements PluginActionHandler<GradleBuildDocument, BuildActions>{
@@ -16,7 +18,7 @@ public class BuildActionHandler implements PluginActionHandler<GradleBuildDocume
 	public void modify(GradleBuildDocument document, BuildActions action) {
 		Collection<Dependency> add = action.getAddedDependencies();
 		Collection<Dependency> remove = action.getRemovedDependencies();
-		Collection<Dependency> all = document.dependencies().values();
+		Collection<Dependency> all = getAllDependencies(document);
 		
 		Set<Dependency> toBeAdded = Sets.newHashSet(add);
 		Set<Dependency> toBeRemoved = Sets.newHashSet(remove);
@@ -38,5 +40,13 @@ public class BuildActionHandler implements PluginActionHandler<GradleBuildDocume
 		
 		if ( ! toBeRemoved.isEmpty() )
 			document.removeDependencies(toBeRemoved);
+	}
+
+	private Collection<Dependency> getAllDependencies(GradleBuildDocument document) {
+		Set<Dependency> dependencies = Sets.newHashSet();
+		for ( Entry<DependencyType, Set<Dependency>> entry : document.dependencies().entrySet() )
+			dependencies.addAll(entry.getValue());
+
+		return dependencies;
 	}
 }

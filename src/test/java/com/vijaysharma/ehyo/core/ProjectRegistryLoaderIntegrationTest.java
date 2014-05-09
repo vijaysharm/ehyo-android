@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Multimap;
+import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildType;
 import com.vijaysharma.ehyo.api.Flavor;
 import com.vijaysharma.ehyo.core.models.Dependency;
@@ -107,7 +107,7 @@ public class ProjectRegistryLoaderIntegrationTest {
 		assertEquals(true, buildTypes.contains(RELEASE));
 		assertEquals(true, buildTypes.contains(DEBUG));
 		
-		Multimap<DependencyType, Dependency> dependencies = build.getDependencies();
+		Map<DependencyType, Set<Dependency>> dependencies = build.getDependencies();
 		assertEquals(0, dependencies.size());
 	}
 
@@ -153,7 +153,7 @@ public class ProjectRegistryLoaderIntegrationTest {
 		assertEquals(true, buildTypes.contains(RELEASE));
 		assertEquals(true, buildTypes.contains(DEBUG));
 		
-		Multimap<DependencyType, Dependency> dependencies = build.getDependencies();
+		Map<DependencyType, Set<Dependency>> dependencies = build.getDependencies();
 		assertEquals(0, dependencies.size());
 	}
 	
@@ -260,13 +260,24 @@ public class ProjectRegistryLoaderIntegrationTest {
 		assertEquals(true, buildTypes.contains(DEBUG));
 		
 	    DependencyType compile = new DependencyType("compile");
-		Multimap<DependencyType, Dependency> dependencies = build.getDependencies();
+	    Map<DependencyType, Set<Dependency>> dependencies = build.getDependencies();
 		Collection<Dependency> collection = dependencies.get(compile);
-		assertEquals(3, dependencies.size());
+		assertEquals(18, dependencies.size());
+		assertEquals(true, dependencies.containsKey(new DependencyType("compile")));
+		assertEquals(true, dependencies.containsKey(new DependencyType("androidTestCompile")));
+		assertEquals(true, dependencies.containsKey(new DependencyType("avelovCompile")));
+		assertEquals(true, dependencies.containsKey(new DependencyType("avelibCompile")));
+		
 		assertEquals(3, collection.size());
 		assertEquals(true, collection.contains(new Dependency(compile, "com.android.support:support-v4:19.0.0")));
 		assertEquals(true, collection.contains(new Dependency(compile, "com.google.android.gms:play-services:4.0.30")));
 		assertEquals(true, collection.contains(new Dependency(compile, "com.squareup.retrofit:retrofit:1.2.2")));
+		
+		Set<Artifact> artifacts = build.getArtifacts(compile);
+		assertEquals(3, artifacts.size());
+		assertEquals(true, artifacts.contains(Artifact.read("com.android.support:support-v4:19.0.0")));
+		assertEquals(true, artifacts.contains(Artifact.read("com.google.android.gms:play-services:4.0.30")));
+		assertEquals(true, artifacts.contains(Artifact.read("com.squareup.retrofit:retrofit:1.2.2")));		
 	}
 	
 	private static String $(String...path) {

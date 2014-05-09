@@ -63,7 +63,7 @@ public class ProjectRegistryBuilder {
 			Set<BuildType> buildTypes = buildTypes(buildDocument.buildTypes());
 			Set<Flavor> flavors = flavors(buildDocument.flavors());
 			Map<SourceSetType, SourceSet> sourceSets = sourceSets(parent, buildTypes, flavors, buildDocument.sourceSets());
-			Multimap<DependencyType, Dependency> dependencies = buildDocument.dependencies();
+			Map<DependencyType, Set<Dependency>> dependencies = buildDocument.dependencies();
 			
 			GradleBuild build = new GradleBuild(projectName, 
 												buildFile,

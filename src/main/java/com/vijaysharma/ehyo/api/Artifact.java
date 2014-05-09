@@ -85,6 +85,9 @@ public class Artifact {
 		if (Strings.isNullOrEmpty(library))
 			throw new IllegalArgumentException("Cannot parse empty library");
 
+		if (library.contains("(") && library.contains(")"))
+			return null;
+
 		String[] split = library.split(":");
 		if (split.length != 3)
 			return null;

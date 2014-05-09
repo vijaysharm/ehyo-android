@@ -39,18 +39,18 @@ public class Main implements Runnable {
 		
 		String[] plugin = {
 //			"permissions",
-//			"--add", "internet",
+//			"--add", "access", "internet"
 //			"--remove", "write"
 				
-//			"dependencies",
-//			"-s", "butterknife",
+			"dependencies",
+			"-s", "butterknife",
 //			"-g", "com.jakewharton"
-//			"--add"
+			"--add"
 //			"--remove", "butterknife"
 				
-			"templates",
+//			"templates",
 //			"-a", "Service"
-			"-i", "Service"
+//			"-i", "Service"
 		};
 		
 		String[] arguments = concat(main, plugin);
