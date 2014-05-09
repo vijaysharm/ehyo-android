@@ -1,12 +1,16 @@
 package com.vijaysharma.ehyo.plugins.dependencies;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.api.Artifact;
 import com.vijaysharma.ehyo.api.BuildConfiguration;
@@ -19,6 +23,11 @@ import com.vijaysharma.ehyo.api.UsageException;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 
+/**
+ * TODO: I should have an object called "BuildArtifact" that combines the build
+ * with its artifact instead of having to re-search which build a given artifact
+ * came from
+ */
 public class Dependencies implements Plugin {
 	private final TextOutput out;
 
@@ -40,12 +49,13 @@ public class Dependencies implements Plugin {
 		StringBuilder usage = new StringBuilder();
 		usage.append("usage: ehyo dependencies [-s <search dependency by name>]\n");
 		usage.append("                         [-g <search dependency by group id>\n");
-		usage.append("                         [--add] [--remove]\n\n");
+		usage.append("                         [--add] [--upgrade] [--remove]\n\n");
 		
 		usage.append("Examples:\n");
 		usage.append("    ehyo dependencies -s guava\n");
 		usage.append("    ehyo dependencies -s retrofit --add\n");
 		usage.append("    ehyo dependencies -g com.jakewharton --add\n");
+		usage.append("    ehyo dependencies --upgrade\n");
 		usage.append("    ehyo dependencies --remove butterknife\n");
 		usage.append("    ehyo dependencies --remove\n");
 		
@@ -61,10 +71,17 @@ public class Dependencies implements Plugin {
 		usage.append("    --add\n");
 		usage.append("        Adds the above search results to the project build.\n");
 		usage.append("        Requires one of the above search parameters to be defined.\n");
+		usage.append("    --upgrade <dependency name>\n");
+		usage.append("        Upgrades a dependency in a build file.\n");
+		usage.append("        Ignores the above search options, and searches the build file for dependency\n");
+		usage.append("        If a dependency name is not given, a list of upgrade-able dependencies will be listed.\n");
 		usage.append("    --remove <dependency name>\n");
 		usage.append("        Removes a dependency from a build file.\n");
 		usage.append("        Ignores the above search options, and searches the build file for dependency\n");
 		usage.append("        If a dependency name is not given, a list of removable dependencies will be listed.\n");
+		
+		usage.append("Notes:\n");
+		usage.append("    This command requires an internet connection in order to search maven.org\n");
 		
 		return usage.toString();
 	}
@@ -78,8 +95,9 @@ public class Dependencies implements Plugin {
 		boolean searchByGroupId = args.contains("-g");
 		boolean containsRemove = args.contains("--remove");
 		boolean containsAdd = args.contains("--add");
+		boolean containsUpgrade = args.contains("--upgrade");
 		
-		if ( ! searchByName && ! containsRemove && ! searchByGroupId )
+		if ( ! searchByName && ! containsRemove && ! searchByGroupId && ! containsUpgrade)
 			throw new UsageException(usage());
 		
 		if ( searchByName && searchByGroupId )
@@ -99,36 +117,62 @@ public class Dependencies implements Plugin {
 				addArtifacts(artifacts, service);
 			else
 				listArtifacts(artifacts, service);
+		} else if (containsUpgrade ) {
+			String toUpgrade = getArgValue("--upgrade", args);
+			upgrade(toUpgrade, service);
 		} else if ( containsRemove ) {
 			String toRemove = getArgValue("--remove", args);
 			remove(toRemove, service);
 		}
 	}
 
-	private void remove(String toRemove, Service service) {
-		List<Artifact> all = Lists.newArrayList();
+	private void upgrade(String toUpgrade, Service service ) {
+		List<Artifact> all = getArtifactsFromBuild(toUpgrade, service);
+		Map<Artifact, Artifact> upgrades = findUpgrades(all, service);
+
+		if ( upgrades.isEmpty() )
+			throw new GentleMessageException("None of your dependencies require upgrading");
 		
-		if ( Strings.isNullOrEmpty(toRemove) ) {
+		Map<Artifact, Artifact> doUpgrade = Maps.newHashMap();
+		for ( Entry<Artifact, Artifact> upgrade : upgrades.entrySet() ) {
+			if (doUpgrade(upgrade.getKey(), upgrade.getValue(), service))
+				doUpgrade.put(upgrade.getKey(), upgrade.getValue());
+		}
+		
+		for ( Entry<Artifact, Artifact> upgrade : doUpgrade.entrySet() ) {
 			for( BuildConfiguration config : service.getBuildConfigurations() ) {
-				all.addAll(config.getArtifacts());
-			}
-			
-			if ( all.isEmpty() )
-				throw new GentleMessageException("No build dependecies found");
-			
-		} else {
-			for( BuildConfiguration config : service.getBuildConfigurations() ) {
-				Set<Artifact> artifacts = config.getArtifacts();
-				for ( Artifact artifact : artifacts ) {
-					if (artifact.toString().toLowerCase().contains(toRemove.toLowerCase())) {
-						all.add(artifact);
-					}
+				Set<Artifact> allArtifacts = config.getArtifacts();
+				if (allArtifacts.contains(upgrade.getKey())) {
+					config.removeArtifact(upgrade.getKey());
+					config.addArtifact(upgrade.getValue());
 				}
 			}
-			
-			if ( all.isEmpty() )
-				throw new GentleMessageException("No build configs found ressembling '" + toRemove + "'");
 		}
+	}
+	
+	private Map<Artifact, Artifact> findUpgrades(List<Artifact> all, Service service) {
+		ImmutableMap.Builder<Artifact, Artifact> upgrades = ImmutableMap.builder();
+
+		MavenService mavenService = service.getMavenService();
+		for ( Artifact artifact : all ) {
+			String query = "id:\"" + artifact.getId() + "\"";
+			QueryByNameResponse response = mavenService.searchByName(query);
+			Artifact[] artifacts = response.getResponse().getArtifacts();
+			if ( artifacts.length == 0 )
+				continue;
+
+			Artifact upgrade = artifacts[0];
+			if ( artifact.equals(upgrade) )
+				continue;
+			
+			upgrades.put(artifact, artifacts[0]);
+		}
+		
+		return upgrades.build();
+	}
+
+	private void remove(String toRemove, Service service) {
+		List<Artifact> all = getArtifactsFromBuild(toRemove, service);
 
 		List<Artifact> selectedArtifacts = service.createSelector("Which artifact would you like to remove?", Artifact.class)
 				.select(all, false);
@@ -148,6 +192,34 @@ public class Dependencies implements Plugin {
 		for ( BuildConfiguration config : selectedBuilds ) {
 			config.removeArtifacts(Sets.newHashSet(selectedArtifacts));
 		}
+	}
+
+	private List<Artifact> getArtifactsFromBuild(String library, Service service) {
+		List<Artifact> all = Lists.newArrayList();
+		
+		if ( Strings.isNullOrEmpty(library) ) {
+			for( BuildConfiguration config : service.getBuildConfigurations() ) {
+				all.addAll(config.getArtifacts());
+			}
+			
+			if ( all.isEmpty() )
+				throw new GentleMessageException("No build dependecies found");
+			
+		} else {
+			for( BuildConfiguration config : service.getBuildConfigurations() ) {
+				Set<Artifact> artifacts = config.getArtifacts();
+				for ( Artifact artifact : artifacts ) {
+					if (artifact.toString().toLowerCase().contains(library.toLowerCase())) {
+						all.add(artifact);
+					}
+				}
+			}
+			
+			if ( all.isEmpty() )
+				throw new GentleMessageException("No build configs found ressembling '" + library + "'");
+		}
+		
+		return all;
 	}
 
 	private void listArtifacts(List<Artifact> artifacts, Service service) {
@@ -193,13 +265,28 @@ public class Dependencies implements Plugin {
 		}
 	}
 
-	private boolean doUpgrade(BuildConfiguration config, Artifact existing, Artifact artifact, Service service) {
+	private boolean doUpgrade(Artifact existing, Artifact artifact, Service service) {
 		StringBuilder message = new StringBuilder();
-		message.append("A version of " + artifact.getArtifactId() + " was found in '" + config + "'.\n");
+		message.append("A different version of " + artifact.getArtifactId() + " was found\n");
 		message.append("Would you like to modify the dependency from ");
 		message.append(existing.getLatestVersion() + " to " + artifact.getLatestVersion());
 		
-		String yes = "Yes - upgrade " + artifact.getArtifactId() + " to " + artifact.getLatestVersion();
+		String yes = "Yes - Switch " + artifact.getArtifactId() + " to " + artifact.getLatestVersion();
+		String no = "No - Keep " + artifact.getArtifactId() + " at " + existing.getLatestVersion();
+		
+		List<String> yesno = Lists.newArrayList(yes, no);
+		List<String> select = service.createSelector( message.toString(), String.class).select(yesno, false);
+		
+		return select.contains(yes);
+	}
+	
+	private boolean doUpgrade(BuildConfiguration config, Artifact existing, Artifact artifact, Service service) {
+		StringBuilder message = new StringBuilder();
+		message.append("A different version of " + artifact.getArtifactId() + " was found in '" + config + "'.\n");
+		message.append("Would you like to modify the dependency from ");
+		message.append(existing.getLatestVersion() + " to " + artifact.getLatestVersion());
+		
+		String yes = "Yes - Switch " + artifact.getArtifactId() + " to " + artifact.getLatestVersion();
 		String no = "No - Keep " + artifact.getArtifactId() + " at " + existing.getLatestVersion();
 		
 		List<String> yesno = Lists.newArrayList(yes, no);
@@ -252,7 +339,7 @@ public class Dependencies implements Plugin {
 		
 		return ImmutableList.copyOf(artifacts);
 	}
-
+	
 	private static String getArgValue(String arg, List<String> args) {
 		int libIndex = args.indexOf(arg);
 		

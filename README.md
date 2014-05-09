@@ -33,16 +33,23 @@ After downloading ehyo, a script to use ehyo is provided in ./bin/ehyo ... Add t
 
 Limitations
 -----------
+TONS. But here are some high-level ones that I can think of.
+
 + This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. It looks for build.gradle and settings.gradle files to determine the project structure.
 ++ Overridden source set paths in builds are not supported
 
 + Templates will always add dependencies to the 'compile' configuration
 
++ Merging with templates
+++ Merging is done in a very naive way. With XML (or any file for that matter), we simply append elements into the expected parent. We do not look for any existing elements that might be similar and attempt to merge them
+
 + Ruins the formatting of the AndroidManifest.xml
+
++ Everything is prompt heavy. Sadly, either I prompt you for what you'd like to do, or I ask you for a large number of arguments. One of my goals was to limit the number of arguments a developer has to remember, so the tradeoff was to just prompt you there and then.
 
 + There's no rollback during failures. If part of a template is applied, and an exception occurs, then there's no way to undo what failed. As a suggestion, run ehyo within a version controlled project with a fresh checkout. That will allow you to rollback your changes when ehyo craps out on you.
 
-+ Developed on and only tested on OSX with Java 1.6. There isn't any OS specific stuff in the code, per-se, but consider this warning if things don't work ask you expect.
++ Developed on and only tested on OSX with Java 1.6. There isn't any OS specific stuff in the code, per-se, but consider this sufficient warning if things don't work ask you expect.
 
 Building the jar
 ----------------
@@ -66,8 +73,6 @@ TODO
 
 + PatchApplier modifies the formatting of XML (doesn't respect the desired Android formatting)
 
-+ Doesn't cope well with dependencies defined as "project(':libraries:lib1')" or "files('libs/foo.jar')"
-
 ##Tasks
 + Show better version information
 ++ Better option description for usage
@@ -88,10 +93,7 @@ TODO
 ++ Document public API
 
 + All commands
-++ Support --project id or --manifest id or --sourceset id where the ID is something you can use to distinctly select the right item to apply a command to (avoiding prompts)
-
-+ Dependencies command
-++ Support upgrading dependencies
+++ Support --project or --variant or --sourceset or --buildtype so you can distinctly select the right item to apply a command to (avoiding prompts)
 
 + Finish template command
 ++ Add support for an "interactive" mode. Allows for users to step and select what is applied.
@@ -108,6 +110,8 @@ TODO
 ++ for templates
 ++ for entire application
 
++ Doesn't cope well with dependencies defined as "project(':libraries:lib1')" or "files('libs/foo.jar')"
+
 + Move all TODOs to Issues list.
 
 ##Roadmap
@@ -122,15 +126,18 @@ TODO
 + Provide a command that lets you rename your package namespace
 
 + Read templates from github
+++ From a gist?
 
 + Provide a way to easily create templates from a diff
 
-+ Provide a way to save templates (as a gist?)
++ Provide a way to save templates 
+++ As a gist?
 
 + Provide support for android projects not created with gradle
 ++ Eclipse? Maven?
 
 + Support merging Java files
+++ Improve merging as a whole
 
 + Improve Command line
 ++ Need to be able to multi-select
@@ -139,3 +146,16 @@ TODO
 + Provide ehyo through Brew
 
 + Tab completion
+
+Open Source Libraries
+---------------------
++ Guava
++ jdom2
++ commons-io
++ commons-lang3
++ reflections
++ retrofit
++ java-diff-utils
++ freemarker
++ junit
++ mockito

@@ -43,10 +43,11 @@ public class Main implements Runnable {
 //			"--remove", "write"
 				
 			"dependencies",
-			"-s", "butterknife",
+//			"-s", "butterknife",
 //			"-g", "com.jakewharton"
-			"--add"
+//			"--add"
 //			"--remove", "butterknife"
+			"--upgrade", "butterknife"
 				
 //			"templates",
 //			"-a", "Service"
