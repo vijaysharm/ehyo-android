@@ -13,10 +13,12 @@ import org.jdom2.input.SAXBuilder;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.vijaysharma.ehyo.api.ProjectSourceSet;
 import com.vijaysharma.ehyo.api.Template;
 import com.vijaysharma.ehyo.api.TemplateFileParameter;
 import com.vijaysharma.ehyo.api.TemplateInfo;
 import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
+import com.vijaysharma.ehyo.core.RunActionInternals.DefaultProjectSourceSet;
 import com.vijaysharma.ehyo.core.TemplateMethods.ActivityToLayout;
 import com.vijaysharma.ehyo.core.TemplateMethods.CamelCaseToUnderscore;
 import com.vijaysharma.ehyo.core.TemplateMethods.ClassToResource;
@@ -52,13 +54,10 @@ class DefaultTemplate implements Template {
 		return new DefaultTemplateInfo(root);
 	}
 	
-	/**
-	 * TODO: The template also needs parameters applied to it (mostly for
-	 * suggestion values).
-	 */
 	@Override
-	public List<TemplateFileParameter> loadTemplateParameters() {
-		return getParameters(templateDocument);
+	public List<TemplateFileParameter> loadTemplateParameters(ProjectSourceSet sourceSet) {
+		DefaultProjectSourceSet ss = (DefaultProjectSourceSet) sourceSet;
+		return getParameters(templateDocument, ss);
 	}
 
 	public void apply(Map<String, Object> properties, RecipeDocumentCallback callback) {
@@ -107,7 +106,7 @@ class DefaultTemplate implements Template {
 		}		
 	}
 	
-	public static List<TemplateFileParameter> getParameters(Document document) {
+	public static List<TemplateFileParameter> getParameters(Document document, DefaultProjectSourceSet sourceSet) {
 		List<TemplateFileParameter> parameters = Lists.newArrayList();
 		Element root = document.getRootElement();
 		for ( Element element : root.getChildren("parameter") ) {
@@ -119,9 +118,19 @@ class DefaultTemplate implements Template {
 			String help = element.getAttributeValue("help");
 			
 			// TODO: Suggest may need to be interpolated (its a template value);
-//			String suggest = element.getAttributeValue("suggest");
+			// String suggest = element.getAttributeValue("suggest");
 			
-			parameters.add(new DefaultTemplateFileParameter(id, name, type, defaultValue, constraints, help));
+			ImmutableMap.Builder<String, String> options = ImmutableMap.builder();
+			for ( Element option : element.getChildren("option") ) {
+				options.put(option.getAttributeValue("id"), option.getTextTrim());
+			}
+			
+			// TODO: Yuck... 
+			if ( "packagename".equalsIgnoreCase(id) ) {
+				defaultValue = sourceSet.getSourceSet().getManifest().getPackageName(); 
+			}
+			
+			parameters.add(new DefaultTemplateFileParameter(id, name, type, defaultValue, constraints, help, options.build()));
 		}
 		
 		return parameters;
@@ -174,18 +183,21 @@ class DefaultTemplate implements Template {
 		private final String type;
 		private final String name;
 		private final String help;
+		private final Map<String, String> options;
 
 		public DefaultTemplateFileParameter(String id, 
-								  String name,
-								  String type,
-								  String defaultValue,
-								  String constraints,
-								  String help) {
+										    String name,
+										    String type,
+										    String defaultValue,
+										    String constraints,
+										    String help, 
+										    Map<String,String> options) {
 			this.id = id;
 			this.type = type;
 			this.defaultValue = defaultValue;
 			this.name = name;
 			this.help = help;
+			this.options = options;
 		}
 		
 		@Override
@@ -211,6 +223,11 @@ class DefaultTemplate implements Template {
 		@Override
 		public String getHelp() {
 			return help;
+		}
+		
+		@Override
+		public Map<String, String> getOptions() {
+			return options;
 		}
 	}
 }

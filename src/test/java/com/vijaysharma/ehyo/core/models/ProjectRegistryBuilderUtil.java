@@ -19,7 +19,7 @@ public class ProjectRegistryBuilderUtil {
 		this.sourceSetDocuments = multimap;
 	}
 
-	public void addSourceSet(String id, File parent, ImmutableMap.Builder<SourceSetType, SourceSet> sourceSet ) {
+	public void addSourceSet(String id, File parent, ImmutableMap.Builder<SourceSetType, SourceSet> sourceSet) {
 		addSourceSet(id, parent, sourceSet, sourceSetDocuments.get(id));
 	}
 	

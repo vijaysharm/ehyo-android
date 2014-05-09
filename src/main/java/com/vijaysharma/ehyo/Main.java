@@ -42,15 +42,15 @@ public class Main implements Runnable {
 //			"--add", "access", "internet"
 //			"--remove", "write"
 				
-			"dependencies",
+//			"dependencies",
 //			"-s", "butterknife",
 //			"-g", "com.jakewharton"
 //			"--add"
 //			"--remove", "butterknife"
-			"--upgrade", "butterknife"
+//			"--upgrade", "butterknife"
 				
-//			"templates",
-//			"-a", "Service"
+			"templates",
+			"-a", "Login", //"Service"
 //			"-i", "Service"
 		};
 		

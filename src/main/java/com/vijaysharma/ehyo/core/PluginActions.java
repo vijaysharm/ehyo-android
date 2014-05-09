@@ -332,10 +332,18 @@ public class PluginActions {
 		
 		@Override
 		public void onDependency(String dependency) {
-			// TODO: Need a way to determine which is the best build
-			// configuration from the source set.
 			Artifact artifact = Artifact.read(dependency);
-			actions.addDependency(build, new DependencyType("compile"), artifact);
+			actions.addDependency(build, determineBestDependencyType(), artifact);
+		}
+
+		// TODO: Need a way to determine which is the best build
+		// configuration from the source set.
+		private DependencyType determineBestDependencyType() {
+			String type = sourceSet.getSourceSet().getType();
+			if (type.equals("main"))
+				return new DependencyType("compile");
+			else
+				return new DependencyType(type + "Compile");
 		}
 		
 		// TODO: This will not work when we start reading the path from the

@@ -57,7 +57,7 @@ public class OptionSelector<T> {
 		
 		int selection = read(1, max);
 
-		if ( selection < 1 || selection > max)
+		if ( selection < 1 || selection > max )
 			throw new GentleMessageException("Your selection is out of range!");
 
 		if ( multiselect && selection == max )

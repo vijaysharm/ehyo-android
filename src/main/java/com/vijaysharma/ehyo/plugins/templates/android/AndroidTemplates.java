@@ -1,6 +1,7 @@
 package com.vijaysharma.ehyo.plugins.templates.android;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -136,8 +137,12 @@ public class AndroidTemplates implements Plugin {
 		TemplateItem item = service.createSelector("Multiple templates with '" + templateName + "' were found.\nWhich one would you like to apply", TemplateItem.class)
 				.selectOne(items);
 		
+		List<ProjectSourceSet> sourceSets = service.getSourceSets();
+		OptionSelector<ProjectSourceSet> configSelector = service.createSelector("Which source set would you like to apply this template to?", ProjectSourceSet.class);
+		ProjectSourceSet sourceSet = configSelector.selectOne(sourceSets);
+		
 		Template template = service.loadTemplate(item.getFullPath());
-		List<TemplateFileParameter> parameters = template.loadTemplateParameters();
+		List<TemplateFileParameter> parameters = template.loadTemplateParameters(sourceSet);
 		
 		Questioner<DefaultQuestion, TemplateProperty> questioner = service.createPrompt(new AnswerFactory<DefaultQuestion, TemplateProperty>() {
 			@Override
@@ -146,8 +151,10 @@ public class AndroidTemplates implements Plugin {
 			}
 		});
 		
-		out.println("The template requires a few paraters:");
-		apply(template, questioner.prompt(wrap(parameters)), service);
+		out.println("The template requires a few paraters.\nDefault values are displayed between []:");
+		List<TemplateProperty> prompt = questioner.prompt(wrap(parameters));
+		
+		sourceSet.applyTemplate(template, prompt);
 	}
 
 	private List<DefaultQuestion> wrap(List<TemplateFileParameter> parameters) {
@@ -185,16 +192,6 @@ public class AndroidTemplates implements Plugin {
 
 		return underline.toString();
 	}
-
-	public void apply(Template template, List<TemplateProperty> properties, Service service) {
-		List<ProjectSourceSet> sourceSets = service.getSourceSets();
-		OptionSelector<ProjectSourceSet> configSelector = service.createSelector("Which source set would you like to apply this template to?", ProjectSourceSet.class);
-		List<ProjectSourceSet> selectedBuildConfigs = configSelector.select(sourceSets, false);
-
-		for ( ProjectSourceSet sourceSet : selectedBuildConfigs ) {
-			sourceSet.applyTemplate(template, properties);
-		}
-	}
 	
 	private static String getArgValue(String arg, List<String> args) {
 		int libIndex = args.indexOf(arg);
@@ -222,6 +219,7 @@ public class AndroidTemplates implements Plugin {
 			return parameters.getId();
 		}
 
+		@Override
 		public String getType() {
 			return parameters.getType();
 		}
@@ -231,6 +229,11 @@ public class AndroidTemplates implements Plugin {
 			return parameters.getDefaultValue();
 		}
 
+		@Override
+		public Map<String, String> getOptions() {
+			return parameters.getOptions();
+		}
+		
 		@Override
 		public String getName() {
 			String name = parameters.getHelp();

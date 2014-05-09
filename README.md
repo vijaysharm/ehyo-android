@@ -1,12 +1,12 @@
 Ehyo
 ====
-A command line tool for scaffolding Android Applications. Heavyily inspired by and loosely named after the yeoman web scaffolding tool. The goal of this project is to provide a command line tool for developers looking to perform worry free boiler-plate operations to their Android projects. Its meant to compliment existing tools namely the android command line tool [http://developer.android.com/tools/projects/projects-cmdline.html], and templates [http://developer.android.com/tools/projects/templates.html].
+A command line tool for scaffolding Android Applications. Heavyily inspired by and loosely named after the [yeoman][4] web scaffolding tool. The goal of this project is to provide a command line tool for developers looking to perform worry free boiler-plate operations to their Android projects. Its meant to compliment existing tools namely the [android command line tool][1], and [templates][2].
 
 The tool allows you to perform common tasks to your Android project
 + Search/Add/Remove permissions from your manifest
 + Search/Add/Upgrade/Remove maven repository dependecies to/from your build
 + Apply common Android templates to your project
-+ Apply templates provided by jgilfelt with https://github.com/jgilfelt/android-adt-templates
++ Apply templates provided by [jgilfelt][3]
 
 Usage
 -----
@@ -38,10 +38,8 @@ TONS. But here are some high-level ones that I can think of.
 + This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. It looks for build.gradle and settings.gradle files to determine the project structure.
 ++ Overridden source set paths in builds are not supported
 
-+ Templates will always add dependencies to the 'compile' configuration
-
 + Merging with templates
-++ Merging is done in a very naive way. With XML (or any file for that matter), we simply append elements into the expected parent. We do not look for any existing elements that might be similar and attempt to merge them
+++ Merging is done in a very naive way. With XML (or any file for that matter), we simply append elements into the expected parent. We do not look for any existing elements that might be similar and attempt to merge them. This can lead to duplicate entries in your resources.
 
 + Ruins the formatting of the AndroidManifest.xml
 
@@ -71,7 +69,7 @@ TODO
 
 + Ugly exception when no internet connection with dependency command
 
-+ PatchApplier modifies the formatting of XML (doesn't respect the desired Android formatting)
++ JDOM2's org.jdom2.output.Format modifies the formatting of XML (doesn't respect the desired Android formatting)
 
 ##Tasks
 + Show better version information
@@ -100,11 +98,9 @@ TODO
 +++ Need to support a non-existent manifest (as an empty file)
 ++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
 ++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
-++ Support optional in the template parameter file
-+++ See blank activity template
-++ Support --<parameter> where the argument is the same parameter in the template
+++ Support --<parameter> where the argument is the same as the parameter id in the template
 ++ Read the min- supported properties on the template object and filter out non-applicable ones during execution
-+ Support the 'revision' attribute on dependencies from template (see Login Activity)
++ Will not upgrade your dependency, will simply add a second instance of it
 
 + Write integration tests 
 ++ for templates
@@ -159,3 +155,25 @@ Open Source Libraries
 + freemarker
 + junit
 + mockito
+
+License
+=======
+
+    Copyright 2014 Vijay Sharma
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+ [1]: http://developer.android.com/tools/projects/projects-cmdline.html
+ [2]: http://developer.android.com/tools/projects/templates.html
+ [3]: https://github.com/jgilfelt/android-adt-templates
+ [4]: http://yeoman.io/

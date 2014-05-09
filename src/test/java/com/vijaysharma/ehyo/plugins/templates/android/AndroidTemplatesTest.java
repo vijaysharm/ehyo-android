@@ -120,7 +120,7 @@ public class AndroidTemplatesTest {
 		when(questioner.prompt(Mockito.anyList())).thenReturn(properties);
 		when(service.getSourceSets()).thenReturn(sourceSets);
 		when(service.createSelector(Mockito.anyString(), Mockito.eq(ProjectSourceSet.class))).thenReturn(configSelector);
-		when(configSelector.select(sourceSets, false)).thenReturn(sourceSets);
+		when(configSelector.selectOne(sourceSets)).thenReturn(sourceSet);
 		
 		command.execute(args, service);
 		verify(sourceSet).applyTemplate(template, properties);

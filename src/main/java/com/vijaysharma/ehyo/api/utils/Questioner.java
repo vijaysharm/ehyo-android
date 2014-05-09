@@ -3,11 +3,14 @@ package com.vijaysharma.ehyo.api.utils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import joptsimple.internal.Strings;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.logging.Output;
 import com.vijaysharma.ehyo.api.logging.TextOutput;
 import com.vijaysharma.ehyo.api.utils.Questioner.Question;
@@ -39,10 +42,15 @@ public class Questioner<T extends Question, K> {
 	}
 	
 	private K ask(T question) {
-		out.println(buildQuestion(question));
-		String value = read(question);
+		if ("enum".equalsIgnoreCase(question.getType())) {
+			String reply = askOptionQuestion(question);
+			return factory.apply(question, reply);
+		} else {
+			out.println(buildQuestion(question));
+			String reply = read(question);
 		
-		return factory.apply(question, value);
+			return factory.apply(question, reply);
+		}
 	}
 
 	private String read(T question) {
@@ -65,9 +73,22 @@ public class Questioner<T extends Question, K> {
 		return q.toString();
 	}
 
+	private String askOptionQuestion(final T question) {
+		Function<String, String> renderer = new Function<String, String>() {
+			@Override
+			public String apply(String input) {
+				return question.getOptions().get(input);
+			}
+		};
+		OptionSelector<String> op = new OptionSelector<String>(question.getName(), renderer);
+		return op.selectOne(Lists.newArrayList(question.getOptions().keySet()));
+	}
+	
 	public static interface Question {
 		public String getValue();
 		public String getName();
+		public String getType();
+		public Map<String, String> getOptions();
 	}
 	
 	public static interface AnswerFactory<T, K> {

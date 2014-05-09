@@ -215,6 +215,10 @@ class RunActionInternals {
 		public String toString() {
 			return Joiner.on(":").join(sourceSet.getProject(), sourceSet.getSourceSet().getType());
 		}
+		
+		public SourceSet getSourceSet() {
+			return sourceSet;
+		}
 	}
 	
 	static class DefaultTemplateFactory implements TemplateFactory {
