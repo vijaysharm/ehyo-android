@@ -2,6 +2,7 @@ package com.vijaysharma.ehyo.plugins.dependencies;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -161,10 +162,9 @@ public class DependenciesTest {
 		List<String> args = Lists.newArrayList("-s", library, "--add");
 		dependencies.execute(args, service);
 		
-		verify(config).addArtifacts(captor.capture());
-		Set<Artifact> value = captor.getValue();
-		assertEquals(1, value.size());
-		assertEquals(true, value.contains(artifact));
+		ArgumentCaptor<Artifact> artifactCaptor = ArgumentCaptor.forClass(Artifact.class);
+		verify(config).addArtifact(artifactCaptor.capture());
+		assertEquals(artifact, artifactCaptor.getValue());
 	}
 	
 	@Test
@@ -194,10 +194,9 @@ public class DependenciesTest {
 		List<String> args = Lists.newArrayList("-s", library, "--add");
 		dependencies.execute(args, service);
 		
-		verify(config).addArtifacts(captor.capture());
-		Set<Artifact> value = captor.getValue();
-		assertEquals(1, value.size());
-		assertEquals(true, value.contains(artifact));
+		ArgumentCaptor<Artifact> artifactCaptor = ArgumentCaptor.forClass(Artifact.class);
+		verify(config).addArtifact(artifactCaptor.capture());
+		assertEquals(artifact, artifactCaptor.getValue());
 	}
 	
 	@Test
@@ -212,7 +211,7 @@ public class DependenciesTest {
 		OptionSelector<String> yesnoSelector = mock(OptionSelector.class);
 		BuildConfiguration config = mock(BuildConfiguration.class);
 		List<BuildConfiguration> listOfConfigs = Lists.newArrayList(config);
-		List<BuildConfiguration> empty = Lists.newArrayList();
+		List<BuildConfiguration> selectedConfigs = Lists.newArrayList(config);
 		Set<Artifact> artifacts = Sets.newHashSet(old);
 		
 		when(mavenService.searchByName(library)).thenReturn(response);
@@ -221,24 +220,59 @@ public class DependenciesTest {
 		when(service.createSelector(Mockito.anyString(), Mockito.eq(Artifact.class))).thenReturn(artifactSelector);
 		when(artifactSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(Lists.newArrayList(artifact));
 		when(service.createSelector(Mockito.anyString(), Mockito.eq(BuildConfiguration.class))).thenReturn(buildSelector);
-		when(buildSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(empty);
+		when(buildSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(selectedConfigs);
 		when(service.getBuildConfigurations()).thenReturn(listOfConfigs);
 		when(service.createSelector(Mockito.anyString(), Mockito.eq(String.class))).thenReturn(yesnoSelector);
-		when(yesnoSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(Lists.newArrayList("Yes"));
+		when(yesnoSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(Lists.newArrayList("Yes - Switch gradle to 0.7.+"));
 		
 		when(config.getArtifacts()).thenReturn(artifacts);
 		
 		List<String> args = Lists.newArrayList("-s", library, "--add");
 		dependencies.execute(args, service);
 		
-		verify(config).addArtifacts(captor.capture());
-		Set<Artifact> value = captor.getValue();
-		assertEquals(1, value.size());
-		assertEquals(true, value.contains(artifact));
+		ArgumentCaptor<Artifact> artifactCaptor = ArgumentCaptor.forClass(Artifact.class);
+		verify(config).addArtifact(artifactCaptor.capture());
+		assertEquals(artifact, artifactCaptor.getValue());
 		
 		ArgumentCaptor<Artifact> removed = ArgumentCaptor.forClass(Artifact.class);
 		verify(config).removeArtifact(removed.capture());
 		assertEquals(old, removed.getValue());
+	}
+	
+	@Test
+	public void execute_wont_upgrade_if_user_doesnt_want_to() {
+		String library = "library";
+		Artifact artifact = Artifact.read("com.android.tools.build:gradle:0.7.+");
+		Artifact old = Artifact.read("com.android.tools.build:gradle:0.7.0");
+		QueryByNameResponse response = mock(QueryByNameResponse.class);
+		QueryResults results = mock(QueryResults.class);
+		OptionSelector<Artifact> artifactSelector = mock(OptionSelector.class);
+		OptionSelector<BuildConfiguration> buildSelector = mock(OptionSelector.class);
+		OptionSelector<String> yesnoSelector = mock(OptionSelector.class);
+		BuildConfiguration config = mock(BuildConfiguration.class);
+		List<BuildConfiguration> listOfConfigs = Lists.newArrayList(config);
+		List<BuildConfiguration> selectedConfigs = Lists.newArrayList(config);
+		Set<Artifact> artifacts = Sets.newHashSet(old);
+		
+		when(mavenService.searchByName(library)).thenReturn(response);
+		when(response.getResponse()).thenReturn(results);
+		when(results.getArtifacts()).thenReturn(new Artifact[]{ artifact });
+		when(service.createSelector(Mockito.anyString(), Mockito.eq(Artifact.class))).thenReturn(artifactSelector);
+		when(artifactSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(Lists.newArrayList(artifact));
+		when(service.createSelector(Mockito.anyString(), Mockito.eq(BuildConfiguration.class))).thenReturn(buildSelector);
+		when(buildSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(selectedConfigs);
+		when(service.getBuildConfigurations()).thenReturn(listOfConfigs);
+		when(service.createSelector(Mockito.anyString(), Mockito.eq(String.class))).thenReturn(yesnoSelector);
+		when(yesnoSelector.select(Mockito.anyList(), Mockito.anyBoolean())).thenReturn(Lists.newArrayList("No"));
+		
+		when(config.getArtifacts()).thenReturn(artifacts);
+		
+		List<String> args = Lists.newArrayList("-s", library, "--add");
+		dependencies.execute(args, service);
+		
+		verify(config, never()).addArtifact(Mockito.any(Artifact.class));
+		verify(config, never()).addArtifacts(Mockito.any(Set.class));
+		verify(config, never()).removeArtifact(Mockito.any(Artifact.class));
 	}
 	
 	@Test(expected=GentleMessageException.class)

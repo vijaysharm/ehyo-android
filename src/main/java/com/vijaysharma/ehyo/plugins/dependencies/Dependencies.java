@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -162,60 +161,67 @@ public class Dependencies implements Plugin {
 		List<Artifact> selectedArtifacts = service.createSelector("Which artifact would you like to add?", Artifact.class)
 				.select(artifacts, false);
 		
-		List<String> yesno = Lists.newArrayList("Yes", "No");
-		
 		List<BuildConfiguration> toModify = Lists.newArrayList();
-		List<BuildConfiguration> toUpdate = Lists.newArrayList();
-		ArrayListMultimap<BuildConfiguration, Artifact> toRemove = ArrayListMultimap.create();
 		for ( BuildConfiguration config : service.getBuildConfigurations() ) {
-			Set<Artifact> all = config.getArtifacts();
-			for ( Artifact artifact : selectedArtifacts ) {
-				if (all.isEmpty())
+			for ( Artifact artifact : artifacts ) {
+				Set<Artifact> all = config.getArtifacts();
+				if ( ! all.contains(artifact) ) {
 					toModify.add(config);
-
-				for ( Artifact a : all ) {
-					if ( artifact.equals(a) )
-						continue;
-					
-					if (artifact.getGroupId().equals(a.getGroupId()) && artifact.getArtifactId().equals(a.getArtifactId())) {
-						StringBuilder message = new StringBuilder();
-						message.append("A version of " + artifact.getArtifactId() + " was found in '" + config + "'.\n");
-						message.append("Would you like to modify the dependency from ");
-						message.append(a.getLatestVersion() + " to " + artifact.getLatestVersion());
-						List<String> select = service.createSelector( message.toString(), String.class).select(yesno, false);
-						if ( select.contains("Yes") ) {
-							toRemove.put(config, a);
-							toUpdate.add(config);
-						}
-					} else {
-						toModify.add(config);
-					}
+					break;
 				}
 			}
 		}
 		
-		if ( toModify.isEmpty() && toRemove.isEmpty() && toUpdate.isEmpty() )
+		if ( toModify.isEmpty() )
 			throw new GentleMessageException("All build configurations contain " + Joiner.on(", ").join(selectedArtifacts));
 		
-		toModify.removeAll(toUpdate);
 		List<BuildConfiguration> selectedBuild = service.createSelector("Which build configuration would you like add " + Joiner.on(", ").join(selectedArtifacts) + " to?", BuildConfiguration.class)
 				.select(toModify, false);
 		
 		for ( BuildConfiguration config : selectedBuild ) {
-			config.addArtifacts(Sets.newHashSet(selectedArtifacts));
-		}
-		
-		for ( BuildConfiguration config : toUpdate ) {
-			config.addArtifacts(Sets.newHashSet(selectedArtifacts));
-		}
-		
-		for ( BuildConfiguration config : toRemove.keySet() ){
-			List<Artifact> list = toRemove.get(config);
-			for ( Artifact artifact : list )
-				config.removeArtifact(artifact);
+			for ( Artifact artifact : selectedArtifacts ) {
+				Artifact existing = findSimilar(config, artifact);
+				if ( existing == null ) {
+					config.addArtifact(artifact);
+				} else {
+					if ( doUpgrade(config, existing, artifact, service) ) {
+						config.removeArtifact(existing);
+						config.addArtifact(artifact);
+					}
+				}
+			}
 		}
 	}
 
+	private boolean doUpgrade(BuildConfiguration config, Artifact existing, Artifact artifact, Service service) {
+		StringBuilder message = new StringBuilder();
+		message.append("A version of " + artifact.getArtifactId() + " was found in '" + config + "'.\n");
+		message.append("Would you like to modify the dependency from ");
+		message.append(existing.getLatestVersion() + " to " + artifact.getLatestVersion());
+		
+		String yes = "Yes - upgrade " + artifact.getArtifactId() + " to " + artifact.getLatestVersion();
+		String no = "No - Keep " + artifact.getArtifactId() + " at " + existing.getLatestVersion();
+		
+		List<String> yesno = Lists.newArrayList(yes, no);
+		List<String> select = service.createSelector( message.toString(), String.class).select(yesno, false);
+		
+		return select.contains(yes);
+	}
+
+	private Artifact findSimilar(BuildConfiguration config, Artifact artifact) {
+		for ( Artifact existing : config.getArtifacts() ) {
+			if (existing.equals(artifact))
+				continue;
+
+			if (artifact.getGroupId().equals(existing.getGroupId()) && 
+				artifact.getArtifactId().equals(existing.getArtifactId())) {
+				return existing;
+			}
+		}
+		
+		return null;
+	}
+	
 	private List<Artifact> searchArtifactsByName(String name, Service service) {
 		if (Strings.isNullOrEmpty(name))
 			throw new UsageException("'-s' has a required argument\n" + usage());

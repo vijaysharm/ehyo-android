@@ -1,16 +1,16 @@
 Ehyo
 ====
-A command line tool for scaffolding Android Applications. Heavyily inspired by and loosely named after the yeoman web scaffolding tool. The goal of this project is to provide a command line tool for developers looking to perform worry free boiler-plate operations to their Android projects.
+A command line tool for scaffolding Android Applications. Heavyily inspired by and loosely named after the yeoman web scaffolding tool. The goal of this project is to provide a command line tool for developers looking to perform worry free boiler-plate operations to their Android projects. Its meant to compliment existing tools namely the android command line tool [http://developer.android.com/tools/projects/projects-cmdline.html], and templates [http://developer.android.com/tools/projects/templates.html].
 
 The tool allows you to perform common tasks to your Android project
 + Search/Add/Remove permissions from your manifest
-+ Search/Add/Remove maven repository dependecies to your build
++ Search/Add/Upgrade/Remove maven repository dependecies to/from your build
 + Apply common Android templates to your project
 + Apply templates provided by jgilfelt with https://github.com/jgilfelt/android-adt-templates
 
 Usage
 -----
-To view the list of actions ehyo supports, run the list command
+To view the list of actions ehyo supports, run the `list` command in an existing Android gradle project
 `ehyo list`
 
 To add or remove a permission to a manifest, run the permissions command. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argument.
@@ -26,14 +26,14 @@ To search, add or remove dependencies from a build, run the dependencies command
 To apply a template to your project, run the templates command.
 `ehyo templates --list`
 `ehyo templates -l`
-`ehyo templates -a [templatename]`
+`ehyo templates -a [templatename] --dry-run`
 `ehyo templates --apply [templatename]`
 
 After downloading ehyo, a script to use ehyo is provided in ./bin/ehyo ... Add this to your path or give the full path to the script in bin and enjoy.
 
 Limitations
 -----------
-+ This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. It looks for settings.gradle files to determine the project structure.
++ This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. It looks for build.gradle and settings.gradle files to determine the project structure.
 ++ Overridden source set paths in builds are not supported
 
 + Templates will always add dependencies to the 'compile' configuration
@@ -42,7 +42,7 @@ Limitations
 
 + There's no rollback during failures. If part of a template is applied, and an exception occurs, then there's no way to undo what failed. As a suggestion, run ehyo within a version controlled project with a fresh checkout. That will allow you to rollback your changes when ehyo craps out on you.
 
-+ Developed on and only tested on OSX. There isn't any OS specific stuff in the code, per-se, but consider this warning if things don't work ask you expect.
++ Developed on and only tested on OSX with Java 1.6. There isn't any OS specific stuff in the code, per-se, but consider this warning if things don't work ask you expect.
 
 Building the jar
 ----------------
@@ -114,7 +114,8 @@ TODO
 + Provide a way to create a new Android application
 ++ Create a project with basic pieces
 +++ Dependency Injection
-+++ Unit testing Framework
++++ Testing Framework
++++ Commonly used libraries
 
 + Create a template that add the 'big cookie model to your project'
 
@@ -127,9 +128,14 @@ TODO
 + Provide a way to save templates (as a gist?)
 
 + Provide support for android projects not created with gradle
+++ Eclipse? Maven?
+
++ Support merging Java files
 
 + Improve Command line
 ++ Need to be able to multi-select
 ++ Inquire.js for java?
 
 + Provide ehyo through Brew
+
++ Tab completion
