@@ -23,6 +23,8 @@ public class RunAction implements Action {
 	private final ManifestChangeManagerFactory manifestChangeFactory;
 	private final GradleBuildChangeManagerFactory buildChangeFactory;
 	private final FileChangeManagerFactory fileChangeFactory;
+	private final ResourceChangeManagerFactory resourceChangeFactory;
+	private final BinaryFileChangeManagerFactory binaryChangeFactory;
 	private final ServiceFactory serviceFactory;
 	private final ObjectFactory objectFactory;
 	private final boolean dryrun;
@@ -37,9 +39,6 @@ public class RunAction implements Action {
 		this(args, 
 			 new PluginLoader(pluginNamespaces),
 			 registry,
-			 new ManifestChangeManagerFactory(),
-			 new GradleBuildChangeManagerFactory(),
-			 new FileChangeManagerFactory(),
 			 new ServiceFactory(),
 			 new ObjectFactory(),
 			 help,
@@ -50,9 +49,6 @@ public class RunAction implements Action {
 	RunAction(List<String> args, 
 			  PluginLoader loader,
 			  ProjectRegistry registry, 
-			  ManifestChangeManagerFactory manifestChangeFactory,
-			  GradleBuildChangeManagerFactory buildChangeFactory,
-			  FileChangeManagerFactory fileChangeFactory,
 			  ServiceFactory serviceFactory,
 			  ObjectFactory actionFactory,
 			  boolean help,
@@ -63,12 +59,15 @@ public class RunAction implements Action {
 		this.dryrun = dryrun;
 		this.help = help;
 		this.pluginLoader = loader;
-		this.manifestChangeFactory = manifestChangeFactory; 
-		this.buildChangeFactory = buildChangeFactory;
-		this.fileChangeFactory = fileChangeFactory;
 		this.serviceFactory = serviceFactory;
 		this.objectFactory = actionFactory;
 		this.out = out;
+		
+		this.manifestChangeFactory = objectFactory.create(ManifestChangeManagerFactory.class); 
+		this.buildChangeFactory = objectFactory.create(GradleBuildChangeManagerFactory.class);
+		this.fileChangeFactory = objectFactory.create(FileChangeManagerFactory .class);
+		this.binaryChangeFactory = objectFactory.create(BinaryFileChangeManagerFactory.class);
+		this.resourceChangeFactory = objectFactory.create(ResourceChangeManagerFactory.class);
 	}
 
 	@Override
@@ -104,15 +103,14 @@ public class RunAction implements Action {
 			changes.commit(dryrun);
 		}
 		
-		// TODO: Move factories into constructor
 		if ( actions.hasResourceChanges() ) {
-			ResourceChangeManager changes = new ResourceChangeManagerFactory().create();
+			ResourceChangeManager changes = resourceChangeFactory.create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}
 		
 		if ( actions.hasBinaryFileChanges() ) {
-			BinaryFileChangeManager changes = new BinaryFileChangeManagerFactory().create();
+			BinaryFileChangeManager changes = binaryChangeFactory.create();
 			changes.apply(actions);
 			changes.commit(dryrun);
 		}

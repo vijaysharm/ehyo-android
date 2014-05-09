@@ -62,9 +62,6 @@ TODO
 + There's a bug displaying the diff: 
 ++ the line below the added line is incorrect, it shows the line after that.
 
-+ Displays the following when commands are run
-++ Manifest for source set: [app:SourceSetType [type=debug]] is null!!!!
-
 + Ugly exception when no internet connection with dependency command
 
 + PatchApplier modifies the formatting of XML (doesn't respect the desired Android formatting)
@@ -89,9 +86,6 @@ TODO
 
 + Make all core models package protected
 ++ Document public API
-
-+ Need to create/modify build.gradle if user wants to add a dependency to a build config that isn't explicitly defined.
-++ check GradleBuildDocument and ProjectRegistryBuilder
 
 + All commands
 ++ Support --project id or --manifest id or --sourceset id where the ID is something you can use to distinctly select the right item to apply a command to (avoiding prompts)

@@ -28,8 +28,10 @@ public class RunActionTest {
 	private ManifestChangeManagerFactory manifestChangeFactory;
 	private GradleBuildChangeManagerFactory buildChangeFactory;
 	private FileChangeManagerFactory fileChangeManagerFactory;
+	private BinaryFileChangeManager binaryChangeManagerFactory;
+	private ResourceChangeManager resourceChangeManager;
 	private ServiceFactory serviceFactory;
-	private ObjectFactory pbjectFactory;
+	private ObjectFactory objectFactory;
 	private TextOutput out;
 	
 	@Before
@@ -39,9 +41,17 @@ public class RunActionTest {
 		manifestChangeFactory = mock(ManifestChangeManagerFactory.class);
 		buildChangeFactory = mock(GradleBuildChangeManagerFactory.class);
 		fileChangeManagerFactory = mock(FileChangeManagerFactory.class);
+		binaryChangeManagerFactory = mock(BinaryFileChangeManager.class);
+		resourceChangeManager = mock(ResourceChangeManager.class);
 		serviceFactory = mock(ServiceFactory.class);
-		pbjectFactory = mock(ObjectFactory.class);
+		objectFactory = mock(ObjectFactory.class);
 		out = mock(TextOutput.class);
+		
+		when(objectFactory.create(ManifestChangeManagerFactory.class)).thenReturn(manifestChangeFactory);
+		when(objectFactory.create(GradleBuildChangeManagerFactory.class)).thenReturn(buildChangeFactory);
+		when(objectFactory.create(FileChangeManagerFactory.class)).thenReturn(fileChangeManagerFactory);
+		when(objectFactory.create(BinaryFileChangeManager.class)).thenReturn(binaryChangeManagerFactory);
+		when(objectFactory.create(ResourceChangeManager.class)).thenReturn(resourceChangeManager);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -77,12 +87,12 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
+		when(objectFactory.create(PluginActions.class)).thenReturn(actions);
 		
 		RunAction action = create(args);
 		action.run();
 		
-		verify(pbjectFactory, times(1)).create(PluginActions.class);
+		verify(objectFactory, times(1)).create(PluginActions.class);
 	}
 	
 	@Test
@@ -94,7 +104,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
+		when(objectFactory.create(PluginActions.class)).thenReturn(actions);
 		
 		RunAction action = create(args);
 		action.run();
@@ -113,7 +123,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
+		when(objectFactory.create(PluginActions.class)).thenReturn(actions);
 		when(serviceFactory.create(pluginLoader, registry, actions)).thenReturn(service);
 		
 		RunAction action = create(args);
@@ -145,7 +155,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
+		when(objectFactory.create(PluginActions.class)).thenReturn(actions);
 		when(actions.hasManifestChanges()).thenReturn(true);
 		when(manifestChangeFactory.create()).thenReturn(changes);
 		
@@ -166,7 +176,7 @@ public class RunActionTest {
 		
 		when(pluginLoader.findPlugin(pluginName)).thenReturn(Optional.of(plugin));
 		when(plugin.name()).thenReturn(pluginName);
-		when(pbjectFactory.create(PluginActions.class)).thenReturn(actions);
+		when(objectFactory.create(PluginActions.class)).thenReturn(actions);
 		when(actions.hasBuildChanges()).thenReturn(true);
 		when(buildChangeFactory.create()).thenReturn(changes);
 		
@@ -185,11 +195,8 @@ public class RunActionTest {
 		return new RunAction(args, 
 							 pluginLoader, 
 							 registry, 
-							 manifestChangeFactory,
-							 buildChangeFactory,
-							 fileChangeManagerFactory,
 							 serviceFactory,
-							 pbjectFactory,
+							 objectFactory,
 							 help, 
 							 dryrun,
 							 out);

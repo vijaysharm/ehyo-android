@@ -79,19 +79,18 @@ public class Artifact {
 		return true;
 	}
 
-	// TODO: Needs to support dependency types of
-	// "project(':libraries:lib1')" or "files('libs/foo.jar')"
 	public static Artifact read(String library) {
 		if (Strings.isNullOrEmpty(library))
 			throw new IllegalArgumentException("Cannot parse empty library");
 
+		// Meant to filter out dependency types of
+		// "project(':libraries:lib1')" or "files('libs/foo.jar')"
 		if (library.contains("(") && library.contains(")"))
 			return null;
 
 		String[] split = library.split(":");
 		if (split.length != 3)
-			return null;
-//			throw new IllegalArgumentException("Failed to parse library '" + library + "'");
+			throw new IllegalArgumentException("Failed to parse library '" + library + "'");
 		
 		Artifact artifact = new Artifact();
 		artifact.g = split[0];

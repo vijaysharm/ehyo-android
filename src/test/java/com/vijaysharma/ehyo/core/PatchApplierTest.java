@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +92,7 @@ public class PatchApplierTest {
 		when(factory.apply(document)).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
-		when(document.toString()).thenReturn("test");
+		when(document.getFile()).thenReturn(new File("test"));
 		
 		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
 		files.put(document, modifiedObject);
@@ -115,7 +116,7 @@ public class PatchApplierTest {
 		when(factory.apply(document)).thenReturn(originalObject);
 		when(originalObject.toListOfStrings()).thenReturn(original);
 		when(modifiedObject.toListOfStrings()).thenReturn(modified);
-		when(document.toString()).thenReturn("test");
+		when(document.getFile()).thenReturn(new File("test"));
 		
 		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
 		files.put(document, modifiedObject);

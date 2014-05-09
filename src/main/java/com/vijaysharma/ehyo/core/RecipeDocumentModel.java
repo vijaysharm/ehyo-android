@@ -89,8 +89,6 @@ class RecipeDocumentModel {
 		}
 	}
 
-	// TODO: Optimize for resource files. We can maybe just call onResourceMerge
-	// which will merge with an empty resource file.
 	private void doCopyCallback(RecipeDocumentCallback callback, File to, File from) {
 		if (isResource(from.getPath())) {
 			callback.onCopyResource(converter.asDocument(from), to);
