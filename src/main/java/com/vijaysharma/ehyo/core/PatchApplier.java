@@ -99,9 +99,10 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		if (position > 0)
 			out.append((position-1) + "  "  + baseline.get((position-1)) + "\n");
 		
-		List<Object> revised = (List<Object>) delta.getOriginal().getLines();
-		for ( Object obj : revised )
-			out.append((position++) + " -"  + obj + "\n");
+		List<?> lines = delta.getOriginal().getLines();
+		for ( int index = 0; index < lines.size(); index++ ) {
+			out.append((position++) + " -"  + lines.get(index) + "\n");
+		}
 		
 		if ( position < baseline.size() )
 			out.append((position) + "  "  + baseline.get((position)) + "\n");		
@@ -113,12 +114,13 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		if (position > 0)
 			out.append( (position-1) + "  "  + baseline.get((position-1)) + "\n");
 		
-		List<Object> revised = (List<Object>) delta.getRevised().getLines();
-		for ( Object obj : revised )
-			out.append((position++) + " +"  + obj + "\n");
+		List<?> lines = delta.getRevised().getLines();
+		for ( int index = 0; index < lines.size(); index++ ) {
+			out.append((position++) + " +"  + lines.get(index) + "\n");
+		}
 		
 		if ( position < baseline.size() )
-			out.append((position) + "  "  + baseline.get((position)) + "\n");
+			out.append((position) + "  "  + baseline.get((delta.getOriginal().getPosition())) + "\n");
 	}
 
 	private static void printChange(Delta delta, List<String> baseline, StringBuilder out) {
@@ -127,14 +129,16 @@ public class PatchApplier<T extends HasDocument, K extends AsListOfStrings> {
 		if (position > 0)
 			out.append( (position-1) + "  "  + baseline.get((position-1)) + "\n");
 
-		List<Object> original = (List<Object>) delta.getOriginal().getLines();
-		for ( Object obj : original )
-			out.append((position++) + " -"  + obj + "\n");
+		List<?> lines = delta.getOriginal().getLines();
+		for ( int index = 0; index < lines.size(); index++ ) {
+			out.append((position++) + " -"  + lines.get(index) + "\n");
+		}
 		
 		position = delta.getRevised().getPosition();
-		List<Object> revised = (List<Object>) delta.getRevised().getLines();
-		for ( Object obj : revised )
-			out.append((position++) + " +"  + obj + "\n");
+		lines = delta.getRevised().getLines();
+		for ( int index = 0; index < lines.size(); index++ ) {
+			out.append((position++) + " +"  + lines.get(index) + "\n");
+		}
 		
 		if ( position < baseline.size() )
 			out.append((position) + "  "  + baseline.get((position)) + "\n");		

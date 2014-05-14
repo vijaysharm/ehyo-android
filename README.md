@@ -13,20 +13,28 @@ Usage
 To view the list of actions ehyo supports, run the `list` command in an existing Android gradle project
 `ehyo list`
 
-To add or remove a permission to a manifest, run the permissions command. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory <dir> argument.
+To add or remove a permission to a manifest, run the permissions command. By default, ehyo assumes you're performing modifications to a project in the current directory. To tell ehyo which project to apply to, include the --directory [dir] argument.
 
 `ehyo permissions --add internet`
+
 `ehyo --directory <dir> permissions --remove internet`
 
 To search, add or remove dependencies from a build, run the dependencies command. If you'd like to see how this will affect your project file, ehyo can be run with a --dry-run option 
+
 `ehyo dependencies -s butterknife --add`
+
 `ehyo dependencies -g com.jakewharton`
+
 `ehyo dependencies --remove retrofit --dry-run`
 
 To apply a template to your project, run the templates command.
+
 `ehyo templates --list`
+
 `ehyo templates -l`
+
 `ehyo templates -a [templatename] --dry-run`
+
 `ehyo templates --apply [templatename]`
 
 After downloading ehyo, a script to use ehyo is provided in ./bin/ehyo ... Add this to your path or give the full path to the script in bin and enjoy.
@@ -59,13 +67,11 @@ TODO
 + FIX: ApplicationRunActionFactoryTest, AndroidManifestDocumentTest
 
 + GradleBuildDocumentModel doesn't support the following kind of dependency
-++ This was seen in the Muzei Gradle build
-++ compile ('de.greenrobot:eventbus:2.2.0') { exclude group:'com.google.android', module: 'support-v4' // already included below }
-+++ Current model will think its a context
-++ Fails for certain types (e.g. tasks)
-
-+ There's a bug displaying the diff: 
-++ the line below the added line is incorrect, it shows the line after that.
+  + This was seen in the Muzei Gradle build
+  + `compile ('de.greenrobot:eventbus:2.2.0') { exclude group:'com.google.android', module: 'support-v4' // already included below }`
+    + Current model will think its a context
+  + Same with `compile 'dependency-1', 'dependency2', etc...`
+  + Fails for certain types (e.g. tasks)
 
 + Ugly exception when no internet connection with dependency command
 
@@ -73,38 +79,38 @@ TODO
 
 ##Tasks
 + Show better version information
-++ Better option description for usage
+  + Better option description for usage
 
 + Improve dry-run diff
-++ Remove line numbers
-++ Should print the number of documents modified (look a the way git does commits)
+  + Remove line numbers
+  + Should print the number of documents modified (look a the way git does commits)
 
 + Check if the project structure is valid
-++ You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
+  + You don't want to throw an exception when they run ./bin/ehyo ... you want them to see the usage. 
 
 + Add support for a --debug for verbose printing
 
 + Should all actions have names so that output is more legible?
-++ Might be useful with --debug (Track when an action is added, whether its executed or not, etc...)
+  + Might be useful with --debug (Track when an action is added, whether its executed or not, etc...)
 
 + Make all core models package protected
-++ Document public API
+  + Document public API
 
 + All commands
-++ Support --project or --variant or --sourceset or --buildtype so you can distinctly select the right item to apply a command to (avoiding prompts)
+  + Support --project or --variant or --sourceset or --buildtype so you can distinctly select the right item to apply a command to (avoiding prompts)
 
 + Finish template command
-++ Add support for an "interactive" mode. Allows for users to step and select what is applied.
-+++ Need to support a non-existent manifest (as an empty file)
-++ Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
-++ Support loading templates from disk or remote (and not just ones from the packaged JAR)
-++ Support --<parameter> where the argument is the same as the parameter id in the template
-++ Read the min- supported properties on the template object and filter out non-applicable ones during execution
+  + Add support for an "interactive" mode. Allows for users to step and select what is applied.
+    + Need to support a non-existent manifest (as an empty file)
+  + Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
+  + Support loading templates from disk or remote (and not just ones from the packaged JAR)
+  + Support --<parameter> where the argument is the same as the parameter id in the template
+  + Read the min- supported properties on the template object and filter out non-applicable ones during execution
 + Will not upgrade your dependency, will simply add a second instance of it
 
 + Write integration tests 
-++ for templates
-++ for entire application
+  + for templates
+  + for entire application
 
 + Doesn't cope well with dependencies defined as "project(':libraries:lib1')" or "files('libs/foo.jar')"
 
@@ -112,32 +118,32 @@ TODO
 
 ##Roadmap
 + Provide a way to create a new Android application
-++ Create a project with basic pieces
-+++ Dependency Injection
-+++ Testing Framework
-+++ Commonly used libraries
+  + Create a project with basic pieces
+  + Dependency Injection
+    + Testing Framework
+    + Commonly used libraries
 
 + Create a template that add the 'big cookie model to your project'
 
 + Provide a command that lets you rename your package namespace
 
 + Read templates from github
-++ From a gist?
+  + From a gist?
 
 + Provide a way to easily create templates from a diff
 
 + Provide a way to save templates 
-++ As a gist?
+   + As a gist?
 
 + Provide support for android projects not created with gradle
-++ Eclipse? Maven?
+   + Eclipse? Maven?
 
 + Support merging Java files
-++ Improve merging as a whole
+   + Improve merging as a whole
 
 + Improve Command line
-++ Need to be able to multi-select
-++ Inquire.js for java?
+  + Need to be able to multi-select
+  + Inquire.js for java?
 
 + Provide ehyo through Brew
 

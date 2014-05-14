@@ -18,6 +18,7 @@ import org.jdom2.output.XMLOutputter;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Activity;
 import com.vijaysharma.ehyo.core.models.ManifestTags.Application;
 import com.vijaysharma.ehyo.core.models.ManifestTags.MetaData;
@@ -179,10 +180,16 @@ public class AndroidManifestDocument implements AsListOfStrings {
 
 	public void removePermission(Set<String> permission) {
 		Element root = document.getRootElement();
+		
+		Set<Element> toRemove = Sets.newHashSet();
 		for (Element target : root.getChildren("uses-permission")) {
 			if ( permission.contains(target.getAttributeValue("name", ANDROID_NAMESPACE)) ) {
-				root.removeContent(target);
+				toRemove.add(target);
 			}
-		}	
+		}
+		
+		for (Element target : toRemove) {
+			root.removeContent(target);
+		}
 	}
 }

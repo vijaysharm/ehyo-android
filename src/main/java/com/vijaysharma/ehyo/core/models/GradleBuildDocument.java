@@ -157,6 +157,7 @@ public class GradleBuildDocument implements AsListOfStrings {
 		if (clean.startsWith(id + " ")) {
 			String library = clean.substring(clean.indexOf(" ") + 1, clean.length()).trim();
 			library = library.replace("'", "");
+			library = library.replace("\"", "");
 			
 			dependencies.build().get(type).add(new Dependency(type, library));
 		}
@@ -175,17 +176,18 @@ public class GradleBuildDocument implements AsListOfStrings {
 
 	public void addDependencies(Set<Dependency> toBeAdded) {
 		for ( Dependency dependency : toBeAdded ) {
-			model.addTo("root.dependencies", formatDependency(dependency));
+			model.addTo("root.dependencies", formatDependency(dependency, "'"));
 		}
 	}
 
 	public void removeDependencies(Set<Dependency> toBeRemoved) {
 		for ( Dependency dependency : toBeRemoved ) {
-			model.removeFrom("root.dependencies", formatDependency(dependency));
+			model.removeFrom("root.dependencies", formatDependency(dependency, "'"));
+			model.removeFrom("root.dependencies", formatDependency(dependency, "\""));
 		}
 	}
 	
-	private String formatDependency(Dependency dependency) {
-		return "    " + dependency.getType().getType() + " '" + dependency.getLibrary() + "'";
+	private String formatDependency(Dependency dependency, String separator) {
+		return "    " + dependency.getType().getType() + " " + separator + dependency.getLibrary() + separator;
 	}
 }

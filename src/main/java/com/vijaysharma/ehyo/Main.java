@@ -38,8 +38,8 @@ public class Main implements Runnable {
 		};
 		
 		String[] plugin = {
-//			"permissions",
-//			"--add", "access", "internet"
+			"permissions",
+			"--add", "access", //"internet"
 //			"--remove", "write"
 				
 //			"dependencies",
@@ -49,8 +49,8 @@ public class Main implements Runnable {
 //			"--remove", "butterknife"
 //			"--upgrade", "butterknife"
 				
-			"templates",
-			"-a", "Login", //"Service"
+//			"templates",
+//			"-a", "Login", //"Service"
 //			"-i", "Service"
 		};
 		

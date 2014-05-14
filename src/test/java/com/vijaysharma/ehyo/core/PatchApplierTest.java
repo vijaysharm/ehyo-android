@@ -127,5 +127,281 @@ public class PatchApplierTest {
 		
 		verify(out, times(1)).print("Writing test... ");
 		verify(out, times(1)).println("done");
+	}
+	
+	@Test
+	public void test_single_insertion_output() {
+		List<String> baseline = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"				
+		);
+		
+		List<String> changed = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"
+		);
+		
+		HasDocument document = mock(HasDocument.class);
+		AsListOfStrings originalObject = mock(AsListOfStrings.class);
+		AsListOfStrings modifiedObject = mock(AsListOfStrings.class);
+		
+		when(factory.apply(document)).thenReturn(originalObject);
+		when(originalObject.toListOfStrings()).thenReturn(baseline);
+		when(modifiedObject.toListOfStrings()).thenReturn(changed);
+		when(document.getFile()).thenReturn(new File("test"));
+		
+		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
+		files.put(document, modifiedObject);
+		
+		patcher.apply(files, true);
+		verify(factory, times(1)).apply(document);
+		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
+		verify(out, times(1)).print(
+			"Diff test\n" +
+			"1  <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">\n" + 
+			"2 +<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" + 
+			"3  <application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n\n"
+		);
+	}
+	
+	@Test
+	public void test_multiple_insertion_output() {
+		List<String> baseline = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"				
+		);
+		
+		List<String> changed = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+				"<uses-permission android:name=\"android.permission.ACCESS_BRIDGE\" />",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"
+		);
+		
+		HasDocument document = mock(HasDocument.class);
+		AsListOfStrings originalObject = mock(AsListOfStrings.class);
+		AsListOfStrings modifiedObject = mock(AsListOfStrings.class);
+		
+		when(factory.apply(document)).thenReturn(originalObject);
+		when(originalObject.toListOfStrings()).thenReturn(baseline);
+		when(modifiedObject.toListOfStrings()).thenReturn(changed);
+		when(document.getFile()).thenReturn(new File("test"));
+		
+		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
+		files.put(document, modifiedObject);
+		
+		patcher.apply(files, true);
+		verify(factory, times(1)).apply(document);
+		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
+		verify(out, times(1)).print(
+			"Diff test\n" +
+			"1  <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">\n" + 
+			"2 +<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" +
+			"3 +<uses-permission android:name=\"android.permission.ACCESS_BRIDGE\" />\n" +
+			"4  <application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n\n"
+		);
+	}
+	
+	@Test
+	public void test_deletion_output() {
+		List<String> baseline = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"
+		);
+		
+		List<String> changed = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"				
+		);
+		
+		HasDocument document = mock(HasDocument.class);
+		AsListOfStrings originalObject = mock(AsListOfStrings.class);
+		AsListOfStrings modifiedObject = mock(AsListOfStrings.class);
+		
+		when(factory.apply(document)).thenReturn(originalObject);
+		when(originalObject.toListOfStrings()).thenReturn(baseline);
+		when(modifiedObject.toListOfStrings()).thenReturn(changed);
+		when(document.getFile()).thenReturn(new File("test"));
+		
+		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
+		files.put(document, modifiedObject);
+		
+		patcher.apply(files, true);
+		verify(factory, times(1)).apply(document);
+		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
+		verify(out, times(1)).print(
+			"Diff test\n" +
+			"1  <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">\n" + 
+			"2 -<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" + 
+			"3  <application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n\n"
+		);
+	}
+	
+	@Test
+	public void test_multiple_deletion_output() {
+		List<String> baseline = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+				"<uses-permission android:name=\"android.permission.ACCESS_BRIDGE\" />",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"
+		);
+		
+		List<String> changed = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"				
+		);
+		
+		HasDocument document = mock(HasDocument.class);
+		AsListOfStrings originalObject = mock(AsListOfStrings.class);
+		AsListOfStrings modifiedObject = mock(AsListOfStrings.class);
+		
+		when(factory.apply(document)).thenReturn(originalObject);
+		when(originalObject.toListOfStrings()).thenReturn(baseline);
+		when(modifiedObject.toListOfStrings()).thenReturn(changed);
+		when(document.getFile()).thenReturn(new File("test"));
+		
+		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
+		files.put(document, modifiedObject);
+		
+		patcher.apply(files, true);
+		verify(factory, times(1)).apply(document);
+		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
+		verify(out, times(1)).print(
+			"Diff test\n" +
+			"1  <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">\n" + 
+			"2 -<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" + 
+			"3 -<uses-permission android:name=\"android.permission.ACCESS_BRIDGE\" />\n" +
+			"4  <application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n\n"
+		);
+	}
+	
+	@Test
+	public void test_line_change_output() {
+		List<String> baseline = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"
+		);
+		
+		List<String> changed = Lists.newArrayList(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+			"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">",
+				"<uses-permission android:name=\"android.permission.ACCESS_BRIDGE\" />",
+				"<application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">",
+					"<activity android:name=\"com.vijay.app.MainActivity\" android:label=\"@string/app_name\">",
+						"<intent-filter>",
+							"<action android:name=\"android.intent.action.MAIN\" />",
+							"<category android:name=\"android.intent.category.LAUNCHER\" />",
+						"</intent-filter>",
+					"</activity>",
+				"</application>", 
+			"</manifest>"				
+		);
+		
+		HasDocument document = mock(HasDocument.class);
+		AsListOfStrings originalObject = mock(AsListOfStrings.class);
+		AsListOfStrings modifiedObject = mock(AsListOfStrings.class);
+		
+		when(factory.apply(document)).thenReturn(originalObject);
+		when(originalObject.toListOfStrings()).thenReturn(baseline);
+		when(modifiedObject.toListOfStrings()).thenReturn(changed);
+		when(document.getFile()).thenReturn(new File("test"));
+		
+		Map<HasDocument, AsListOfStrings> files = Maps.newHashMap();
+		files.put(document, modifiedObject);
+		
+		patcher.apply(files, true);
+		verify(factory, times(1)).apply(document);
+		verify(writer, never()).write(any(HasDocument.class), Mockito.anyList());
+		verify(out, times(1)).print(
+			"Diff test\n" +
+			"1  <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"com.vijay.app\">\n" + 
+			"2 -<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" + 
+			"2 +<uses-permission android:name=\"android.permission.ACCESS_BRIDGE\" />\n" +
+			"3  <application android:allowBackup=\"true\" android:icon=\"@drawable/ic_launcher\" android:label=\"@string/app_name\" android:theme=\"@style/AppTheme\">\n\n"
+		);
 	}	
 }
