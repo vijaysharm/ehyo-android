@@ -106,11 +106,12 @@ public class DependenciesTest {
 		dependencies.execute(args, service);
 		
 		ArgumentCaptor<Object> output = ArgumentCaptor.forClass(Object.class);
-		verify(out, times(2)).println(output.capture());
+		verify(out, times(1)).println(output.capture());
 		
-		List<Object> values = output.getAllValues();
-		assertEquals("Found the following artifacts:", values.get(0));
-		assertEquals("    com.android.tools.build:gradle:0.7.+", values.get(1));
+		Object value = output.getValue();
+		assertEquals("Found the following artifacts:\n" + 
+					 "    com.android.tools.build:gradle:0.7.+\n" +
+					 "Append --add to this command to add the dependency to your build.", value);
 	}
 	
 	@Test(expected=GentleMessageException.class)

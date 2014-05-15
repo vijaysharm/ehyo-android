@@ -2,7 +2,6 @@ package com.vijaysharma.ehyo.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import org.jdom2.input.SAXBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.vijaysharma.ehyo.api.ProjectSourceSet;
-import com.vijaysharma.ehyo.api.Template;
 import com.vijaysharma.ehyo.api.TemplateFileParameter;
 import com.vijaysharma.ehyo.api.TemplateInfo;
 import com.vijaysharma.ehyo.core.RecipeDocumentModel.RecipeDocumentCallback;
@@ -29,22 +27,18 @@ import com.vijaysharma.ehyo.core.TemplateMethods.SlashedPackageName;
 import com.vijaysharma.ehyo.core.utils.UncheckedIoException;
 
 import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.TemplateExceptionHandler;
 
-class DefaultTemplate implements Template {
-	private final String path;
+class DefaultTemplate implements InternalTemplate {
 	private final Document templateDocument;
 	private final TemplateConverter converter;
 	private final File templateFileRoot;
+	private final TemplateConfigLoader configLoader;
 	
 	// TODO: This should probably be moved to a factory
-	public DefaultTemplate(String path) {
-		this.path = path;
-		URL templateRoot = DefaultTemplate.class.getResource(path);
-		templateFileRoot = new File(templateRoot.getFile());
-		File templateStartingPoint = new File(templateFileRoot, "template.xml");
-		this.templateDocument = load(templateStartingPoint);
+	public DefaultTemplate(TemplateConfigLoader configLoader, File templateRoot) {
+		this.configLoader = configLoader;
+		this.templateFileRoot = templateRoot; 
+		this.templateDocument = load(new File(templateFileRoot, "template.xml"));
 		this.converter = new TemplateConverter();
 	}
 	
@@ -60,6 +54,7 @@ class DefaultTemplate implements Template {
 		return getParameters(templateDocument, ss);
 	}
 
+	@Override
 	public void apply(Map<String, Object> properties, RecipeDocumentCallback callback) {
 		final ImmutableMap.Builder<String, Object> mapping = ImmutableMap.builder();
 		
@@ -73,7 +68,7 @@ class DefaultTemplate implements Template {
 		mapping.put("activityToLayout", new ActivityToLayout());
 		
 		DocumentHelper model = new DocumentHelper(templateDocument);
-		final Configuration config = config( DefaultTemplate.class, path );
+		final Configuration config = configLoader.create();
 		freemarker.template.Template globalTemplate = converter.get(config, model.getAttribute("globals", "file"));
 		Document globalDocument = converter.asDocument(globalTemplate, mapping.build());
 		
@@ -150,15 +145,15 @@ class DefaultTemplate implements Template {
 		}
 	}
 
-	private static Configuration config( Class<?> clazz, String name ) {
-		Configuration cfg = new Configuration();
-		cfg.setClassForTemplateLoading(clazz, name);
-		cfg.setObjectWrapper(new DefaultObjectWrapper());
-		cfg.setDefaultEncoding("UTF-8");
-		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.DEBUG_HANDLER);
-		
-		return cfg;
-	}
+//	private static Configuration config( Class<?> clazz, String name ) {
+//		Configuration cfg = new Configuration();
+//		cfg.setClassForTemplateLoading(clazz, name);
+//		cfg.setObjectWrapper(new DefaultObjectWrapper());
+//		cfg.setDefaultEncoding("UTF-8");
+//		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.DEBUG_HANDLER);
+//		
+//		return cfg;
+//	}
 	
 	private static class DefaultTemplateInfo implements TemplateInfo {
 		private final Element root;

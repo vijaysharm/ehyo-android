@@ -7,7 +7,7 @@
             <#else>
             android:label="@string/title_${activityToLayout(activityClass)}"
             </#if>
-            android:theme="@android:style/Theme.Holo.NoActionBar"
+            android:theme="@android:style/Theme.Holo.NoActionBar">
             <#if isLauncher>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

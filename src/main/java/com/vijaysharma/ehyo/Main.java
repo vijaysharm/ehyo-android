@@ -38,8 +38,8 @@ public class Main implements Runnable {
 		};
 		
 		String[] plugin = {
-			"permissions",
-			"--add", "access", //"internet"
+//			"permissions",
+//			"--add", "access", //"internet"
 //			"--remove", "write"
 				
 //			"dependencies",
@@ -49,9 +49,11 @@ public class Main implements Runnable {
 //			"--remove", "butterknife"
 //			"--upgrade", "butterknife"
 				
-//			"templates",
-//			"-a", "Login", //"Service"
-//			"-i", "Service"
+			"templates",
+			"--location", "/Users/vsharma/programming/android/android-adt-templates/activities/TVLeftNavBarActivity",
+//			"--location", "/Users/vsharma/android-sdks/tools/templates/other/Service/",
+//			"--location", "/Users/vsharma/android-sdks/tools/templates/projects/NewAndroidApplication",
+			"--apply"
 		};
 		
 		String[] arguments = concat(main, plugin);

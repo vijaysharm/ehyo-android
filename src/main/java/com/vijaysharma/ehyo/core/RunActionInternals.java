@@ -1,5 +1,7 @@
 package com.vijaysharma.ehyo.core;
 
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +20,8 @@ import com.vijaysharma.ehyo.api.Template;
 import com.vijaysharma.ehyo.api.TemplateFactory;
 import com.vijaysharma.ehyo.api.TemplateProperty;
 import com.vijaysharma.ehyo.api.utils.OptionSelector;
+import com.vijaysharma.ehyo.core.TemplateConfigLoader.ClasspathConfigLoader;
+import com.vijaysharma.ehyo.core.TemplateConfigLoader.DiskConfigLoader;
 import com.vijaysharma.ehyo.core.models.AndroidManifest;
 import com.vijaysharma.ehyo.core.models.DependencyType;
 import com.vijaysharma.ehyo.core.models.GradleBuild;
@@ -207,7 +211,7 @@ class RunActionInternals {
 		
 		@Override
 		public void applyTemplate(Template template, List<TemplateProperty> parameters) {
-			DefaultTemplate tmpl = (DefaultTemplate) template;
+			InternalTemplate tmpl = (InternalTemplate) template;
 			actions.applyTemplate(tmpl, sourceSet, parameters, registry);
 		}
 		
@@ -224,7 +228,15 @@ class RunActionInternals {
 	static class DefaultTemplateFactory implements TemplateFactory {
 		@Override
 		public Template create(String path) {
-			return new DefaultTemplate(path);
+			URL templateRoot = DefaultTemplate.class.getResource(path); 
+			ClasspathConfigLoader loader = new ClasspathConfigLoader(DefaultTemplate.class, path);
+			return new DefaultTemplate(loader, new File(templateRoot.getFile()));
+		}
+		
+		@Override
+		public Template createDiskTemplate(String templateLocation) {
+			DiskConfigLoader loader = new DiskConfigLoader(templateLocation);
+			return new DefaultTemplate(loader, new File(templateLocation));
 		}
 	}
 	

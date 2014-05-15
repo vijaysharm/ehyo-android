@@ -223,10 +223,14 @@ public class Dependencies implements Plugin {
 	}
 
 	private void listArtifacts(List<Artifact> artifacts, Service service) {
-		out.println("Found the following artifacts:");
+		StringBuilder output = new StringBuilder();
+		output.append("Found the following artifacts:\n");
 		for ( Artifact artifact : artifacts ) {
-			out.println("    " + artifact);
+			output.append("    " + artifact + "\n");
 		}
+		
+		output.append("Append --add to this command to add the dependency to your build.");
+		out.println(output.toString());
 	}
 
 	private void addArtifacts(List<Artifact> artifacts, Service service) {

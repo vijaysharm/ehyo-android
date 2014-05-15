@@ -31,7 +31,6 @@ public class AndroidTemplates implements Plugin {
 		this(new TemplateRegistry(), Output.out);
 	}
 	
-	
 	AndroidTemplates(TemplateRegistry templateRegistry, TextOutput out) {
 		this.registry = templateRegistry;
 		this.out = out;
@@ -45,23 +44,41 @@ public class AndroidTemplates implements Plugin {
 	@Override
 	public String usage() {
 		StringBuilder usage = new StringBuilder();
-		usage.append("usage: ehyo template [-l | --list]\n");
-		usage.append("                     [-i | --info <template name>]\n");
-		usage.append("                     [-a | --apply <template name>]\n\n");
+//		usage.append("usage: ehyo templates [-l | --list]\n");
+//		usage.append("                      [-i | --info <template name>]\n");
+//		usage.append("                      [-a | --apply <template name>]\n\n");
+//		
+//		usage.append("Examples:\n");
+//		usage.append("    ehyo templates --list\n");
+//		usage.append("    ehyo templates -l\n");
+//		usage.append("    ehyo templates -a EmptyActivity\n");
+//		usage.append("    ehyo templates --info Service\n");
+//
+//		usage.append("Options:\n");
+//		usage.append("    -l, --list\n");
+//		usage.append("        List all supported templates.\n");
+//		usage.append("    -a, --apply <template name>\n");
+//		usage.append("        Apply the given template to the project.\n");
+//		usage.append("    -i, --info <template name>\n");
+//		usage.append("        Display information regarding the given template.\n");		
+		
+		
+		usage.append("usage: ehyo templates [-l | --location <template directory>]\n");
+		usage.append("                      [-a | --apply]\n\n");
 		
 		usage.append("Examples:\n");
-		usage.append("    ehyo dependencies --list\n");
-		usage.append("    ehyo dependencies -l\n");
-		usage.append("    ehyo dependencies -a EmptyActivity\n");
-		usage.append("    ehyo dependencies --info Service\n");
+		usage.append("    ehyo templates --location <directory>\n");
+		usage.append("    ehyo templates --location <directory> -a\n");
+		usage.append("    ehyo templates --location <directory> --apply\n");
 
 		usage.append("Options:\n");
-		usage.append("    -l, --list\n");
-		usage.append("        List all supported templates.\n");
-		usage.append("    -a, --apply <template name>\n");
-		usage.append("        Apply the given template to the project.\n");
-		usage.append("    -i, --info <template name>\n");
-		usage.append("        Display information regarding the givne tempmate.\n");		
+		usage.append("    -l, --location <template directory>\n");
+		usage.append("        Read the template from a given location.\n");
+		usage.append("        If none of the arguments below are given, this command will\n");
+		usage.append("        output information regarding the given template\n");
+		usage.append("    -a, --apply\n");
+		usage.append("        Modifier to the --location argument, it applies\n"); 
+		usage.append("        the given template to the project.\n");
 		
 		return usage.toString();
 	}
@@ -71,22 +88,36 @@ public class AndroidTemplates implements Plugin {
 		if ( args.isEmpty() )
 			throw new UsageException(usage());
 		
-		boolean containsList = args.contains("-l") || args.contains("--list");
-		boolean containsApply = args.contains("-a") || args.contains("--apply");
-		boolean containsInfo = args.contains("-i") || args.contains("--info");
-		
-		if ( ! containsList && ! containsApply && ! containsInfo)
+		boolean containsLocation = args.contains("-l") || args.contains("--location");
+
+		if ( ! containsLocation )
 			throw new UsageException(usage());
 		
-		if( containsList ) {
-			handleList();
-		} else if ( containsInfo ) {
-			handleInfo(args, service);
-		} else if ( containsApply ) {
-			handleApply(args, service);
+		if ( containsLocation ) {
+			handleInfoFromLocation(args, service);
 		}
 	}
+	
+	private void handleInfoFromLocation(List<String> args, Service service) {
+		String templateLocation = getArgValue("-l", args);
+		if ( Strings.isNullOrEmpty(templateLocation) ) {
+			templateLocation = getArgValue("--location", args);
+			
+			if ( Strings.isNullOrEmpty(templateLocation) ) {
+				throw new UsageException("'-l, --location' have a required argument\n" + usage());
+			}
+		}
+		boolean containsApply = args.contains("-a") || args.contains("--apply");
+		
+		Template template = service.loadTemplateFromDisk(templateLocation);
 
+		if ( containsApply ) {
+			doApply(template, service);
+		} else {
+			doShowInfo(template, service);
+		}
+	}
+	
 	private void handleInfo(List<String> args, Service service) {
 		String templateName = getArgValue("-i", args);
 		if ( Strings.isNullOrEmpty(templateName) ) {
@@ -107,6 +138,10 @@ public class AndroidTemplates implements Plugin {
 				.selectOne(items);
 		
 		Template template = service.loadTemplate(item.getFullPath());
+		doShowInfo(template, service);
+	}
+
+	private void doShowInfo(Template template, Service service) {
 		TemplateInfo info = template.loadTemplateInformation();
 		
 		StringBuilder builder = new StringBuilder();
@@ -136,12 +171,16 @@ public class AndroidTemplates implements Plugin {
 		
 		TemplateItem item = service.createSelector("Multiple templates with '" + templateName + "' were found.\nWhich one would you like to apply", TemplateItem.class)
 				.selectOne(items);
+		Template template = service.loadTemplate(item.getFullPath());
 		
+		doApply(template, service);
+	}
+
+	private void doApply(Template template, Service service) {
 		List<ProjectSourceSet> sourceSets = service.getSourceSets();
 		OptionSelector<ProjectSourceSet> configSelector = service.createSelector("Which source set would you like to apply this template to?", ProjectSourceSet.class);
 		ProjectSourceSet sourceSet = configSelector.selectOne(sourceSets);
 		
-		Template template = service.loadTemplate(item.getFullPath());
 		List<TemplateFileParameter> parameters = template.loadTemplateParameters(sourceSet);
 		
 		Questioner<DefaultQuestion, TemplateProperty> questioner = service.createPrompt(new AnswerFactory<DefaultQuestion, TemplateProperty>() {
@@ -236,15 +275,17 @@ public class AndroidTemplates implements Plugin {
 		
 		@Override
 		public String getName() {
-			String name = parameters.getHelp();
+			StringBuilder name = new StringBuilder();
 			
-			if (Strings.isNullOrEmpty(name))
-				name = parameters.getName();
-				
-			if (Strings.isNullOrEmpty(name))
-				return name = parameters.getId();
+			if (Strings.isNullOrEmpty(parameters.getName()))
+				name.append(parameters.getId());
+			else
+				name.append(parameters.getName());
 			
-			return name;
+			if (! Strings.isNullOrEmpty(parameters.getHelp()))
+					name.append("\n" + parameters.getHelp());
+					
+			return name.toString();
 		}
 	}	
 }

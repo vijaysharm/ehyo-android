@@ -235,7 +235,7 @@ public class PluginActions {
 
 	// TODO: Can't say I'm a fan of this API... 4 arguments??
 	// TODO: Need to read in the buildApi and the minApiLevel from the build
-	public void applyTemplate(DefaultTemplate template, SourceSet sourceSet, List<TemplateProperty> parameters, ProjectRegistry registry) {
+	public void applyTemplate(InternalTemplate template, SourceSet sourceSet, List<TemplateProperty> parameters, ProjectRegistry registry) {
 		Project project = registry.getProject(sourceSet.getProject());
 		final GradleBuild build = project.getBuild();
 		final AndroidManifest manifest = sourceSet.getManifest();

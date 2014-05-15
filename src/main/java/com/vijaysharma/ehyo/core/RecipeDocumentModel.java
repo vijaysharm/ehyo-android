@@ -109,7 +109,7 @@ class RecipeDocumentModel {
 			List<String> result = converter.asListOfStrings(template, properties);
 			callback.onCreateResource(result, to);
 		} else {
-			throw new UnsupportedOperationException("merging unknown type: " + fromPath);
+			throw new UnsupportedOperationException("instantiating unknown type: " + fromPath);	
 		}
 	}
 

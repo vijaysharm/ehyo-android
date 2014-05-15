@@ -29,13 +29,13 @@ To search, add or remove dependencies from a build, run the dependencies command
 
 To apply a template to your project, run the templates command.
 
-`ehyo templates --list`
+`ehyo templates --location [path to android templates]`
 
-`ehyo templates -l`
+`ehyo templates -l [path to android templates]`
 
-`ehyo templates -a [templatename] --dry-run`
+`ehyo templates -l [path to android templates] -a --dry-run`
 
-`ehyo templates --apply [templatename]`
+`ehyo templates -l [path to android templates] --apply [templatename]`
 
 After downloading ehyo, a script to use ehyo is provided in ./bin/ehyo ... Add this to your path or give the full path to the script in bin and enjoy.
 
@@ -44,10 +44,12 @@ Limitations
 TONS. But here are some high-level ones that I can think of.
 
 + This project was designed around the default Android gradle project structure, and therefore makes a lot of assumptions based on the way it structures its code. It looks for build.gradle and settings.gradle files to determine the project structure.
-++ Overridden source set paths in builds are not supported
+  + Overridden source set paths in builds are not supported
+
++ Android templates to create new projects do not work
 
 + Merging with templates
-++ Merging is done in a very naive way. With XML (or any file for that matter), we simply append elements into the expected parent. We do not look for any existing elements that might be similar and attempt to merge them. This can lead to duplicate entries in your resources.
+  + Merging is done in a very naive way. With XML (or any file for that matter), we simply append elements into the expected parent. We do not look for any existing elements that might be similar and attempt to merge them. This can lead to duplicate entries in your resources.
 
 + Ruins the formatting of the AndroidManifest.xml
 
@@ -103,18 +105,18 @@ TODO
   + Add support for an "interactive" mode. Allows for users to step and select what is applied.
     + Need to support a non-existent manifest (as an empty file)
   + Support adding build variables in the freemaker template (minApiLevel, build version, etc...)
-  + Support loading templates from disk or remote (and not just ones from the packaged JAR)
+  + Support loading templates from remote and from JAR
   + Support --<parameter> where the argument is the same as the parameter id in the template
   + Read the min- supported properties on the template object and filter out non-applicable ones during execution
-+ Will not upgrade your dependency, will simply add a second instance of it
+  + Should always prompt for package name
+  + Not merging providers in Manifest
+  + Will not upgrade your dependency, will simply add a second instance of it
 
 + Write integration tests 
   + for templates
   + for entire application
 
 + Doesn't cope well with dependencies defined as "project(':libraries:lib1')" or "files('libs/foo.jar')"
-
-+ Move all TODOs to Issues list.
 
 ##Roadmap
 + Provide a way to create a new Android application

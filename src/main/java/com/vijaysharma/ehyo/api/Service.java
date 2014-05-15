@@ -66,6 +66,10 @@ public class Service {
 		return configs.build();
 	}
 
+	public Template loadTemplateFromDisk(String templateLocation) {
+		return templateFactory.createDiskTemplate(templateLocation);
+	}
+	
 	public Template loadTemplate(String templatePath) {
 		return templateFactory.create(templatePath);
 	}
