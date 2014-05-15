@@ -4,7 +4,7 @@
   <groupId>com.vijaysharma.ehyo</groupId>
   <artifactId>ehyo</artifactId>
   <packaging>jar</packaging>
-  <version>0.1</version>
+  <version>1.0.0</version>
   <name>ehyo</name>
   <url>http://maven.apache.org</url>
   <dependencies>

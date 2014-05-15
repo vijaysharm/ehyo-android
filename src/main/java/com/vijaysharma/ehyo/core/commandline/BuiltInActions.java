@@ -32,7 +32,7 @@ class BuiltInActions implements CommandLineAction {
 			return new Action() {
 				@Override
 				public void run() {
-					out.println("VERSION INFORMATION");
+					out.println("ehyo version 1.0.0");
 				}
 			};
 		}

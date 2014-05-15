@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-scriptpath='../target/ehyo-0.1.jar'
+scriptpath='../target/ehyo-1.0.0.jar'
 java -jar `dirname $0`/"$scriptpath" $@
 
