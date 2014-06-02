@@ -8,6 +8,10 @@ The tool allows you to perform common tasks to your Android project
 + Apply common Android templates to your project
 + Apply templates provided by [jgilfelt][3]
 
+Motivation
+----------
+I wrote a blog post about the project which you can read about [here][5].
+
 Usage
 -----
 To view the list of actions ehyo supports, run the `list` command in an existing Android gradle project
@@ -185,3 +189,4 @@ License
  [2]: http://developer.android.com/tools/projects/templates.html
  [3]: https://github.com/jgilfelt/android-adt-templates
  [4]: http://yeoman.io/
+ [5]: http://vijaysharm.github.io/2014/05/15/why-i-wrote-ehyo.html
